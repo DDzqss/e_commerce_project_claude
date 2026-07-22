@@ -71,5 +71,5 @@ jobs:
           DATABASE_URL: postgresql+asyncpg://jdclone:jdclone_test_password@localhost:5432/jdclone_test
           REDIS_URL: redis://localhost:6379/0
           SECRET_KEY: ci_test_secret_key_min_32_characters_long
-          ENVIRONMENT: test
+          ENVIRONMENT: dev
         run: uv run pytest -v
