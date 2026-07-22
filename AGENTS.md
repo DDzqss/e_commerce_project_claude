@@ -19,6 +19,7 @@
 8. [代码提交与 PR 规范](#8-代码提交与-pr-规范)
 9. [业务深度思考纪律](#9-业务深度思考纪律)
 10. [文档与知识沉淀](#10-文档与知识沉淀)
+11. [填坑清单（历次 Phase 沉淀）](#11-填坑清单历次-phase-沉淀)★
 
 ---
 
@@ -671,6 +672,66 @@ git commit -m "feat(backend): ..."
 git push -u origin HEAD
 gh pr create --base develop
 ```
+
+---
+
+## 11. 填坑清单（历次 Phase 沉淀）
+
+本节记录在实战中踩过的坑与对应对策，避免后续 Phase 与新增 Agent 重复失误。**Agent 在启动前应先扫一遍相关分类。**
+
+### 11.1 跨平台 / 大小写敏感
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| macOS 大小写不敏感 vs Linux CI 敏感 | 本地 build 通过，CI import 报 "Cannot find module" | Agent 在提交前必须跑 `git ls-files <dir>` 核对文件是否真的入库；命名一律 kebab-case 或明确规则 |
+| `.gitignore` 使用过宽的通用词 | Python venv 的 `lib/` 规则误伤前端 `src/lib/`；本地 Mac 无感、Linux CI 报缺文件 | **各语言/框架规则放到对应 workspace 的 `.gitignore`**，根 `.gitignore` 只放跨端通用（OS/IDE/.env/logs/db 卷）|
+| 文件路径含大写字母被 rename 大小写 | git 不感知，需要 `git mv -f` 或双步 rename | Agent 一开始就选定命名，避免大小写变更 |
+
+### 11.2 Node / pnpm / Next.js
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| pnpm 11+ 需要 Node ≥ 22（用了 `node:sqlite`） | CI `ERR_UNKNOWN_BUILTIN_MODULE: node:sqlite` | `.nvmrc` 与 CI 都用 Node 22+；`package.json.engines.node` 声明 `>=22` |
+| `pnpm/action-setup` 的 `version:` 与 `packageManager` 冲突 | CI 报 "Multiple versions of pnpm specified" | 只在一处指定：优先用 `packageManager: pnpm@x.y.z`，action 不传 `version` |
+| pnpm workspace 隐性 hoisting 让本地"能跑"但 CI 挂 | `@eslint/eslintrc` 被 A workspace 用了但只在 B workspace 声明；本地 pnpm 从 A 找到，CI strict resolution 找不到 | **每个 workspace 必须显式声明它 import 的所有包**，即便看起来在别处已装 |
+| Next.js `experimental.typedRoutes` 与 `string` href 类型不兼容 | `Type 'string' is not assignable to type 'UrlObject \| RouteImpl<string>'` | 要么全端统一开启并把 href 类型改为 `Route`；要么 Phase 0/1 不开，留到统一改造 |
+| Tailwind CSS 4 抛弃 `tailwind.config.ts` | 用旧格式配置无效 | 全部主题变量放在 `globals.css` 的 `@import "tailwindcss"` + `@theme { ... }`，PostCSS 用 `@tailwindcss/postcss` |
+| `next lint` 在 Next 15 已 deprecated | 有 warning，Next 16 会删除 | Phase 2/3 迁移到 `eslint` CLI（`next-lint-to-eslint-cli` codemod） |
+
+### 11.3 Python / FastAPI / uv
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| pydantic-settings 的 `Literal` 字段严格 | CI 传了非枚举值（如 `ENVIRONMENT=test`）就报 validation error | Settings 枚举字段要在文档写清可选值；CI 配置里的值必须匹配 |
+| `MINIO_SECRET_KEY = "minioadmin"` 触发 ruff S105 | ruff 认为是硬编码密码 | 加 `# noqa: S105  dev-only default; production must override via env` 注释说明 |
+| ruff PT018 禁止一行内多断言 | `assert x in body and isinstance(...)` 被拆 | 每个断言独占一行 |
+
+### 11.4 CI/CD
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| 三端前端 CI matrix 只装依赖一次会互相污染 | — | 用 `pnpm --frozen-lockfile` 一次装完 workspace，然后 `pnpm --filter <ws>` 执行各步骤 |
+| `next build` 的类型检查比 `tsc --noEmit` 更严 | 本地 tsc 过，CI build 挂 | Agent 完成前必须本地跑 `pnpm --filter <ws> build`，不能只跑 tsc |
+
+### 11.5 Agent 行为规范增强（Prompt 模板必附）
+
+启动 subagent 时，除 §3.3 标准模板外，**必须额外强调**：
+
+```
+【交付前自检】
+1. 跑 `git ls-files <你的目录>` 核对所有交付文件都已被 git 追踪，尤其是 lib/、utils/ 等易被 .gitignore 误伤的目录
+2. 后端：跑 `uv run ruff check .` + `uv run pytest -v`；前端：跑 `pnpm --filter <ws> tsc --noEmit` + `pnpm --filter <ws> build`
+3. 显式列出你新增依赖的 npm/PyPI 包，Orchestrator 需据此更新 lockfile
+4. 命名一律 kebab-case（文件）、snake_case（Python）、camelCase（JS/TS 变量）、PascalCase（组件/类）
+```
+
+### 11.6 沉淀更新流程
+
+每个 Phase 完成后，Orchestrator 必须：
+1. 回顾本 Phase 遇到的所有 CI 挂/回滚/返工
+2. 提炼 1-3 条填坑规则加到本节
+3. 相应更新对应 workspace 的 `CLAUDE.md`（如有）
+4. 与 Phase merge commit 一起提交
 
 ---
 
