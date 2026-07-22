@@ -1,0 +1,22 @@
+{
+  "name": "e-commerce-project-claude",
+  "version": "0.0.0",
+  "private": true,
+  "description": "JD-Clone e-commerce platform monorepo (backend + 3 web frontends + Android)",
+  "packageManager": "pnpm@11.15.1",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev:user-web": "pnpm --filter frontend-user-web dev",
+    "dev:merchant": "pnpm --filter frontend-merchant dev",
+    "dev:admin": "pnpm --filter frontend-admin dev",
+    "build:all": "pnpm -r build",
+    "lint:all": "pnpm -r lint",
+    "test:all": "pnpm -r test"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

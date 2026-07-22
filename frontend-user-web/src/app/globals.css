@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind CSS v4 主题变量。
+ * 主色借鉴京东红 #E1251B，微调为 #D0211A 以避免完全一致。
+ * 页面整体保持灰白基调，主色仅用于强调（按钮、价格、CTA、Badge）。
+ */
+@theme {
+  --color-primary: #d0211a;
+  --color-primary-50: #fff1f0;
+  --color-primary-100: #ffdcd9;
+  --color-primary-200: #ffb4ae;
+  --color-primary-300: #ff8880;
+  --color-primary-400: #f15a51;
+  --color-primary-500: #d0211a;
+  --color-primary-600: #b31812;
+  --color-primary-700: #90130e;
+  --color-primary-800: #6c0f0a;
+  --color-primary-900: #470a07;
+
+  --color-accent: #f7c948;
+
+  --font-sans:
+    "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* 基础样式微调 */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局链接默认样式（在 Tailwind reset 之上略作调整） */
+a {
+  color: inherit;
+  text-decoration: none;
+}

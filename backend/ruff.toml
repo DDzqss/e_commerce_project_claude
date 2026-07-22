@@ -1,0 +1,56 @@
+# Ruff config for the JD-Clone backend.
+# https://docs.astral.sh/ruff/configuration/
+
+line-length = 100
+target-version = "py312"
+
+extend-exclude = [
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "alembic/versions",
+]
+
+[lint]
+# Enable a pragmatic-but-strict rule set.
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "SIM",  # flake8-simplify
+    "PL",   # pylint
+    "RUF",  # ruff-specific
+    "ASYNC",# flake8-async
+    "S",    # bandit (security)
+    "T20",  # flake8-print (no stray prints)
+    "TID",  # flake8-tidy-imports
+    "PT",   # pytest style
+]
+
+ignore = [
+    "E501",    # line-length handled by formatter
+    "PLR0913", # too-many-arguments (FastAPI deps make this noisy)
+    "PLR2004", # magic value comparisons
+    "S101",    # allow assert (used in tests)
+    "B008",    # allow FastAPI Depends() in defaults
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "S105", "S106"]
+"alembic/env.py" = ["E402"]
+
+[lint.isort]
+known-first-party = ["app"]
+combine-as-imports = true
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true

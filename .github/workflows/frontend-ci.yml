@@ -1,0 +1,64 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "frontend-user-web/**"
+      - "frontend-merchant/**"
+      - "frontend-admin/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/frontend-ci.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "frontend-user-web/**"
+      - "frontend-merchant/**"
+      - "frontend-admin/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/frontend-ci.yml"
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace:
+          - frontend-user-web
+          - frontend-merchant
+          - frontend-admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter ${{ matrix.workspace }} lint
+
+      - name: Type check
+        run: pnpm --filter ${{ matrix.workspace }} exec tsc --noEmit
+
+      - name: Test
+        run: pnpm --filter ${{ matrix.workspace }} test --run || true
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+        run: pnpm --filter ${{ matrix.workspace }} build

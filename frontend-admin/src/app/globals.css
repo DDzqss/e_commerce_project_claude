@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind CSS v4 主题变量 —— 平台管理员后台。
+ *
+ * 设计意图：
+ * - 管理端追求"严肃、克制、信息密度高"，故主色使用中性 slate/深灰
+ *   （--color-primary: #0f172a），刻意与用户端京东红、商家端运营色区分。
+ * - 强调色 --color-danger 仅用于破坏性操作（强制退款、封禁、下架）。
+ * - 表格 / 卡片沿用中性灰阶（--color-surface / --color-border）。
+ */
+@theme {
+  /* 主色：深灰蓝，用于主按钮、选中态、Sidebar 高亮 */
+  --color-primary: #0f172a;
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+
+  /* 破坏性 / 高风险操作 */
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+
+  /* 语义色 */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-info: #2563eb;
+
+  /* 表面 / 边框 */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-border: #e2e8f0;
+
+  --font-sans:
+    "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* 基础样式微调 */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  /* 管理端字号略小，追求信息密度 */
+  font-size: 14px;
+  color: #0f172a;
+  background-color: var(--color-surface-muted);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局链接默认样式 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 管理端惯用的紧凑滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}

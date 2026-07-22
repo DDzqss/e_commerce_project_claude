@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. The actual Compose UI colors are supplied
+         by `JDCloneTheme`; this XML style is only used as the launch theme
+         (splash / decor view) before Compose takes over. -->
+    <style name="Theme.JDClone" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor" tools:targetApi="l">@color/jd_red</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+</resources>
