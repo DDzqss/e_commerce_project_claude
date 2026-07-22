@@ -5,7 +5,7 @@
   "description": "JD-Clone e-commerce platform monorepo (backend + 3 web frontends + Android)",
   "packageManager": "pnpm@11.15.1",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
   },
   "scripts": {
