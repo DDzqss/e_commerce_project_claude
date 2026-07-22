@@ -44,3 +44,9 @@ export interface Timestamps {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * 领域强类型 & 错误码：重新导出，方便 `import { UserOut } from "@/types"`。
+ */
+export * from "./api";
+export * from "./errors";

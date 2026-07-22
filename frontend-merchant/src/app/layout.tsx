@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-client";
+import { ToastRegion } from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
   title: "商家后台 | JD-Clone",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="min-h-screen bg-neutral-50 text-neutral-900 antialiased">
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          {children}
+          <ToastRegion />
+        </QueryProvider>
       </body>
     </html>
   );

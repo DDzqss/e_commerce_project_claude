@@ -44,6 +44,10 @@ ignore = [
 [lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004", "S105", "S106"]
 "alembic/env.py" = ["E402"]
+# AppException is our project-wide business exception; keeping the
+# name to match the rest of the codebase / docs is more important than
+# ruff's default suffix rule.
+"app/core/errors.py" = ["N818"]
 
 [lint.isort]
 known-first-party = ["app"]

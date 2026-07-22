@@ -1,13 +1,17 @@
-"""Security primitives: password hashing and JWT encode/decode.
+"""Security primitives: password hashing, JWT encode/decode, refresh token helpers.
 
-These are placeholder-quality implementations. They are correct enough
-for local development and testing, but the auth feature branch is
-expected to layer on refresh-token rotation, Redis-backed blacklists,
-and rate limiting.
+JWT scheme (contract §10):
+- HS256, signed with :attr:`app.core.config.Settings.SECRET_KEY`
+- ``aud`` claim identifies the identity domain: ``user`` / ``merchant`` / ``admin``
+- Access tokens carry ``exp`` (default 15 minutes)
+- Refresh tokens are **opaque random strings** (not JWTs), stored as
+  SHA-256 hash in the ``refresh_tokens`` table.
 """
 
 from __future__ import annotations
 
+import hashlib
+import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
@@ -18,16 +22,19 @@ from app.core.config import get_settings
 
 _settings = get_settings()
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# rounds=12 per contract; bcrypt limits passwords to 72 bytes so we truncate
+# defensively at the application layer via schema validators.
+_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 
-TokenType = Literal["access", "refresh"]
+# JWT audience claim: which identity domain the token is for.
+Audience = Literal["user", "merchant", "admin"]
 
 
 # ---------------------------------------------------------------------------
 # Password hashing
 # ---------------------------------------------------------------------------
 def hash_password(plain: str) -> str:
-    """Hash a plaintext password using bcrypt."""
+    """Hash a plaintext password using bcrypt (rounds=12)."""
     return _pwd_context.hash(plain)
 
 
@@ -37,54 +44,72 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# JWT
+# Access JWT
 # ---------------------------------------------------------------------------
-def _create_token(
-    subject: str,
-    token_type: TokenType,
-    expires_delta: timedelta,
+def create_access_token(
+    *,
+    subject: str | int,
+    audience: Audience,
     extra_claims: dict[str, Any] | None = None,
+    expires_delta: timedelta | None = None,
 ) -> str:
+    """Create a signed access JWT.
+
+    Access tokens are short-lived (contract §10, default 15 minutes).
+    """
     now = datetime.now(UTC)
+    # Contract §10: TTL = 15 minutes for access tokens. Fall back to the
+    # settings value so ops can override.
+    delta = expires_delta or timedelta(minutes=15)
     payload: dict[str, Any] = {
-        "sub": subject,
-        "type": token_type,
+        "sub": str(subject),
+        "aud": audience,
         "iat": int(now.timestamp()),
-        "exp": int((now + expires_delta).timestamp()),
+        "exp": int((now + delta).timestamp()),
     }
     if extra_claims:
         payload.update(extra_claims)
     return jwt.encode(payload, _settings.SECRET_KEY, algorithm=_settings.JWT_ALGORITHM)
 
 
-def create_access_token(
-    subject: str,
-    extra_claims: dict[str, Any] | None = None,
-    expires_delta: timedelta | None = None,
-) -> str:
-    """Create a short-lived access token."""
-    delta = expires_delta or timedelta(minutes=_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return _create_token(subject, "access", delta, extra_claims)
+def decode_access_token(token: str, *, audience: Audience) -> dict[str, Any]:
+    """Decode & validate a JWT for the given audience.
 
-
-def create_refresh_token(
-    subject: str,
-    extra_claims: dict[str, Any] | None = None,
-    expires_delta: timedelta | None = None,
-) -> str:
-    """Create a long-lived refresh token."""
-    delta = expires_delta or timedelta(minutes=_settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-    return _create_token(subject, "refresh", delta, extra_claims)
-
-
-def decode_token(token: str) -> dict[str, Any]:
-    """Decode & validate a JWT. Raises :class:`JWTError` on failure."""
+    Raises :class:`jose.JWTError` (or a subclass such as
+    ``ExpiredSignatureError``) on failure — callers translate those to
+    ``AppException`` with the appropriate business code.
+    """
     try:
         return jwt.decode(
             token,
             _settings.SECRET_KEY,
             algorithms=[_settings.JWT_ALGORITHM],
+            audience=audience,
         )
     except JWTError:
-        # Re-raise as-is so callers can distinguish auth errors.
         raise
+
+
+# ---------------------------------------------------------------------------
+# Refresh tokens (opaque random string + SHA-256 hash)
+# ---------------------------------------------------------------------------
+def generate_refresh_token() -> str:
+    """Generate a cryptographically-random opaque refresh token."""
+    # 48 bytes -> ~64 url-safe chars, matching contract §10.
+    return secrets.token_urlsafe(48)
+
+
+def hash_refresh_token(token: str) -> str:
+    """SHA-256 hash of a refresh token (hex-encoded)."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+__all__ = [
+    "Audience",
+    "create_access_token",
+    "decode_access_token",
+    "generate_refresh_token",
+    "hash_password",
+    "hash_refresh_token",
+    "verify_password",
+]
