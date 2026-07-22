@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  /* 商家后台专业蓝主色（区别于用户端红色） */
+  --color-primary: #1a56db;
+  --color-primary-hover: #1e429f;
+  --color-primary-foreground: #ffffff;
+
+  /* 中性色 */
+  --color-sidebar: #0f172a;
+  --color-sidebar-foreground: #e2e8f0;
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-active: #1a56db;
+
+  /* 状态色 */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
+
+  /* 字体 */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+}

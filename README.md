@@ -30,13 +30,30 @@
 ## 🚀 快速开始
 
 ```bash
-# 一键启动本地环境（Postgres + Redis + MinIO + Backend）
-docker-compose up
+# 1. 复制环境变量
+cp .env.example .env
 
-# 分别启动各前端
-cd frontend-user-web && pnpm dev
-cd frontend-merchant  && pnpm dev
-cd frontend-admin     && pnpm dev
+# 2. 启动基础设施 + 后端
+docker-compose up -d postgres redis minio minio-init
+# 或全部（含后端）
+docker-compose up -d
+
+# 3. 后端（本地开发，不走 docker）
+cd backend
+uv sync --all-extras
+uv run alembic upgrade head    # 首次运行前
+uv run uvicorn app.main:app --reload
+# 后端在 http://localhost:8000  Swagger: /docs
+
+# 4. 前端（在项目根目录）
+pnpm install
+pnpm dev:user-web     # http://localhost:3000  普通用户购物端
+pnpm dev:merchant     # http://localhost:3001  商家后台
+pnpm dev:admin        # http://localhost:3002  管理员后台
+
+# 5. Android
+# 用 Android Studio 打开 android-app/，首次加载会自动生成 gradle wrapper
+# 或命令行：cd android-app && gradle wrapper --gradle-version 8.10.2 && ./gradlew assembleDebug
 ```
 
 ## 📁 目录结构
