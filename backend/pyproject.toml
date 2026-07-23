@@ -31,6 +31,9 @@ dependencies = [
     "python-multipart>=0.0.17",
     # HTTP client (internal calls, health checks, tests)
     "httpx>=0.28.0",
+    # MinIO / S3 (async client, presigned URLs)
+    "aioboto3>=13.0.0",
+    "botocore>=1.35.0",
 ]
 
 [project.optional-dependencies]

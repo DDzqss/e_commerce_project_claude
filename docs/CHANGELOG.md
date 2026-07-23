@@ -13,6 +13,80 @@
 
 ---
 
+## [0.3.0-phase2] — 2026-07-23
+
+### Phase 2：商品与浏览（Category / Brand / SPU / SKU / 上架审核 / 库存 / MinIO 图片上传）
+
+#### 契约先行
+- `docs/API/phase-2-contracts.md`（526 行）：模型、SPU 状态机、RBAC 权限清单、
+  MinIO 图片上传三步流程、库存日志规范、公开浏览 API
+
+#### Backend
+- **5 张新表**：categories（3 级树+ CHECK level 1-3）/ brands / spus / skus / inventory_logs
+- **Alembic 0002**：手写迁移，3 个 native enum + JSON/JSONB variant (Postgres/SQLite 双兼容)
+- **Storage 层**（`app/core/storage.py`）：aioboto3 封装 presign_put / build_public_url
+- **41 个 REST 端点**：
+  - Catalog 公开 4 个（categories tree / brands / spus list-detail-related / recommendations）
+  - Admin 15 个（categories CRUD / brands CRUD / spus review + force-offshelf）
+  - Merchant 22 个（spus 9 + skus 4 + upload presign 1 + inventory 2 + others）
+- **SPU 状态机**：draft → pending_review → approved / rejected / off_shelf；关键字段编辑自动回 pending_review
+- **冗余字段**：SPU.min/max_price_cents 在 SKU 增删改时同步更新
+- **库存流水**：只写不改；adjust 事务内 update stock + insert log + audit
+- **图片上传**：aioboto3 生成 presigned PUT URL，前端直传 MinIO（15min TTL，仅 image/jpeg,png,webp，≤5MB）
+- **依赖新增**：aioboto3>=13.0.0 / botocore>=1.35.0
+- **测试**：8 组新测试（catalog_categories / brands / product_lifecycle / sku / inventory / upload / browse / admin_review），55/55 全绿
+- **Seed 扩展**：10 个 3 级类目 + 5 品牌 + 1 shop + 3 SPU/7 SKU（幂等）
+- **Docker Compose**：MinIO 增加 CORS 配置（允许前端 3000/3001/3002 直传）
+
+#### Frontend · User-Web
+- **API 层**：catalog-api（6 端点）+ image.ts 工具（object_key → CDN URL + fallback）
+- **通用组件**：Price（分转元 + 划线价）/ ImageWithFallback / SPUCard / SKUSelector（联动禁用不可用组合）/ CategoryNav / BreadcrumbCategory / PriceRangeFilter / SortDropdown / Pagination
+- **页面**：
+  - `/` 首页重写：类目 grid + 精选 10 SPU
+  - `/category/[id]` 类目页：面包屑 + 侧栏筛选 + 商品 grid + 分页
+  - `/search` 搜索页
+  - `/products/[id]` 商品详情：图片 gallery + SKU 选择器 + 相关推荐 + 加购按钮占位（Phase 3 开放）
+- SiteHeader 加搜索栏 + 二排 CategoryNav
+- **测试**：28 个（含 image / sku-selector 联动）
+
+#### Frontend · Merchant-Web
+- **API 层**：product / sku / inventory / upload / catalog
+- **上传工具**：`uploadFile(file, purpose)` 二步（presign → PUT）+ XHR 进度回调 + abort
+- **通用组件**：ImageUpload（单）/ MultiImageUpload（最多 8）/ CategoryPicker（3 级级联）/ BrandPicker / StatusBadge / PriceInput（元↔分）
+- **业务组件**：SPUBasicInfoForm（wizard+edit 共用，含关键字段编辑警告横幅）/ SKUFormModal（编辑态 sku_code/specs 只读）
+- **页面**：
+  - `/products` 商品列表（status tab + 搜索 + 分页 + 删除确认）
+  - `/products/new` 3 步向导（草稿 vs 提审校验分层）
+  - `/products/[id]` 编辑（tab: 基本信息 / SKU / 库存；按状态严格控制操作按钮可见性）
+- Sidebar "商品管理" 开放
+- **测试**：22 个（含 upload / sku-form）
+
+#### Frontend · Admin-Web
+- **API 层**：category / brand / product / upload
+- **RBAC 更新**：新增 5 个 Phase 2 权限键 + 角色→权限映射（super 全权，business 具备类目/品牌/审核/强制下架，cs 只读所有）
+- **通用组件**：StatusBadge / BrandLogo / ImageUpload / CategoryTreeEditor（3 级 + 上下移动 + 添加子类目按钮 level=3 时禁用）
+- **页面**：
+  - `/console/catalog/categories` 类目树管理
+  - `/console/catalog/brands` 品牌 CRUD
+  - `/console/products/review` 审核队列（status tab + 关键字/店铺筛选 + 分页）
+  - `/console/products/review/[id]` 审核详情（timeline + approve/reject/force-offshelf）
+- Console 首页 4 张卡片全部改真实 API 数据 + 可点击跳转
+- Sidebar 移除三项"即将开放"，按 permissions 门控
+- **测试**：25 个（含 category-tree / review-page）
+
+### 验证结果
+- 后端：ruff ✓ · pytest 55/55 ✓（Phase 1: 29 + Phase 2: 26）
+- 三前端：pnpm build ✓ · vitest 合计 75+ 用例通过（user-web 28 + merchant 22 + admin 25）
+
+### 沉淀（AGENTS.md §11.3 新增 5 条 Backend 陷阱）
+- bcrypt 5+ × passlib 1.7 不兼容 → pin bcrypt<5
+- sqlalchemy async 缺 greenlet → 显式 `sqlalchemy[asyncio]` + `greenlet>=3.0`
+- SQLite 不给 BigInteger 自增 → `BigIntId = BigInteger().with_variant(Integer, "sqlite")`
+- session.flush() 后返回 Pydantic 前需 `session.refresh(row)` 才能读 onupdate 字段
+- Agent 本地 .venv 缓存旧依赖 → CI 全新装才暴露问题；启动前需 `uv sync --refresh`
+
+---
+
 ## [0.2.0-phase1] — 2026-07-22
 
 ### Phase 1：基础能力（认证 + RBAC + 商家入驻）

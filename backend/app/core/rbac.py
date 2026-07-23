@@ -25,16 +25,27 @@ class Permission(enum.StrEnum):
     USER_MERCHANT_APPLICATION_SUBMIT = "user:merchant_application:submit"
     USER_MERCHANT_APPLICATION_WITHDRAW = "user:merchant_application:withdraw"
     USER_MERCHANT_APPLICATION_READ = "user:merchant_application:read"
+    USER_CATALOG_READ = "user:catalog:read"
+    USER_SPU_READ = "user:spu:read"
 
     # merchant scope
     MERCHANT_SELF_READ = "merchant:self:read"
     MERCHANT_SHOP_UPDATE = "merchant:shop:update"
+    MERCHANT_SPU_MANAGE = "merchant:spu:manage"
+    MERCHANT_SKU_MANAGE = "merchant:sku:manage"
+    MERCHANT_INVENTORY_ADJUST = "merchant:inventory:adjust"
+    MERCHANT_UPLOAD_PRESIGN = "merchant:upload:presign"
 
     # admin scope
     ADMIN_SELF_READ = "admin:self:read"
     ADMIN_MERCHANT_APPLICATION_READ = "admin:merchant_application:read"
     ADMIN_MERCHANT_APPLICATION_REVIEW = "admin:merchant_application:review"
     ADMIN_AUDIT_LOG_READ = "admin:audit_log:read"
+    ADMIN_CATEGORY_MANAGE = "admin:category:manage"
+    ADMIN_BRAND_MANAGE = "admin:brand:manage"
+    ADMIN_SPU_REVIEW = "admin:spu:review"
+    ADMIN_SPU_FORCE_OFFSHELF = "admin:spu:force_offshelf"
+    ADMIN_SPU_READ_ALL = "admin:spu:read_all"
 
 
 # ---------------------------------------------------------------------------
@@ -49,6 +60,8 @@ USER_BASE_PERMISSIONS: frozenset[Permission] = frozenset(
         Permission.USER_MERCHANT_APPLICATION_SUBMIT,
         Permission.USER_MERCHANT_APPLICATION_WITHDRAW,
         Permission.USER_MERCHANT_APPLICATION_READ,
+        Permission.USER_CATALOG_READ,
+        Permission.USER_SPU_READ,
     }
 )
 
@@ -59,11 +72,19 @@ MERCHANT_ROLE_PERMISSIONS: dict[MerchantRole, frozenset[Permission]] = {
         {
             Permission.MERCHANT_SELF_READ,
             Permission.MERCHANT_SHOP_UPDATE,
+            Permission.MERCHANT_SPU_MANAGE,
+            Permission.MERCHANT_SKU_MANAGE,
+            Permission.MERCHANT_INVENTORY_ADJUST,
+            Permission.MERCHANT_UPLOAD_PRESIGN,
         }
     ),
     MerchantRole.SHOP_OPERATOR: frozenset(
         {
             Permission.MERCHANT_SELF_READ,
+            Permission.MERCHANT_SPU_MANAGE,
+            Permission.MERCHANT_SKU_MANAGE,
+            Permission.MERCHANT_INVENTORY_ADJUST,
+            Permission.MERCHANT_UPLOAD_PRESIGN,
         }
     ),
     MerchantRole.SHOP_SUPPORT: frozenset(
@@ -82,11 +103,17 @@ ROLE_PERMISSIONS: dict[AdminRole, frozenset[Permission]] = {
             Permission.ADMIN_SELF_READ,
             Permission.ADMIN_MERCHANT_APPLICATION_READ,
             Permission.ADMIN_MERCHANT_APPLICATION_REVIEW,
+            Permission.ADMIN_CATEGORY_MANAGE,
+            Permission.ADMIN_BRAND_MANAGE,
+            Permission.ADMIN_SPU_REVIEW,
+            Permission.ADMIN_SPU_FORCE_OFFSHELF,
+            Permission.ADMIN_SPU_READ_ALL,
         }
     ),
     AdminRole.CUSTOMER_SERVICE_ADMIN: frozenset(
         {
             Permission.ADMIN_SELF_READ,
+            Permission.ADMIN_SPU_READ_ALL,
         }
     ),
     AdminRole.TECH_ADMIN: frozenset(

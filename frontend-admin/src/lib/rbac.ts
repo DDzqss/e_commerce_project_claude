@@ -29,10 +29,10 @@ export enum AdminRole {
  * 权限点联合类型。
  *
  * 命名规则：`{scope}:{resource}[:{sub}]:{action}`，scope ∈ {user, merchant, admin}。
- * Phase 1 仅使用契约 §7.2 中的权限键；后续 Phase 追加新权限时在此扩展。
+ * Phase 1 使用契约 §7.2 权限键；Phase 2 追加类目/品牌/商品审核（契约 §5）。
  *
- * 尚未在契约中出现但骨架页面仍需引用的占位键（`admin:product:*` 等）保留为
- * 未来 Phase 声明，Sidebar 在 Phase 1 会将无匹配权限的项 disabled 化。
+ * 尚未在契约中出现但骨架页面仍需引用的占位键保留为未来 Phase 声明，
+ * Sidebar 会将无匹配权限的项 disabled 化。
  */
 export type Permission =
   // ---- 契约 §7.2 Phase 1 权限清单 ----
@@ -47,7 +47,13 @@ export type Permission =
   | "admin:merchant_application:read"
   | "admin:merchant_application:review"
   | "admin:audit_log:read"
-  // ---- 后续 Phase 预留（Phase 1 一律返回 false，UI 侧 disabled）----
+  // ---- Phase 2 契约 §5 新增：类目 / 品牌 / 商品审核 ----
+  | "admin:category:manage"
+  | "admin:brand:manage"
+  | "admin:spu:review"
+  | "admin:spu:force_offshelf"
+  | "admin:spu:read_all"
+  // ---- 后续 Phase 预留（暂无对应权限时返回 false，UI 侧 disabled）----
   | "admin:product:review"
   | "admin:order:read"
   | "admin:order:intervene"
@@ -62,6 +68,19 @@ export interface AdminRoleMeta {
   /** 用于 badge 的中性色调 */
   tone: "primary" | "info" | "warning" | "danger";
   description: string;
+  /**
+   * 该角色**理论上**默认拥有的权限（仅作 UI 文案与文档参考）。
+   *
+   * 权限的真实来源仍是后端 GET /admin/me 下发的 permissions 数组，
+   * 前端不用此字段做鉴权判断（避免与后端矩阵漂移）。
+   *
+   * 契约 §5 Phase 2 分配：
+   * - SUPER_ADMIN         → 全部
+   * - BUSINESS_ADMIN      → 商家审核 + 类目/品牌/商品审核 + 强制下架
+   * - CUSTOMER_SERVICE_ADMIN → 只读商品（read_all）+ 售后仲裁（Phase 4）
+   * - TECH_ADMIN          → 系统 / RBAC / 日志
+   */
+  defaultPermissions: readonly Permission[];
 }
 
 export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
@@ -70,24 +89,63 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
     label: "超级管理员",
     tone: "danger",
     description: "拥有所有权限，请谨慎操作",
+    defaultPermissions: [
+      "admin:self:read",
+      "admin:merchant_application:read",
+      "admin:merchant_application:review",
+      "admin:audit_log:read",
+      "admin:category:manage",
+      "admin:brand:manage",
+      "admin:spu:review",
+      "admin:spu:force_offshelf",
+      "admin:spu:read_all",
+      "admin:order:read",
+      "admin:order:intervene",
+      "admin:refund:arbitrate",
+      "admin:user:manage",
+      "admin:rbac:manage",
+    ],
   },
   [AdminRole.BUSINESS_ADMIN]: {
     role: AdminRole.BUSINESS_ADMIN,
     label: "业务管理员",
     tone: "primary",
     description: "商家 / 商品 / 订单业务侧管理",
+    defaultPermissions: [
+      "admin:self:read",
+      "admin:merchant_application:read",
+      "admin:merchant_application:review",
+      "admin:category:manage",
+      "admin:brand:manage",
+      "admin:spu:review",
+      "admin:spu:force_offshelf",
+      "admin:spu:read_all",
+      "admin:order:read",
+    ],
   },
   [AdminRole.CUSTOMER_SERVICE_ADMIN]: {
     role: AdminRole.CUSTOMER_SERVICE_ADMIN,
     label: "客服管理员",
     tone: "info",
     description: "售后仲裁与用户投诉处理",
+    defaultPermissions: [
+      "admin:self:read",
+      "admin:spu:read_all",
+      "admin:refund:arbitrate",
+      "admin:order:read",
+    ],
   },
   [AdminRole.TECH_ADMIN]: {
     role: AdminRole.TECH_ADMIN,
     label: "技术管理员",
     tone: "warning",
     description: "系统配置、日志与权限分配",
+    defaultPermissions: [
+      "admin:self:read",
+      "admin:audit_log:read",
+      "admin:user:manage",
+      "admin:rbac:manage",
+    ],
   },
 };
 

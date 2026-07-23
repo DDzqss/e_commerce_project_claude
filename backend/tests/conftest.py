@@ -38,6 +38,8 @@ from app.core.security import hash_password  # noqa: E402
 from app.main import app as fastapi_app  # noqa: E402
 from app.models import Base  # noqa: E402
 from app.models.admin_user import AdminRole, AdminStatus, AdminUser  # noqa: E402
+from app.models.brand import Brand  # noqa: E402
+from app.models.category import Category  # noqa: E402
 from app.models.merchant import (  # noqa: E402
     MerchantAccount,
     MerchantAccountStatus,
@@ -225,6 +227,93 @@ async def seed_merchant_account(
     await db_session.refresh(account)
     await db_session.refresh(shop)
     return account, shop
+
+
+@pytest_asyncio.fixture()
+async def seed_catalog(
+    db_session: AsyncSession,
+) -> dict[str, object]:
+    """Seed a small 3-level category tree + one brand for Phase 2 tests."""
+    # level 1
+    root = Category(
+        parent_id=None,
+        name="数码",
+        slug="digital",
+        level=1,
+        path="pending",
+        sort_order=0,
+        is_visible=True,
+    )
+    db_session.add(root)
+    await db_session.flush()
+    root.path = str(root.id)
+
+    # level 2
+    l2 = Category(
+        parent_id=root.id,
+        name="手机通讯",
+        slug="phones-communication",
+        level=2,
+        path="pending",
+        sort_order=0,
+        is_visible=True,
+    )
+    db_session.add(l2)
+    await db_session.flush()
+    l2.path = f"{root.path}/{l2.id}"
+
+    # level 3 (leaf)
+    leaf = Category(
+        parent_id=l2.id,
+        name="手机",
+        slug="phones",
+        level=3,
+        path="pending",
+        sort_order=0,
+        is_visible=True,
+    )
+    db_session.add(leaf)
+    await db_session.flush()
+    leaf.path = f"{l2.path}/{leaf.id}"
+
+    # a second sibling leaf for edit/moving tests
+    leaf2 = Category(
+        parent_id=l2.id,
+        name="对讲机",
+        slug="walkie-talkies",
+        level=3,
+        path="pending",
+        sort_order=1,
+        is_visible=True,
+    )
+    db_session.add(leaf2)
+    await db_session.flush()
+    leaf2.path = f"{l2.path}/{leaf2.id}"
+
+    brand = Brand(
+        name="Apple",
+        slug="apple",
+        logo_url="brand/seed/apple.png",
+        description=None,
+        sort_order=0,
+        is_visible=True,
+    )
+    db_session.add(brand)
+    await db_session.commit()
+
+    await db_session.refresh(root)
+    await db_session.refresh(l2)
+    await db_session.refresh(leaf)
+    await db_session.refresh(leaf2)
+    await db_session.refresh(brand)
+
+    return {
+        "root": root,
+        "l2": l2,
+        "leaf": leaf,
+        "leaf2": leaf2,
+        "brand": brand,
+    }
 
 
 # ---------------------------------------------------------------------------
