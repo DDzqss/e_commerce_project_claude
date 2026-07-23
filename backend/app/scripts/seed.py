@@ -19,16 +19,18 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 import sys
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import async_session_factory, dispose_engine
 from app.core.security import hash_password
+from app.models.address import Address
 from app.models.admin_user import AdminRole, AdminUser
 from app.models.brand import Brand
 from app.models.category import Category
@@ -39,6 +41,9 @@ from app.models.merchant import (
     Shop,
     ShopStatus,
 )
+from app.models.order import Order, OrderStatus
+from app.models.order_item import OrderItem
+from app.models.order_status_history import ActorType, OrderStatusHistory
 from app.models.product import SPU, SPUStatus
 from app.models.sku import SKU
 from app.models.user import User, UserStatus
@@ -440,6 +445,177 @@ async def _seed_spus(
         logger.info("seeded spu: %s (id=%d, skus=%d)", spec.title, spu.id, len(spec.skus))
 
 
+async def _seed_addresses(session: AsyncSession) -> None:
+    """Insert two demo addresses per baseline user (idempotent)."""
+    for spec in USERS:
+        user_row = (
+            await session.execute(select(User).where(User.phone == spec.phone))
+        ).scalar_one_or_none()
+        if user_row is None:
+            continue
+        existing = list(
+            (
+                await session.execute(
+                    select(Address.id).where(
+                        Address.user_id == user_row.id, Address.deleted_at.is_(None)
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if existing:
+            continue
+        session.add_all(
+            [
+                Address(
+                    user_id=user_row.id,
+                    receiver_name=spec.nickname,
+                    receiver_phone=spec.phone,
+                    province="浙江省",
+                    city="杭州市",
+                    district="西湖区",
+                    detail="文三路 100 号 A 楼 3 层",
+                    postal_code="310012",
+                    is_default=True,
+                ),
+                Address(
+                    user_id=user_row.id,
+                    receiver_name=spec.nickname,
+                    receiver_phone=spec.phone,
+                    province="北京市",
+                    city="北京市",
+                    district="海淀区",
+                    detail="中关村大街 27 号 8 层",
+                    postal_code="100080",
+                    is_default=False,
+                ),
+            ]
+        )
+        logger.info("seeded 2 addresses for %s", spec.phone)
+
+
+async def _seed_demo_orders(session: AsyncSession, shop: Shop) -> None:
+    """Insert three demo orders for the first baseline user against the demo shop."""
+    user_row = (
+        await session.execute(select(User).where(User.phone == USERS[0].phone))
+    ).scalar_one_or_none()
+    if user_row is None:
+        return
+
+    # Idempotency: skip if we already have >=3 demo orders for this user + shop.
+    already = int(
+        (
+            await session.execute(
+                select(func.count(Order.id)).where(
+                    Order.user_id == user_row.id, Order.shop_id == shop.id
+                )
+            )
+        ).scalar_one()
+    )
+    if already >= 3:
+        return
+
+    # Grab any two SKUs from the shop.
+    sku_stmt = (
+        select(SKU)
+        .join(SPU, SPU.id == SKU.spu_id)
+        .where(SPU.shop_id == shop.id, SKU.deleted_at.is_(None), SPU.deleted_at.is_(None))
+        .limit(2)
+    )
+    skus = list((await session.execute(sku_stmt)).scalars().all())
+    if len(skus) < 1:
+        return
+
+    now = datetime.now(UTC)
+
+    def _make_order(
+        status: OrderStatus,
+        *,
+        offset_days: int,
+        idempotency_key: str,
+        paid: bool = False,
+        shipped: bool = False,
+        completed: bool = False,
+    ) -> Order:
+        created_at = now - timedelta(days=offset_days)
+        subtotal = skus[0].price_cents
+        order = Order(
+            order_no=(created_at.strftime("%Y%m%d") + f"{random.randint(0, 9_999_999_999):010d}"),  # noqa: S311
+            user_id=user_row.id,
+            shop_id=shop.id,
+            status=status,
+            subtotal_cents=subtotal,
+            shipping_fee_cents=0,
+            discount_cents=0,
+            total_cents=subtotal,
+            receiver_name=USERS[0].nickname,
+            receiver_phone=USERS[0].phone,
+            receiver_address="浙江省杭州市西湖区文三路 100 号 A 楼 3 层",
+            user_note=None,
+            payment_deadline_at=created_at + timedelta(minutes=30),
+            paid_at=created_at + timedelta(minutes=5) if paid else None,
+            shipped_at=created_at + timedelta(hours=1) if shipped else None,
+            auto_complete_at=(
+                (created_at + timedelta(hours=1) + timedelta(days=15)) if shipped else None
+            ),
+            completed_at=created_at + timedelta(days=3) if completed else None,
+            idempotency_key=idempotency_key,
+        )
+        session.add(order)
+        return order
+
+    demos = [
+        _make_order(
+            OrderStatus.PENDING_PAYMENT,
+            offset_days=0,
+            idempotency_key="seed-order-pending-1",
+        ),
+        _make_order(
+            OrderStatus.PAID,
+            offset_days=1,
+            idempotency_key="seed-order-paid-1",
+            paid=True,
+        ),
+        _make_order(
+            OrderStatus.COMPLETED,
+            offset_days=20,
+            idempotency_key="seed-order-completed-1",
+            paid=True,
+            shipped=True,
+            completed=True,
+        ),
+    ]
+    await session.flush()
+
+    for order in demos:
+        session.add(
+            OrderItem(
+                order_id=order.id,
+                sku_id=skus[0].id,
+                spu_id=skus[0].spu_id,
+                shop_id=shop.id,
+                spu_title="演示商品",
+                sku_specs=dict(skus[0].specs or {}),
+                sku_image=skus[0].image,
+                unit_price_cents=skus[0].price_cents,
+                quantity=1,
+                subtotal_cents=skus[0].price_cents,
+            )
+        )
+        session.add(
+            OrderStatusHistory(
+                order_id=order.id,
+                from_status=None,
+                to_status=OrderStatus.PENDING_PAYMENT.value,
+                actor_type=ActorType.USER,
+                actor_id=user_row.id,
+                note="seed",
+            )
+        )
+    logger.info("seeded %d demo orders for shop %s", len(demos), shop.name)
+
+
 async def _seed() -> None:
     settings = get_settings()
     if settings.ENVIRONMENT == "production":
@@ -457,6 +633,12 @@ async def _seed() -> None:
         await session.commit()
 
         await _seed_spus(session, shop, categories, brands)
+        await session.commit()
+
+        # Phase 3 seed data
+        await _seed_addresses(session)
+        await session.commit()
+        await _seed_demo_orders(session, shop)
         await session.commit()
 
     await dispose_engine()

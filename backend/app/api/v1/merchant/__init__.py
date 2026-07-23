@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.merchant import auth, inventory, me, skus, spus, uploads
+from app.api.v1.merchant import auth, inventory, me, orders, skus, spus, uploads
 
 router = APIRouter()
 
@@ -15,5 +15,6 @@ router.include_router(spus.router, prefix="/spus", tags=["merchant.spus"])
 router.include_router(skus.router, prefix="/spus", tags=["merchant.skus"])
 router.include_router(uploads.router, prefix="/uploads", tags=["merchant.uploads"])
 router.include_router(inventory.router, prefix="", tags=["merchant.inventory"])
+router.include_router(orders.router, prefix="/orders", tags=["merchant.orders"])
 
 __all__ = ["router"]

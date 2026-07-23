@@ -3,14 +3,19 @@
 /**
  * 管理员工作台首页 (`/console`)。
  *
- * Phase 2 变化：
- * - 4 张卡片改为：
- *   1. 待审核商家（沿用 Phase 1，调 GET /admin/merchant-applications?status=pending）
- *   2. 待审核商品（GET /admin/spus?status=pending_review）
- *   3. 已上架商品（GET /admin/spus?status=approved）
- *   4. 类目总数   （GET /admin/categories，计算树节点数）
- * - 待审核商品卡片可点击 → /console/products/review
- * - 权限缺失的卡片显示 "—"
+ * Phase 3 变化：新增订单大盘的 4 张卡片：
+ *   1. 今日订单量
+ *   2. 今日 GMV
+ *   3. 待付款订单数
+ *   4. 待发货订单数
+ * 保留 Phase 1/2 的 4 张卡片：
+ *   5. 待审核商家
+ *   6. 待审核商品
+ *   7. 已上架商品
+ *   8. 类目总数
+ *
+ * 总计 8 张卡片，两行 4 列布局（≥xl）。
+ * 权限缺失的卡片显示 "—"。
  */
 
 import Link from "next/link";
@@ -20,12 +25,14 @@ import { listMerchantApplications } from "@/lib/merchant-application-api";
 import { listAllSPUs } from "@/lib/product-api";
 import { listAllCategories } from "@/lib/category-api";
 import { countTreeNodes } from "@/components/ui/CategoryTreeEditor";
+import { useOrderOverview } from "@/hooks/useOrders";
 import { usePermission } from "@/hooks/useAuth";
 
 export default function ConsoleHomePage() {
   const canReadApplications = usePermission("admin:merchant_application:read");
   const canReadSPUs = usePermission("admin:spu:read_all");
   const canManageCategory = usePermission("admin:category:manage");
+  const canReadOrders = usePermission("admin:order:read_all");
 
   const pendingApplications = useQuery({
     queryKey: ["dashboard", "pending-applications-count"],
@@ -57,155 +64,295 @@ export default function ConsoleHomePage() {
     staleTime: 5 * 60_000,
   });
 
+  const orderOverview = useOrderOverview({ enabled: canReadOrders });
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex items-end justify-between">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">工作台</h1>
           <p className="mt-1 text-sm text-neutral-500">
-            平台运行概览。数据每 30 秒自动刷新。
+            平台运行概览。订单数据每 30 秒自动刷新。
           </p>
         </div>
         <span className="rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500">
-          Phase 2
+          Phase 3
         </span>
       </header>
 
-      <section
-        aria-label="核心指标"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
-      >
-        {/* 1. 待审核商家 */}
-        {canReadApplications ? (
-          <Link
-            href="/console/merchants/applications?status=pending"
-            className="rounded-md transition hover:shadow"
-            aria-label="查看待审核商家申请"
-          >
+      {/* Phase 3 · 订单大盘 */}
+      <section aria-label="订单大盘">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+          订单大盘（今日 & 实时）
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* 今日订单量 */}
+          {canReadOrders ? (
+            <Link
+              href="/console/orders"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看今日订单"
+            >
+              <StatCard
+                label="今日订单量"
+                value={
+                  orderOverview.isLoading
+                    ? "…"
+                    : orderOverview.isError
+                      ? "—"
+                      : String(orderOverview.data?.orders_today_count ?? 0)
+                }
+                hint={
+                  orderOverview.isError
+                    ? "拉取失败，请稍后刷新"
+                    : "今日新建订单数（不含超时取消）"
+                }
+                tone="info"
+              />
+            </Link>
+          ) : (
             <StatCard
-              label="待审核商家"
-              value={
-                pendingApplications.isLoading
-                  ? "…"
-                  : pendingApplications.isError
-                    ? "—"
-                    : String(pendingApplications.data?.total ?? 0)
-              }
-              hint={
-                pendingApplications.isError
-                  ? "拉取失败，请稍后刷新"
-                  : "商家入驻申请等待处理（点击查看）"
-              }
-              tone="warning"
-            />
-          </Link>
-        ) : (
-          <StatCard
-            label="待审核商家"
-            value="—"
-            hint="您当前无查看权限"
-            tone="warning"
-          />
-        )}
-
-        {/* 2. 待审核商品 */}
-        {canReadSPUs ? (
-          <Link
-            href="/console/products/review?status=pending_review"
-            className="rounded-md transition hover:shadow"
-            aria-label="查看待审核商品"
-          >
-            <StatCard
-              label="待审核商品"
-              value={
-                pendingSPUs.isLoading
-                  ? "…"
-                  : pendingSPUs.isError
-                    ? "—"
-                    : String(pendingSPUs.data?.total ?? 0)
-              }
-              hint={
-                pendingSPUs.isError
-                  ? "拉取失败，请稍后刷新"
-                  : "商家提交、待审核的商品数（点击查看）"
-              }
+              label="今日订单量"
+              value="—"
+              hint="您当前无查看权限"
               tone="info"
             />
-          </Link>
-        ) : (
-          <StatCard
-            label="待审核商品"
-            value="—"
-            hint="您当前无查看权限"
-            tone="info"
-          />
-        )}
+          )}
 
-        {/* 3. 已上架商品 */}
-        {canReadSPUs ? (
-          <Link
-            href="/console/products/review?status=approved"
-            className="rounded-md transition hover:shadow"
-            aria-label="查看已上架商品"
-          >
+          {/* 今日 GMV */}
+          {canReadOrders ? (
+            <Link
+              href="/console/orders?status=paid"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看今日 GMV"
+            >
+              <StatCard
+                label="今日 GMV"
+                value={
+                  orderOverview.isLoading
+                    ? "…"
+                    : orderOverview.isError
+                      ? "—"
+                      : `¥${(
+                          (orderOverview.data?.orders_today_gmv_cents ?? 0) /
+                          100
+                        ).toLocaleString("zh-CN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                }
+                hint="今日已下单总金额（含未支付）"
+                tone="success"
+              />
+            </Link>
+          ) : (
             <StatCard
-              label="已上架商品"
-              value={
-                approvedSPUs.isLoading
-                  ? "…"
-                  : approvedSPUs.isError
-                    ? "—"
-                    : String(approvedSPUs.data?.total ?? 0)
-              }
-              hint="平台在售商品总数"
+              label="今日 GMV"
+              value="—"
+              hint="您当前无查看权限"
               tone="success"
             />
-          </Link>
-        ) : (
-          <StatCard
-            label="已上架商品"
-            value="—"
-            hint="您当前无查看权限"
-            tone="success"
-          />
-        )}
+          )}
 
-        {/* 4. 类目总数 */}
-        {canManageCategory ? (
-          <Link
-            href="/console/catalog/categories"
-            className="rounded-md transition hover:shadow"
-            aria-label="查看类目管理"
-          >
+          {/* 待付款订单 */}
+          {canReadOrders ? (
+            <Link
+              href="/console/orders?status=pending_payment"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待付款订单"
+            >
+              <StatCard
+                label="待付款订单"
+                value={
+                  orderOverview.isLoading
+                    ? "…"
+                    : orderOverview.isError
+                      ? "—"
+                      : String(orderOverview.data?.pending_payment_count ?? 0)
+                }
+                hint="30 分钟内未支付的活跃订单"
+                tone="warning"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待付款订单"
+              value="—"
+              hint="您当前无查看权限"
+              tone="warning"
+            />
+          )}
+
+          {/* 待发货订单 */}
+          {canReadOrders ? (
+            <Link
+              href="/console/orders?status=paid"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待发货订单"
+            >
+              <StatCard
+                label="待发货订单"
+                value={
+                  orderOverview.isLoading
+                    ? "…"
+                    : orderOverview.isError
+                      ? "—"
+                      : String(orderOverview.data?.pending_ship_count ?? 0)
+                }
+                hint="用户已支付、等待商家发货"
+                tone="danger"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待发货订单"
+              value="—"
+              hint="您当前无查看权限"
+              tone="danger"
+            />
+          )}
+        </div>
+      </section>
+
+      {/* Phase 1/2 · 商家 & 商品 */}
+      <section aria-label="商家与商品">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+          商家与商品
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* 待审核商家 */}
+          {canReadApplications ? (
+            <Link
+              href="/console/merchants/applications?status=pending"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待审核商家申请"
+            >
+              <StatCard
+                label="待审核商家"
+                value={
+                  pendingApplications.isLoading
+                    ? "…"
+                    : pendingApplications.isError
+                      ? "—"
+                      : String(pendingApplications.data?.total ?? 0)
+                }
+                hint={
+                  pendingApplications.isError
+                    ? "拉取失败，请稍后刷新"
+                    : "商家入驻申请等待处理（点击查看）"
+                }
+                tone="warning"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待审核商家"
+              value="—"
+              hint="您当前无查看权限"
+              tone="warning"
+            />
+          )}
+
+          {/* 待审核商品 */}
+          {canReadSPUs ? (
+            <Link
+              href="/console/products/review?status=pending_review"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待审核商品"
+            >
+              <StatCard
+                label="待审核商品"
+                value={
+                  pendingSPUs.isLoading
+                    ? "…"
+                    : pendingSPUs.isError
+                      ? "—"
+                      : String(pendingSPUs.data?.total ?? 0)
+                }
+                hint={
+                  pendingSPUs.isError
+                    ? "拉取失败，请稍后刷新"
+                    : "商家提交、待审核的商品数（点击查看）"
+                }
+                tone="info"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待审核商品"
+              value="—"
+              hint="您当前无查看权限"
+              tone="info"
+            />
+          )}
+
+          {/* 已上架商品 */}
+          {canReadSPUs ? (
+            <Link
+              href="/console/products/review?status=approved"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看已上架商品"
+            >
+              <StatCard
+                label="已上架商品"
+                value={
+                  approvedSPUs.isLoading
+                    ? "…"
+                    : approvedSPUs.isError
+                      ? "—"
+                      : String(approvedSPUs.data?.total ?? 0)
+                }
+                hint="平台在售商品总数"
+                tone="success"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="已上架商品"
+              value="—"
+              hint="您当前无查看权限"
+              tone="success"
+            />
+          )}
+
+          {/* 类目总数 */}
+          {canManageCategory ? (
+            <Link
+              href="/console/catalog/categories"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看类目管理"
+            >
+              <StatCard
+                label="类目总数"
+                value={
+                  categoryTree.isLoading
+                    ? "…"
+                    : categoryTree.isError
+                      ? "—"
+                      : String(countTreeNodes(categoryTree.data ?? []))
+                }
+                hint="含各级类目（点击管理）"
+                tone="default"
+              />
+            </Link>
+          ) : (
             <StatCard
               label="类目总数"
-              value={
-                categoryTree.isLoading
-                  ? "…"
-                  : categoryTree.isError
-                    ? "—"
-                    : String(countTreeNodes(categoryTree.data ?? []))
-              }
-              hint="含各级类目（点击管理）"
+              value="—"
+              hint="您当前无查看权限"
               tone="default"
             />
-          </Link>
-        ) : (
-          <StatCard
-            label="类目总数"
-            value="—"
-            hint="您当前无查看权限"
-            tone="default"
-          />
-        )}
+          )}
+        </div>
       </section>
 
       <section className="rounded-md border border-dashed border-[color:var(--color-border)] bg-white p-6 text-sm text-neutral-500">
         <div className="mb-1 text-neutral-700 font-medium">
-          更多能力将在 Phase 3 / Phase 4 开放
+          Phase 4 售后仲裁台正在筹备中
         </div>
         <p>
-          Phase 3 将上线订单大盘与干预操作，Phase 4 上线售后仲裁台，敬请关注开发规划文档。
+          售后申请、商家超时升级、平台强制退款等能力将在下一个 Phase
+          开放，敬请关注开发规划文档。
         </p>
       </section>
     </div>

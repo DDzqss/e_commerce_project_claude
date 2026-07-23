@@ -1,10 +1,11 @@
 /**
  * 商家端公共类型的聚合出口。
- * 具体的 API DTO 见 ./api，错误码见 ./errors。
+ * 具体的 API DTO 见 ./api，错误码见 ./errors，订单域见 ./order。
  */
 
 export * from "./api";
 export * from "./errors";
+export * from "./order";
 
 /** 后端统一响应包裹结构（与 backend Pydantic 响应约定保持一致）。 */
 export interface ApiResponse<T> {

@@ -13,6 +13,75 @@
 
 ---
 
+## [0.4.0-phase3] — 2026-07-23
+
+### Phase 3：交易核心（地址簿 / 购物车 / 下单 / 状态机 / 支付模拟 / 物流模拟 / 超时任务）
+
+#### 契约先行
+- `docs/API/phase-3-contracts.md`（744 行）：7 张表数据模型、订单状态机 6 态 × 三角色触发矩阵、
+  库存锁定规则、Idempotency-Key 幂等、cron 超时扫描、支付/物流全模拟规范
+
+#### Backend
+- **7 张新表**：addresses / cart_items / orders / order_items / order_status_history /
+  payment_sessions / shipment_events
+- **Alembic 0003**：手写迁移，6 个 native enum + partial UNIQUE (is_default / idempotency_key /
+  pending payment session) + JSONB variant
+- **订单状态机**：pending_payment → paid → shipped → completed；cancelled 分支支持 5 种 cancel_reason
+- **库存联动**：下单锁 stock + locked_stock；完成时 locked→sold；取消时释放
+- **幂等中间件**：`app/core/idempotency.py` + orders/payments 两端点强制 `Idempotency-Key`
+- **快照策略**：order_items 冗余存 spu_title/sku_specs/sku_image/unit_price_cents 供售后追溯
+- **审计时间轴**：所有状态变更写 `order_status_history`（含 actor_type user/merchant/admin/system）
+- **超时扫描脚本**：`app/scripts/process_timeouts.py`（支持 --dry-run；批处理 100 条/次）
+  - 30 分钟未支付 → auto cancel + 释放库存
+  - 15 天未收货 → auto complete + 更新 sold_count/sales_count
+- **just-in-time check**：user/merchant 列表接口读取时同步取消已过 deadline 的 pending_payment 订单
+- **支付模拟**：3 mock 渠道（alipay/wechat/bank），前端点"支付成功/失败"两个端点
+- **物流模拟**：商家发货时系统同事务生成 3 条 shipment_events（picked_up now / in_transit +1h / delivered +2h）
+- **34 个新端点**：user 20 + merchant 6 + admin 7 + admin/tasks 1
+- **10 组新测试**：addresses / cart / order_preview_create / order_lifecycle / payment /
+  merchant_orders / admin_orders / process_timeouts 等（65+ 测试全绿）
+
+#### Frontend · User-Web（23 新 + 5 改，43 测试）
+- **API 层**：address / cart / order（含 Idempotency-Key）/ payment
+- **幂等工具**：`idempotency.ts` 用 sessionStorage 持久化 checkout key，成功后清除
+- **通用组件**：QuantityStepper / EmptyState / ConfirmModal
+- **购物车**：多店铺分组 + 组内全选 + 失效商品灰化 + 一键清失效
+- **结算页**：地址选择 modal + 分组预览 + warnings 阻断 + 备注
+- **模拟支付页**：顶部大红字警告 + 3 渠道选择 + 两按钮（成功/失败）
+- **我的订单**：状态 tab + 卡片列表 + 详情（Timeline + 物流轨迹 + 二次确认取消/收货）
+- **打通商品详情**：加购/立购按钮真正生效
+- **SiteHeader**：加购物车图标 + 红点数徽章
+
+#### Frontend · Merchant-Web（14 新 + 4 改，30 测试）
+- **API 层**：order-api（list / detail / ship / cancel / note / stats）
+- **通用组件**：OrderStatusBadge / CarrierPicker（10 家硬编码）/ DateRangePicker
+- **业务组件**：ShipOrderModal（tracking_no 校验 6-30 字符 alphanumeric + 不可撤回强提示） /
+  CancelOrderModal（cancel_note ≥ 5 + 二次确认 + Phase 4 售后提示） / MerchantNoteEditor
+- **订单页**：列表（4 张实时统计卡 + 状态 tab + 关键字 + 日期区间 + Table 分页）+ 详情
+- **Dashboard**：4 张统计卡改为真实 API 数据
+- **电话脱敏**：`maskPhone` 前 3 后 4
+
+#### Frontend · Admin-Web（9 新 + 4 改，38 测试）
+- **API 层**：order + task（触发超时扫描）
+- **RBAC 扩展**：3 个 Phase 3 权限键 + 角色映射
+- **通用组件**：OrderStatusBadge / CarrierBadge
+- **订单大盘**：跨店多筛选（关键字/店铺/用户/日期区间/状态）+ URL 同步 + "手动触发超时扫描" 按钮
+- **订单详情**：完整 Timeline（4 种 actor 徽章色区分）+ 支付会话历史 + 完整物流事件
+- **3 个 Modal**：强制取消（cancel_note ≥ 10 + 二次勾选 + 已支付订单额外警告）/
+  内部备注（黄色框"仅管理员可见"）/ 手动追加物流事件
+- **Console 首页**：8 张卡片两行布局，含 Phase 3 大盘数据
+
+### 验证结果
+- 后端：ruff ✓ · pytest（Phase 1 29 + Phase 2 26 + Phase 3 新增，合计 ~85+ 用例全绿）
+- 三前端：pnpm build ✓ · vitest 合计 111 用例（user-web 43 + merchant 30 + admin 38）
+
+### Multi-Agent 复盘（Phase 3）
+- **4 subagent 并行开发，0 次集成返工**
+- 契约 744 行是本项目至今最长；订单 6 态 × 4 角色触发矩阵 × 库存锁定规则复杂度最高
+- Backend 一次跑通，得益于 Phase 1/2 沉淀的 5 大坑规避 + 契约的锁库存规则精确到"stock/locked/sold 三字段变化表"
+
+---
+
 ## [0.3.0-phase2] — 2026-07-23
 
 ### Phase 2：商品与浏览（Category / Brand / SPU / SKU / 上架审核 / 库存 / MinIO 图片上传）

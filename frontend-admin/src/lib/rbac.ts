@@ -53,10 +53,13 @@ export type Permission =
   | "admin:spu:review"
   | "admin:spu:force_offshelf"
   | "admin:spu:read_all"
+  // ---- Phase 3 契约 §5 新增：订单大盘与干预 ----
+  | "admin:order:read_all"
+  | "admin:order:intervene"
+  | "admin:order:add_note"
   // ---- 后续 Phase 预留（暂无对应权限时返回 false，UI 侧 disabled）----
   | "admin:product:review"
   | "admin:order:read"
-  | "admin:order:intervene"
   | "admin:refund:arbitrate"
   | "admin:user:manage"
   | "admin:rbac:manage";
@@ -100,7 +103,9 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:spu:force_offshelf",
       "admin:spu:read_all",
       "admin:order:read",
+      "admin:order:read_all",
       "admin:order:intervene",
+      "admin:order:add_note",
       "admin:refund:arbitrate",
       "admin:user:manage",
       "admin:rbac:manage",
@@ -121,6 +126,7 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:spu:force_offshelf",
       "admin:spu:read_all",
       "admin:order:read",
+      "admin:order:read_all",
     ],
   },
   [AdminRole.CUSTOMER_SERVICE_ADMIN]: {
@@ -133,6 +139,9 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:spu:read_all",
       "admin:refund:arbitrate",
       "admin:order:read",
+      "admin:order:read_all",
+      "admin:order:intervene",
+      "admin:order:add_note",
     ],
   },
   [AdminRole.TECH_ADMIN]: {
