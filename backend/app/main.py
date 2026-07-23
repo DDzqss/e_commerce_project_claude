@@ -1,8 +1,8 @@
 """FastAPI application entrypoint.
 
-Bootstraps the JD-Clone backend: config, CORS, router mounting, and
-lifecycle hooks. Business routers live under ``app.api.v1``; this module
-only wires them up.
+Bootstraps the JD-Clone backend: config, CORS, exception handlers,
+router mounting, and lifecycle hooks. Business routers live under
+``app.api.v1``; this module only wires them up.
 """
 
 from __future__ import annotations
@@ -17,6 +17,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.api.v1 import api_router as v1_router
 from app.core.config import get_settings
+from app.core.errors import register_exception_handlers
+from app.core.redis import close_redis
 
 
 @asynccontextmanager
@@ -29,6 +31,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # startup
     yield
     # shutdown
+    await close_redis()
 
 
 def create_app() -> FastAPI:
@@ -53,6 +56,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Business error envelope + validation handlers.
+    register_exception_handlers(app)
 
     # Mount v1 API
     app.include_router(v1_router, prefix=settings.API_V1_PREFIX)

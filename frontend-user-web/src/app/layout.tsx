@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ReactQueryProvider } from "@/lib/query-client";
+import { ToastViewport } from "@/components/ui/Toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,7 +26,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="min-h-screen bg-neutral-50 text-neutral-900 antialiased">
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          {children}
+          <ToastViewport />
+        </ReactQueryProvider>
       </body>
     </html>
   );

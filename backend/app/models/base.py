@@ -9,8 +9,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, func
+from sqlalchemy import BigInteger, DateTime, Integer, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+# BigInteger auto-increments natively in Postgres (via BIGSERIAL/IDENTITY) but
+# NOT in SQLite (which only auto-increments INTEGER PRIMARY KEY). To keep prod
+# on BIGINT while allowing SQLite-based tests, use a variant.
+BigIntId = BigInteger().with_variant(Integer, "sqlite")
 
 
 class Base(DeclarativeBase):
@@ -21,7 +26,7 @@ class IdMixin:
     """Auto-increment ``BIGINT`` primary key named ``id``."""
 
     id: Mapped[int] = mapped_column(
-        BigInteger,
+        BigIntId,
         primary_key=True,
         autoincrement=True,
         sort_order=-100,
