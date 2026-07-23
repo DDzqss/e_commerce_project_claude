@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { CategoryNav } from "@/components/catalog/CategoryNav";
+import { useCart } from "@/hooks/useCart";
+import { useCartBadge } from "@/lib/cart-store";
 
 /**
  * 全站顶部导航条：
- *   第一行：品牌 logo + 搜索栏 + 登录/注册（或用户菜单）
- *   第二行：一级类目导航（hover 出下拉）
+ *   第一行：品牌 logo + 搜索栏 + 购物车 + 登录/注册（或用户菜单）
+ *   第二行：一级类目导航
+ *
+ * Phase 3 新增：
+ *   - 购物车图标 + 红点数（数据源为 useCart，登录后自动订阅）
+ *   - 用户菜单下拉新增 "我的订单" / "地址管理"
  *
  * 未登录也可用搜索与类目浏览（对齐契约 §5：user 端浏览接口不强制登录）。
- * 搜索栏提交 → /search?keyword=xxx；空关键字不跳。
- *
- * SSR/CSR 首帧鉴权占位保持不变，避免闪跳。
  */
 export function SiteHeader() {
   const { isLoggedIn, hasHydrated, user, logout } = useAuth();
@@ -22,6 +25,10 @@ export function SiteHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
+
+  // 触发拉购物车（同时同步 badge），未登录时 hook 内部会跳过请求
+  useCart();
+  const cartBadgeCount = useCartBadge((s) => s.itemCount);
 
   useEffect(() => {
     if (!open) return;
@@ -72,6 +79,40 @@ export function SiteHeader() {
         </form>
 
         <nav className="flex items-center gap-4 text-sm">
+          {/* 购物车入口：登录/未登录都显示，未登录点了会被 RequireAuth 拦到登录 */}
+          <Link
+            href="/cart"
+            className="relative flex items-center gap-1 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100"
+            aria-label="购物车"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M3 3h2l2.4 12.3a2 2 0 002 1.7h8.5a2 2 0 002-1.6L21 8H6"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="10" cy="20" r="1.5" fill="currentColor" />
+              <circle cx="17" cy="20" r="1.5" fill="currentColor" />
+            </svg>
+            <span>购物车</span>
+            {isLoggedIn && cartBadgeCount > 0 && (
+              <span
+                data-testid="cart-badge"
+                className="absolute -right-1 -top-1 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--color-primary)] px-1 text-[10px] font-semibold leading-4 text-white"
+              >
+                {cartBadgeCount > 99 ? "99+" : cartBadgeCount}
+              </span>
+            )}
+          </Link>
+
           {!hasHydrated ? (
             <div className="h-6 w-24 animate-pulse rounded bg-neutral-100" />
           ) : isLoggedIn && user ? (
@@ -118,6 +159,22 @@ export function SiteHeader() {
                     onClick={() => setOpen(false)}
                   >
                     我的账户
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    href="/orders"
+                    className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    我的订单
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    href="/account/addresses"
+                    className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    地址管理
                   </Link>
                   <Link
                     role="menuitem"

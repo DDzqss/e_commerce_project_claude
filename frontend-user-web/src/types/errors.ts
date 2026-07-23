@@ -48,6 +48,35 @@ export enum ErrorCode {
   ResourceNotFound = 5002,
   RateLimited = 5003,
 
+  // 11xxx Phase 3 地址
+  AddressNotFound = 11001,
+  AddressForbidden = 11002,
+
+  // 12xxx Phase 3 购物车
+  CartItemNotFound = 12001,
+  CartSkuInvalid = 12002,
+  CartQuantityExceedStock = 12003,
+  CartQuantityExceedLimit = 12004,
+
+  // 13xxx Phase 3 订单
+  OrderNotFound = 13001,
+  OrderForbidden = 13002,
+  OrderStatusIllegal = 13003,
+  OrderStockShort = 13004,
+  OrderCartEmpty = 13005,
+  OrderNothingSelected = 13006,
+  OrderAddressInvalid = 13007,
+  OrderPaymentDeadlinePassed = 13008,
+  OrderIdempotencyConflict = 13009,
+  OrderTrackingNoInvalid = 13010,
+  OrderCancelledCannotOperate = 13011,
+
+  // 14xxx Phase 3 支付
+  PaymentSessionNotFound = 14001,
+  PaymentSessionFinalized = 14002,
+  PaymentChannelUnsupported = 14003,
+  PaymentMockFailed = 14004,
+
   // 9xxx 服务端
   InternalError = 9000,
 }
@@ -82,6 +111,35 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.ValidationFailed]: "参数校验失败",
   [ErrorCode.ResourceNotFound]: "资源不存在",
   [ErrorCode.RateLimited]: "请求过于频繁，请稍后再试",
+
+  // 11xxx 地址
+  [ErrorCode.AddressNotFound]: "地址不存在",
+  [ErrorCode.AddressForbidden]: "无权访问该地址",
+
+  // 12xxx 购物车
+  [ErrorCode.CartItemNotFound]: "购物车项不存在",
+  [ErrorCode.CartSkuInvalid]: "该商品已失效，无法加入购物车",
+  [ErrorCode.CartQuantityExceedStock]: "数量超过库存",
+  [ErrorCode.CartQuantityExceedLimit]: "单次购买数量最多 999 件",
+
+  // 13xxx 订单
+  [ErrorCode.OrderNotFound]: "订单不存在",
+  [ErrorCode.OrderForbidden]: "无权查看该订单",
+  [ErrorCode.OrderStatusIllegal]: "当前订单状态不允许该操作",
+  [ErrorCode.OrderStockShort]: "库存不足，下单失败",
+  [ErrorCode.OrderCartEmpty]: "购物车为空，请先添加商品",
+  [ErrorCode.OrderNothingSelected]: "没有可结算的商品",
+  [ErrorCode.OrderAddressInvalid]: "收货地址无效",
+  [ErrorCode.OrderPaymentDeadlinePassed]: "订单已超过支付时限，请重新下单",
+  [ErrorCode.OrderIdempotencyConflict]: "订单已提交，请勿重复操作",
+  [ErrorCode.OrderTrackingNoInvalid]: "快递单号格式无效",
+  [ErrorCode.OrderCancelledCannotOperate]: "订单已取消，无法继续操作",
+
+  // 14xxx 支付
+  [ErrorCode.PaymentSessionNotFound]: "支付订单不存在",
+  [ErrorCode.PaymentSessionFinalized]: "此支付已完成或已失败，不可重试",
+  [ErrorCode.PaymentChannelUnsupported]: "该支付方式暂不支持",
+  [ErrorCode.PaymentMockFailed]: "模拟支付失败",
 
   [ErrorCode.InternalError]: "服务器开小差了，请稍后重试",
 };

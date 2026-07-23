@@ -66,10 +66,10 @@ const NAV_ITEMS: readonly NavItem[] = [
   },
   {
     href: "/console/orders",
-    label: "订单总览",
-    requires: ["admin:order:read", "admin:order:intervene"],
+    label: "订单管理",
+    requires: ["admin:order:read_all"],
     group: "business",
-    available: false,
+    available: true,
   },
   {
     href: "/console/refunds",
@@ -190,7 +190,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-[color:var(--color-border)] px-4 py-3 text-[11px] text-neutral-400">
-        Phase 2 · 商品与类目管理已上线
+        Phase 3 · 交易核心已上线
       </div>
     </aside>
   );

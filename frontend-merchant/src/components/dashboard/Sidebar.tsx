@@ -23,7 +23,6 @@ const NAV_ITEMS: readonly NavItem[] = [
     href: "/orders",
     label: "订单管理",
     icon: "▤",
-    comingSoonNote: "Phase 3 开放",
   },
   {
     href: "/products",
@@ -181,7 +180,7 @@ export function Sidebar() {
       <div className="border-t border-white/10 p-3">
         <AccountBottomMenu />
         <div className="mt-2 text-[11px] text-white/50">
-          v0.1.0 · Phase 1
+          v0.3.0 · Phase 3
         </div>
       </div>
     </nav>

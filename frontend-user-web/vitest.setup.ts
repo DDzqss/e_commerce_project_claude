@@ -1,13 +1,13 @@
 import "@testing-library/jest-dom/vitest";
 
 /**
- * jsdom 在某些版本下 window.localStorage 未挂载，
- * 而我们的 auth-store 依赖 persist middleware。
+ * jsdom 在某些版本下 window.localStorage / sessionStorage 未挂载，
+ * 而我们的 auth-store / idempotency 依赖 persist / sessionStorage。
  * 提供一个内存实现，保证测试可运行。
  */
-if (typeof window !== "undefined" && !window.localStorage) {
+function makeMemoryStorage(): Storage {
   const store = new Map<string, string>();
-  const memoryStorage: Storage = {
+  return {
     get length() {
       return store.size;
     },
@@ -21,8 +21,18 @@ if (typeof window !== "undefined" && !window.localStorage) {
       store.set(key, String(value));
     },
   };
+}
+
+if (typeof window !== "undefined" && !window.localStorage) {
   Object.defineProperty(window, "localStorage", {
-    value: memoryStorage,
+    value: makeMemoryStorage(),
+    configurable: true,
+  });
+}
+
+if (typeof window !== "undefined" && !window.sessionStorage) {
+  Object.defineProperty(window, "sessionStorage", {
+    value: makeMemoryStorage(),
     configurable: true,
   });
 }

@@ -121,6 +121,13 @@ class Settings(BaseSettings):
     # ---- Logging ----------------------------------------------------------
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
+    # ---- Phase 3 · orders / cart -----------------------------------------
+    PAYMENT_TIMEOUT_MINUTES: int = 30
+    AUTO_COMPLETE_DAYS: int = 15
+    MAX_ADDRESSES_PER_USER: int = 20
+    MAX_CART_ITEMS_PER_USER: int = 500
+    MAX_CART_ITEM_QUANTITY: int = 999
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

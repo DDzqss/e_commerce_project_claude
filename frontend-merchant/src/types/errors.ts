@@ -31,6 +31,30 @@ export const ErrorCode = {
   TOO_MANY_REQUESTS: 5003,
   /** 服务端错误 */
   INTERNAL_ERROR: 9000,
+
+  // ----- Phase 3 · 订单域（13xxx） -----
+  /** 订单不存在 */
+  ORDER_NOT_FOUND: 13001,
+  /** 无权访问此订单（不属于当前店铺） */
+  ORDER_ACCESS_DENIED: 13002,
+  /** 订单状态不允许此操作（如已发货订单不能取消） */
+  ORDER_STATUS_NOT_ALLOWED: 13003,
+  /** 库存不足（用户端下单，商家端不常见） */
+  ORDER_STOCK_SHORT: 13004,
+  /** 购物车为空 */
+  ORDER_CART_EMPTY: 13005,
+  /** 未选中任何 SKU */
+  ORDER_NO_SKU_SELECTED: 13006,
+  /** 收货地址无效 */
+  ORDER_ADDRESS_INVALID: 13007,
+  /** 订单已过支付截止时间 */
+  ORDER_PAYMENT_TIMEOUT: 13008,
+  /** idempotency key 冲突 */
+  ORDER_IDEMPOTENCY_CONFLICT: 13009,
+  /** 快递单号格式无效（6-30 字符 alphanumeric） */
+  ORDER_TRACKING_NO_INVALID: 13010,
+  /** 已取消订单不可再操作 */
+  ORDER_ALREADY_CANCELLED: 13011,
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -49,6 +73,20 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.NOT_FOUND]: "资源不存在",
   [ErrorCode.TOO_MANY_REQUESTS]: "操作过于频繁，请稍后再试",
   [ErrorCode.INTERNAL_ERROR]: "服务暂不可用，请稍后重试",
+
+  // ----- Phase 3 · 订单域 -----
+  [ErrorCode.ORDER_NOT_FOUND]: "订单不存在",
+  [ErrorCode.ORDER_ACCESS_DENIED]: "无权访问此订单",
+  [ErrorCode.ORDER_STATUS_NOT_ALLOWED]: "订单当前状态不允许此操作",
+  [ErrorCode.ORDER_STOCK_SHORT]: "库存不足，无法完成操作",
+  [ErrorCode.ORDER_CART_EMPTY]: "购物车为空",
+  [ErrorCode.ORDER_NO_SKU_SELECTED]: "未选中任何商品",
+  [ErrorCode.ORDER_ADDRESS_INVALID]: "收货地址无效",
+  [ErrorCode.ORDER_PAYMENT_TIMEOUT]: "订单已过支付截止时间",
+  [ErrorCode.ORDER_IDEMPOTENCY_CONFLICT]: "重复提交，请稍后重试",
+  [ErrorCode.ORDER_TRACKING_NO_INVALID]:
+    "快递单号格式无效，需 6-30 位字母/数字",
+  [ErrorCode.ORDER_ALREADY_CANCELLED]: "订单已取消，不可再操作",
 };
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SPUCard } from "@/components/catalog/SPUCard";
 import { SKUSelector } from "@/components/catalog/SKUSelector";
@@ -9,8 +9,16 @@ import { BreadcrumbCategory } from "@/components/catalog/BreadcrumbCategory";
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { Price } from "@/components/ui/Price";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
+import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { useSPUDetail, useRelatedSPUs } from "@/hooks/useSPUDetail";
+import { useAuth } from "@/hooks/useAuth";
+import { useInvalidateCart } from "@/hooks/useCart";
+import { useCartBadge } from "@/lib/cart-store";
+import { addToCart } from "@/lib/cart-api";
+import { ApiError } from "@/lib/api";
+import { messageForCode } from "@/types/errors";
 import type { SKUOut, SPUDetail } from "@/types/catalog";
 
 /**
@@ -65,6 +73,13 @@ export default function ProductDetailPage() {
 }
 
 function DetailBody({ data }: { data: SPUDetail }) {
+  const router = useRouter();
+  const { isLoggedIn, hasHydrated } = useAuth();
+  const invalidateCart = useInvalidateCart();
+  const bumpBadge = useCartBadge((s) => s.bump);
+  const [adding, setAdding] = useState(false);
+  const [buying, setBuying] = useState(false);
+
   const breadcrumb = useMemo(
     () => [
       ...(data.category?.path ?? []).map((p) => ({
@@ -98,6 +113,64 @@ function DetailBody({ data }: { data: SPUDetail }) {
 
   const stock = selectedSku?.stock ?? 0;
   const skuChosen = data.spec_axes.length === 0 || selectedSku !== null;
+  // 若 SPU 只有单 SKU（无 spec 轴），默认取第一个 SKU 作为下单目标
+  const effectiveSku: SKUOut | null =
+    selectedSku ?? (data.spec_axes.length === 0 ? data.skus[0] ?? null : null);
+
+  const canBuy = Boolean(effectiveSku) && (effectiveSku?.stock ?? 0) > 0 && quantity > 0;
+
+  const guardLogin = (): boolean => {
+    if (!hasHydrated) return false;
+    if (!isLoggedIn) {
+      const next = encodeURIComponent(window.location.pathname);
+      router.push(`/login?next=${next}`);
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddToCart = async () => {
+    if (!effectiveSku) {
+      toast.error("请先选择商品规格");
+      return;
+    }
+    if (!guardLogin()) return;
+    setAdding(true);
+    try {
+      await addToCart({ sku_id: effectiveSku.id, quantity });
+      bumpBadge(1); // 乐观 +1（后端会去重同 SKU 累加数量）
+      invalidateCart();
+      toast.success("已加入购物车");
+    } catch (e) {
+      const msg =
+        e instanceof ApiError ? messageForCode(e.code, e.message) : "加入失败";
+      toast.error(msg);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!effectiveSku) {
+      toast.error("请先选择商品规格");
+      return;
+    }
+    if (!guardLogin()) return;
+    setBuying(true);
+    try {
+      // Phase 3 简化：先加入购物车，再跳到 checkout 用返回的 cart_item_id
+      const item = await addToCart({ sku_id: effectiveSku.id, quantity });
+      bumpBadge(1);
+      invalidateCart();
+      router.push(`/checkout?cart_item_ids=${item.id}`);
+    } catch (e) {
+      const msg =
+        e instanceof ApiError ? messageForCode(e.code, e.message) : "下单失败";
+      toast.error(msg);
+    } finally {
+      setBuying(false);
+    }
+  };
 
   return (
     <>
@@ -200,32 +273,41 @@ function DetailBody({ data }: { data: SPUDetail }) {
             <QuantityInput
               value={quantity}
               onChange={setQuantity}
-              max={selectedSku ? stock : undefined}
+              max={effectiveSku ? effectiveSku.stock : undefined}
             />
           </div>
 
           <div className="mt-2 flex flex-wrap gap-3">
-            <button
-              type="button"
-              disabled
-              title="购物车即将开放"
-              className="inline-flex h-11 min-w-[10rem] items-center justify-center rounded-md border border-[color:var(--color-primary)] px-6 text-sm font-medium text-[color:var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-60"
+            <Button
+              variant="secondary"
+              className="min-w-[10rem] border-[color:var(--color-primary)] text-[color:var(--color-primary)]"
+              size="lg"
+              disabled={!canBuy}
+              loading={adding}
+              onClick={handleAddToCart}
+              data-testid="add-to-cart-btn"
             >
               加入购物车
-            </button>
-            <button
-              type="button"
-              disabled
-              title="购物车即将开放"
-              className="inline-flex h-11 min-w-[10rem] items-center justify-center rounded-md bg-[color:var(--color-primary)] px-6 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+            </Button>
+            <Button
+              variant="primary"
+              className="min-w-[10rem]"
+              size="lg"
+              disabled={!canBuy}
+              loading={buying}
+              onClick={handleBuyNow}
+              data-testid="buy-now-btn"
             >
               立即购买
-            </button>
-            <p className="w-full text-xs text-neutral-400">
-              {skuChosen
-                ? "购物车即将在 Phase 3 开放，敬请期待"
-                : "请先选择商品规格"}
-            </p>
+            </Button>
+            {!skuChosen && (
+              <p className="w-full text-xs text-neutral-400">请先选择商品规格</p>
+            )}
+            {skuChosen && (effectiveSku?.stock ?? 0) <= 0 && (
+              <p className="w-full text-xs text-[color:var(--color-primary)]">
+                当前 SKU 已售罄
+              </p>
+            )}
           </div>
         </div>
       </div>
