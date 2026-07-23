@@ -3,32 +3,59 @@
 /**
  * 管理员工作台首页 (`/console`)。
  *
- * Phase 1 变化：
- * - "待审核商家"卡片从 mock 0 改为真实调 GET /admin/merchant-applications?status=pending 取 total
- * - 该卡片可点击 → /console/merchants/applications?status=pending
- * - 其余三张卡片仍为 mock 0（Phase 2/3 接入商品/售后/订单后开放）
- * - 底部提示"更多能力将在 Phase 2/3 开放"
+ * Phase 2 变化：
+ * - 4 张卡片改为：
+ *   1. 待审核商家（沿用 Phase 1，调 GET /admin/merchant-applications?status=pending）
+ *   2. 待审核商品（GET /admin/spus?status=pending_review）
+ *   3. 已上架商品（GET /admin/spus?status=approved）
+ *   4. 类目总数   （GET /admin/categories，计算树节点数）
+ * - 待审核商品卡片可点击 → /console/products/review
+ * - 权限缺失的卡片显示 "—"
  */
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { StatCard } from "@/components/console/StatCard";
 import { listMerchantApplications } from "@/lib/merchant-application-api";
+import { listAllSPUs } from "@/lib/product-api";
+import { listAllCategories } from "@/lib/category-api";
+import { countTreeNodes } from "@/components/ui/CategoryTreeEditor";
 import { usePermission } from "@/hooks/useAuth";
 
 export default function ConsoleHomePage() {
   const canReadApplications = usePermission("admin:merchant_application:read");
+  const canReadSPUs = usePermission("admin:spu:read_all");
+  const canManageCategory = usePermission("admin:category:manage");
 
-  const { data, isLoading, isError } = useQuery({
+  const pendingApplications = useQuery({
     queryKey: ["dashboard", "pending-applications-count"],
     queryFn: () =>
       listMerchantApplications({ status: "pending", page: 1, size: 1 }),
     enabled: canReadApplications,
-    // dashboard 数据更实时
     staleTime: 30_000,
   });
 
-  const pendingCount = data?.total ?? 0;
+  const pendingSPUs = useQuery({
+    queryKey: ["dashboard", "pending-spus-count"],
+    queryFn: () =>
+      listAllSPUs({ status: "pending_review", page: 1, size: 1 }),
+    enabled: canReadSPUs,
+    staleTime: 30_000,
+  });
+
+  const approvedSPUs = useQuery({
+    queryKey: ["dashboard", "approved-spus-count"],
+    queryFn: () => listAllSPUs({ status: "approved", page: 1, size: 1 }),
+    enabled: canReadSPUs,
+    staleTime: 60_000,
+  });
+
+  const categoryTree = useQuery({
+    queryKey: ["dashboard", "category-tree"],
+    queryFn: listAllCategories,
+    enabled: canManageCategory,
+    staleTime: 5 * 60_000,
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,7 +67,7 @@ export default function ConsoleHomePage() {
           </p>
         </div>
         <span className="rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500">
-          Phase 1
+          Phase 2
         </span>
       </header>
 
@@ -48,6 +75,7 @@ export default function ConsoleHomePage() {
         aria-label="核心指标"
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
+        {/* 1. 待审核商家 */}
         {canReadApplications ? (
           <Link
             href="/console/merchants/applications?status=pending"
@@ -57,12 +85,16 @@ export default function ConsoleHomePage() {
             <StatCard
               label="待审核商家"
               value={
-                isLoading ? "…" : isError ? "—" : String(pendingCount)
+                pendingApplications.isLoading
+                  ? "…"
+                  : pendingApplications.isError
+                    ? "—"
+                    : String(pendingApplications.data?.total ?? 0)
               }
               hint={
-                isError
+                pendingApplications.isError
                   ? "拉取失败，请稍后刷新"
-                  : "商家入驻申请等待业务管理员处理（点击查看）"
+                  : "商家入驻申请等待处理（点击查看）"
               }
               tone="warning"
             />
@@ -76,33 +108,104 @@ export default function ConsoleHomePage() {
           />
         )}
 
-        <StatCard
-          label="待审核商品"
-          value={0}
-          hint="Phase 2 开放：商家提交、待审核的商品数"
-          tone="info"
-        />
-        <StatCard
-          label="待仲裁售后"
-          value={0}
-          hint="Phase 4 开放：升级到客服的售后单"
-          tone="danger"
-        />
-        <StatCard
-          label="今日订单量"
-          value={0}
-          hint="Phase 3 开放：自然日 0 点至今全平台订单数"
-          tone="default"
-        />
+        {/* 2. 待审核商品 */}
+        {canReadSPUs ? (
+          <Link
+            href="/console/products/review?status=pending_review"
+            className="rounded-md transition hover:shadow"
+            aria-label="查看待审核商品"
+          >
+            <StatCard
+              label="待审核商品"
+              value={
+                pendingSPUs.isLoading
+                  ? "…"
+                  : pendingSPUs.isError
+                    ? "—"
+                    : String(pendingSPUs.data?.total ?? 0)
+              }
+              hint={
+                pendingSPUs.isError
+                  ? "拉取失败，请稍后刷新"
+                  : "商家提交、待审核的商品数（点击查看）"
+              }
+              tone="info"
+            />
+          </Link>
+        ) : (
+          <StatCard
+            label="待审核商品"
+            value="—"
+            hint="您当前无查看权限"
+            tone="info"
+          />
+        )}
+
+        {/* 3. 已上架商品 */}
+        {canReadSPUs ? (
+          <Link
+            href="/console/products/review?status=approved"
+            className="rounded-md transition hover:shadow"
+            aria-label="查看已上架商品"
+          >
+            <StatCard
+              label="已上架商品"
+              value={
+                approvedSPUs.isLoading
+                  ? "…"
+                  : approvedSPUs.isError
+                    ? "—"
+                    : String(approvedSPUs.data?.total ?? 0)
+              }
+              hint="平台在售商品总数"
+              tone="success"
+            />
+          </Link>
+        ) : (
+          <StatCard
+            label="已上架商品"
+            value="—"
+            hint="您当前无查看权限"
+            tone="success"
+          />
+        )}
+
+        {/* 4. 类目总数 */}
+        {canManageCategory ? (
+          <Link
+            href="/console/catalog/categories"
+            className="rounded-md transition hover:shadow"
+            aria-label="查看类目管理"
+          >
+            <StatCard
+              label="类目总数"
+              value={
+                categoryTree.isLoading
+                  ? "…"
+                  : categoryTree.isError
+                    ? "—"
+                    : String(countTreeNodes(categoryTree.data ?? []))
+              }
+              hint="含各级类目（点击管理）"
+              tone="default"
+            />
+          </Link>
+        ) : (
+          <StatCard
+            label="类目总数"
+            value="—"
+            hint="您当前无查看权限"
+            tone="default"
+          />
+        )}
       </section>
 
       <section className="rounded-md border border-dashed border-[color:var(--color-border)] bg-white p-6 text-sm text-neutral-500">
         <div className="mb-1 text-neutral-700 font-medium">
-          更多能力将在 Phase 2 / Phase 3 开放
+          更多能力将在 Phase 3 / Phase 4 开放
         </div>
         <p>
-          Phase 1 聚焦「身份认证 + 商家入驻审核」。商品审核、订单大盘、售后仲裁、
-          用户/权限管理等模块将在后续 Phase 逐步上线，敬请关注开发规划文档。
+          Phase 3 将上线订单大盘与干预操作，Phase 4 上线售后仲裁台，敬请关注开发规划文档。
         </p>
       </section>
     </div>

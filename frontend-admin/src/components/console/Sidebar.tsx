@@ -31,8 +31,9 @@ interface NavItem {
  * 导航项定义。
  *
  * requires 中列出的权限键都取自 rbac.ts Permission 联合类型。
- * "商家审核" 是 Phase 1 唯一可用项；其它项目 available=false，
- * 会以 disabled 样式呈现，提示 "Phase X 开放"。
+ * Phase 1 上线：商家审核。
+ * Phase 2 上线：商品审核、类目管理、品牌管理（按 permissions 门控）。
+ * 其它项目 available=false，会以 disabled 样式呈现，提示 "Phase X 开放"。
  */
 const NAV_ITEMS: readonly NavItem[] = [
   {
@@ -43,11 +44,25 @@ const NAV_ITEMS: readonly NavItem[] = [
     available: true,
   },
   {
-    href: "/console/products",
+    href: "/console/products/review",
     label: "商品审核",
-    requires: ["admin:product:review"],
+    requires: ["admin:spu:read_all", "admin:spu:review"],
     group: "business",
-    available: false,
+    available: true,
+  },
+  {
+    href: "/console/catalog/categories",
+    label: "类目管理",
+    requires: ["admin:category:manage"],
+    group: "business",
+    available: true,
+  },
+  {
+    href: "/console/catalog/brands",
+    label: "品牌管理",
+    requires: ["admin:brand:manage"],
+    group: "business",
+    available: true,
   },
   {
     href: "/console/orders",
@@ -175,7 +190,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-[color:var(--color-border)] px-4 py-3 text-[11px] text-neutral-400">
-        Phase 1 · 商家入驻审核已上线
+        Phase 2 · 商品与类目管理已上线
       </div>
     </aside>
   );

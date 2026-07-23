@@ -1,20 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { CategoryNav } from "@/components/catalog/CategoryNav";
 
 /**
  * 全站顶部导航条：
- * - 左侧品牌 logo（回首页）
- * - 右侧：未登录 → "登录 / 注册" 链接；已登录 → 昵称头像 + 下拉菜单
+ *   第一行：品牌 logo + 搜索栏 + 登录/注册（或用户菜单）
+ *   第二行：一级类目导航（hover 出下拉）
  *
- * 使用 useAuth 判断登录态；未 hydrate 时先渲染占位骨架，避免 SSR/CSR 结果不一致导致的闪跳。
+ * 未登录也可用搜索与类目浏览（对齐契约 §5：user 端浏览接口不强制登录）。
+ * 搜索栏提交 → /search?keyword=xxx；空关键字不跳。
+ *
+ * SSR/CSR 首帧鉴权占位保持不变，避免闪跳。
  */
 export function SiteHeader() {
   const { isLoggedIn, hasHydrated, user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -25,15 +32,44 @@ export function SiteHeader() {
     return () => document.removeEventListener("click", onClick);
   }, [open]);
 
+  const onSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const kw = keyword.trim();
+    if (!kw) return;
+    router.push(`/search?keyword=${encodeURIComponent(kw)}`);
+  };
+
   return (
-    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-6">
         <Link
           href="/"
           className="text-lg font-semibold tracking-tight text-[color:var(--color-primary)]"
         >
           JD-Clone
         </Link>
+
+        <form
+          onSubmit={onSearchSubmit}
+          role="search"
+          className="flex flex-1 items-center overflow-hidden rounded-md border border-neutral-300 focus-within:border-[color:var(--color-primary)]"
+        >
+          <input
+            type="search"
+            name="keyword"
+            aria-label="搜索商品"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="搜索商品、品牌、类目"
+            className="h-9 min-w-0 flex-1 bg-transparent px-3 text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="h-9 shrink-0 bg-[color:var(--color-primary)] px-4 text-sm text-white hover:opacity-90"
+          >
+            搜索
+          </button>
+        </form>
 
         <nav className="flex items-center gap-4 text-sm">
           {!hasHydrated ? (
@@ -122,6 +158,11 @@ export function SiteHeader() {
             </>
           )}
         </nav>
+      </div>
+      <div className="border-t border-neutral-100 bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-2">
+          <CategoryNav />
+        </div>
       </div>
     </header>
   );

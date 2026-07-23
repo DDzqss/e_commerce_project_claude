@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.merchant import auth, me
+from app.api.v1.merchant import auth, inventory, me, skus, spus, uploads
 
 router = APIRouter()
 
 router.include_router(auth.router, prefix="/auth", tags=["merchant.auth"])
 router.include_router(me.router, prefix="/me", tags=["merchant.me"])
+router.include_router(spus.router, prefix="/spus", tags=["merchant.spus"])
+# SKU routes live nested under /merchant/spus/{spu_id}/skus (contract §8.2).
+router.include_router(skus.router, prefix="/spus", tags=["merchant.skus"])
+router.include_router(uploads.router, prefix="/uploads", tags=["merchant.uploads"])
+router.include_router(inventory.router, prefix="", tags=["merchant.inventory"])
 
 __all__ = ["router"]

@@ -29,7 +29,6 @@ const NAV_ITEMS: readonly NavItem[] = [
     href: "/products",
     label: "商品管理",
     icon: "▦",
-    comingSoonNote: "Phase 2 开放",
   },
   { href: "/shop", label: "店铺信息", icon: "◉" },
   {
