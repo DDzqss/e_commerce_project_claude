@@ -705,6 +705,11 @@ gh pr create --base develop
 | pydantic-settings 的 `Literal` 字段严格 | CI 传了非枚举值（如 `ENVIRONMENT=test`）就报 validation error | Settings 枚举字段要在文档写清可选值；CI 配置里的值必须匹配 |
 | `MINIO_SECRET_KEY = "minioadmin"` 触发 ruff S105 | ruff 认为是硬编码密码 | 加 `# noqa: S105  dev-only default; production must override via env` 注释说明 |
 | ruff PT018 禁止一行内多断言 | `assert x in body and isinstance(...)` 被拆 | 每个断言独占一行 |
+| **`bcrypt` 5.0+ 与 `passlib` 1.7.x 不兼容** | 测试报 `ValueError: password cannot be longer than 72 bytes` 即使密码很短 | pin `bcrypt>=4.0,<5.0`（passlib 停更多年未适配 bcrypt 4+ 的 API 变化）；长期方案是直接用 `bcrypt` 库或迁移到 `argon2-cffi` |
+| **SQLAlchemy 2.0 async 缺 greenlet** | 报 `ValueError: the greenlet library is required`；本地已装可能碰巧有，CI 全新装必挂 | 依赖里显式声明 `sqlalchemy[asyncio]` **或** `greenlet>=3.0`；两个都写更保险 |
+| **SQLite 不给 `BigInteger` 自增** | 用 aiosqlite 跑测试报 `NOT NULL constraint failed: users.id`；Postgres 无碍 | `BigInteger().with_variant(Integer, "sqlite")` 定义 `BigIntId` 类型；PK 与 FK 全部用这个 |
+| **`session.flush()` 后 Pydantic 序列化访问 `updated_at`** | `MissingGreenlet: greenlet_spawn has not been called` — 因 `onupdate=func.now()` 需要 refresh 才能拿到新值 | 状态变更后写 `await session.refresh(row)` 再返回 |
+| **Agent 本地 `.venv` 缓存旧依赖** | Agent 本地 pytest pass，CI 全新装挂 4 类问题 | Agent 在启动前必须 `uv sync --refresh --all-extras` 或删掉 `.venv` 重装；Orchestrator 派活时明确要求 |
 
 ### 11.4 CI/CD
 
