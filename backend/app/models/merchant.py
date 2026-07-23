@@ -11,10 +11,10 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, IdMixin, SoftDeleteMixin, TimestampMixin
+from app.models.base import Base, BigIntId, IdMixin, SoftDeleteMixin, TimestampMixin
 
 
 class ShopStatus(enum.StrEnum):
@@ -61,7 +61,7 @@ class MerchantAccount(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "merchant_accounts"
 
     user_id: Mapped[int] = mapped_column(
-        BigInteger,
+        BigIntId,
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
         index=True,
@@ -69,7 +69,7 @@ class MerchantAccount(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
     login_name: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     shop_id: Mapped[int] = mapped_column(
-        BigInteger,
+        BigIntId,
         ForeignKey("shops.id", ondelete="RESTRICT"),
         nullable=False,
         index=True,

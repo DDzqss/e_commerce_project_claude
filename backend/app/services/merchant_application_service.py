@@ -78,6 +78,7 @@ async def apply(
     )
     session.add(row)
     await session.flush()
+    await session.refresh(row)
 
     await write_audit(
         session,
@@ -144,6 +145,9 @@ async def withdraw(
     row.status = MerchantApplicationStatus.WITHDRAWN
     row.reviewed_at = datetime.now(UTC)
     await session.flush()
+    # updated_at is server-side onupdate; refresh so Pydantic serialization
+    # sees the new value without lazy-loading after session close.
+    await session.refresh(row)
 
     await write_audit(
         session,
@@ -259,6 +263,7 @@ async def admin_approve(
     row.reviewed_at = datetime.now(UTC)
     row.approved_merchant_account_id = account.id
     await session.flush()
+    await session.refresh(row)
 
     # SIMULATED CHANNEL — real SMS/email delivery is deferred; contract
     # §8.1 says we log the credentials so devs can complete onboarding.
@@ -325,6 +330,7 @@ async def admin_reject(
     row.review_note = review_note
     row.reviewed_at = datetime.now(UTC)
     await session.flush()
+    await session.refresh(row)
 
     await write_audit(
         session,

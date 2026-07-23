@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import enum
 
-from sqlalchemy import JSON, BigInteger, Enum, Index, String
+from sqlalchemy import JSON, Enum, Index, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, IdMixin, TimestampMixin
+from app.models.base import Base, BigIntId, IdMixin, TimestampMixin
 
 
 class AuditActorType(enum.StrEnum):
@@ -39,10 +39,10 @@ class AuditLog(IdMixin, TimestampMixin, Base):
         ),
         nullable=False,
     )
-    actor_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    actor_id: Mapped[int | None] = mapped_column(BigIntId, nullable=True)
     action: Mapped[str] = mapped_column(String(80), nullable=False)
     target_type: Mapped[str | None] = mapped_column(String(60), nullable=True)
-    target_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    target_id: Mapped[int | None] = mapped_column(BigIntId, nullable=True)
     ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Portable JSON column — Postgres will materialize as JSONB via

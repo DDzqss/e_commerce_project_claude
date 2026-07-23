@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, Request, status
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_client_ip, get_current_user, get_user_agent
@@ -97,7 +98,7 @@ async def logout(
 @router.post("/forgot-password", summary="Send a password-reset code (simulated)")
 async def forgot_password(
     payload: ForgotPasswordIn,
-    redis=Depends(get_redis),
+    redis: Redis = Depends(get_redis),
 ) -> dict[str, Any]:
     await auth_service.forgot_password(redis, payload)
     return envelope(message="verification code sent", data=None)
@@ -108,7 +109,7 @@ async def reset_password(
     payload: ResetPasswordIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
-    redis=Depends(get_redis),
+    redis: Redis = Depends(get_redis),
 ) -> dict[str, Any]:
     await auth_service.reset_password(
         session,

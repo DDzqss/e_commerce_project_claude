@@ -11,10 +11,10 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, IdMixin, TimestampMixin
+from app.models.base import Base, BigIntId, IdMixin, TimestampMixin
 
 
 class MerchantApplicationStatus(enum.StrEnum):
@@ -32,7 +32,7 @@ class MerchantApplication(IdMixin, TimestampMixin, Base):
     __tablename__ = "merchant_applications"
 
     applicant_user_id: Mapped[int] = mapped_column(
-        BigInteger,
+        BigIntId,
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
         index=True,
@@ -55,7 +55,7 @@ class MerchantApplication(IdMixin, TimestampMixin, Base):
         index=True,
     )
     reviewer_admin_id: Mapped[int | None] = mapped_column(
-        BigInteger,
+        BigIntId,
         ForeignKey("admin_users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
@@ -63,7 +63,7 @@ class MerchantApplication(IdMixin, TimestampMixin, Base):
     review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     approved_merchant_account_id: Mapped[int | None] = mapped_column(
-        BigInteger,
+        BigIntId,
         ForeignKey("merchant_accounts.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
