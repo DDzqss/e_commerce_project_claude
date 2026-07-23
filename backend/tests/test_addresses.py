@@ -59,9 +59,9 @@ async def test_update_and_set_default(client: AsyncClient, seed_user: User) -> N
     a = (await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())).json()[
         "data"
     ]
-    b = (
-        await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())
-    ).json()["data"]
+    b = (await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())).json()[
+        "data"
+    ]
     # update a's detail
     upd = await client.patch(
         f"/api/v1/user/addresses/{a['id']}",
@@ -84,9 +84,9 @@ async def test_delete_default_does_not_reassign(client: AsyncClient, seed_user: 
     a = (await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())).json()[
         "data"
     ]
-    _b = (await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())).json()[
-        "data"
-    ]
+    _b = (
+        await client.post("/api/v1/user/addresses", headers=headers, json=_addr_payload())
+    ).json()["data"]
     resp = await client.delete(f"/api/v1/user/addresses/{a['id']}", headers=headers)
     assert resp.json()["data"]["deleted"] is True
 
@@ -117,9 +117,7 @@ async def test_address_not_owned_returns_11002(
     )
     owner_headers = await _user_headers(client, seed_user)
     a = (
-        await client.post(
-            "/api/v1/user/addresses", headers=owner_headers, json=_addr_payload()
-        )
+        await client.post("/api/v1/user/addresses", headers=owner_headers, json=_addr_payload())
     ).json()["data"]
     r = await client.get(f"/api/v1/user/addresses/{a['id']}", headers=other_headers)
     assert r.json()["code"] == 11002

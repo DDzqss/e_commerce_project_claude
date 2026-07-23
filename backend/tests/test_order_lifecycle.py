@@ -146,9 +146,7 @@ async def test_user_cancel_returns_stock(
         assert row.stock == 7
         assert row.locked_stock == 3
 
-    r = await client.post(
-        f"/api/v1/user/orders/{order['id']}/cancel", headers=u_headers, json={}
-    )
+    r = await client.post(f"/api/v1/user/orders/{order['id']}/cancel", headers=u_headers, json={})
     assert r.json()["code"] == 0
     assert r.json()["data"]["status"] == OrderStatus.CANCELLED.value
 
@@ -229,9 +227,7 @@ async def test_pay_ship_confirm_flow(
     assert len(detail["shipment_events"]) == 3
 
     # User confirm receipt.
-    cr = await client.post(
-        f"/api/v1/user/orders/{order['id']}/confirm-receipt", headers=u_headers
-    )
+    cr = await client.post(f"/api/v1/user/orders/{order['id']}/confirm-receipt", headers=u_headers)
     assert cr.json()["data"]["status"] == OrderStatus.COMPLETED.value
 
     # sold_count on SKU should be 2 now.
@@ -273,9 +269,7 @@ async def test_shipped_auto_complete_via_scan(
     # Fast-forward auto_complete_at.
     past = datetime.now(UTC) - timedelta(minutes=1)
     async with _sf()() as s:
-        await s.execute(
-            update(Order).where(Order.id == order["id"]).values(auto_complete_at=past)
-        )
+        await s.execute(update(Order).where(Order.id == order["id"]).values(auto_complete_at=past))
         await s.commit()
 
     a_headers = await _headers_admin(client)

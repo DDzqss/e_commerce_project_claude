@@ -29,13 +29,13 @@ async def preview_orders(
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_CREATE)),
 ) -> dict[str, Any]:
-    result = await order_service.preview(
-        session, user, payload.cart_item_ids, payload.address_id
-    )
+    result = await order_service.preview(session, user, payload.cart_item_ids, payload.address_id)
     return envelope(data=result.model_dump(mode="json"))
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, summary="Create orders (may fan out per shop)")
+@router.post(
+    "", status_code=status.HTTP_201_CREATED, summary="Create orders (may fan out per shop)"
+)
 async def create_orders(
     payload: OrderCreateIn,
     request: Request,

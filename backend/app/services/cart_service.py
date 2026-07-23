@@ -52,9 +52,7 @@ def _judge_status(sku: SKU | None, spu: SPU | None) -> tuple[str, str | None]:
     return "valid", None
 
 
-async def _load_owned_cart_item(
-    session: AsyncSession, user: User, item_id: int
-) -> CartItem:
+async def _load_owned_cart_item(session: AsyncSession, user: User, item_id: int) -> CartItem:
     row = await session.get(CartItem, item_id)
     if row is None or row.user_id != user.id:
         raise AppException(ErrorCode.CART_ITEM_NOT_FOUND, "cart item not found")
@@ -88,9 +86,7 @@ async def _fetch_related(
     return sku_map, spu_map, shop_map
 
 
-def _build_item_out(
-    row: CartItem, sku: SKU | None, spu: SPU | None
-) -> CartItemOut | None:
+def _build_item_out(row: CartItem, sku: SKU | None, spu: SPU | None) -> CartItemOut | None:
     """Return None if the SKU/SPU is completely gone (extreme case)."""
     status, reason = _judge_status(sku, spu)
     # For rendering we still want the SKU/SPU snapshot even if invalid;
@@ -152,7 +148,7 @@ async def get_cart_grouped(session: AsyncSession, user: User) -> CartResponseOut
             total_cents_selected += line_total
             total_selected_count += r.quantity
 
-        assert spu is not None  # noqa: S101 — narrowed by item_out check
+        assert spu is not None
         shop_id = spu.shop_id
         group = groups_map.get(shop_id)
         if group is None:
@@ -271,7 +267,7 @@ async def add(
         extra={"sku_id": row.sku_id, "quantity": row.quantity},
     )
     out = _build_item_out(row, sku, spu)
-    assert out is not None  # noqa: S101
+    assert out is not None
     return out
 
 
@@ -320,7 +316,7 @@ async def update_item(
         user_agent=user_agent,
     )
     out = _build_item_out(row, sku, spu)
-    assert out is not None  # noqa: S101
+    assert out is not None
     return out
 
 
@@ -381,9 +377,7 @@ async def select_all(
     ip: str | None = None,
     user_agent: str | None = None,
 ) -> int:
-    stmt = (
-        update(CartItem).where(CartItem.user_id == user.id).values(selected=selected)
-    )
+    stmt = update(CartItem).where(CartItem.user_id == user.id).values(selected=selected)
     result = await session.execute(stmt)
     await session.flush()
     changed = int(result.rowcount or 0)
@@ -409,13 +403,7 @@ async def clear_invalid(
     user_agent: str | None = None,
 ) -> int:
     rows = list(
-        (
-            await session.execute(
-                select(CartItem).where(CartItem.user_id == user.id)
-            )
-        )
-        .scalars()
-        .all()
+        (await session.execute(select(CartItem).where(CartItem.user_id == user.id))).scalars().all()
     )
     sku_map, spu_map, _ = await _fetch_related(session, (r.sku_id for r in rows))
 
@@ -429,9 +417,7 @@ async def clear_invalid(
 
     if invalid_ids:
         await session.execute(
-            delete(CartItem).where(
-                CartItem.user_id == user.id, CartItem.id.in_(invalid_ids)
-            )
+            delete(CartItem).where(CartItem.user_id == user.id, CartItem.id.in_(invalid_ids))
         )
         await session.flush()
     await write_audit(

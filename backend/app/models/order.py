@@ -85,9 +85,7 @@ class Order(IdMixin, TimestampMixin, Base):
     admin_note: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # lifecycle timestamps + deadlines
-    payment_deadline_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    payment_deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     shipped_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     auto_complete_at: Mapped[datetime | None] = mapped_column(

@@ -141,12 +141,10 @@ def _to_out(row: PaymentSession, expires_at: datetime, _idem: str) -> PaymentSes
     )
 
 
-async def get_session(
-    session: AsyncSession, user: User, session_id: int
-) -> PaymentSessionOut:
+async def get_session(session: AsyncSession, user: User, session_id: int) -> PaymentSessionOut:
     ps = await _load_session_for_user(session, user, session_id)
     order = await session.get(Order, ps.order_id)
-    assert order is not None  # noqa: S101 — narrowed by loader
+    assert order is not None
     return _to_out(ps, order.payment_deadline_at, "")
 
 
@@ -165,7 +163,7 @@ async def mock_succeed(
             "payment session not pending",
         )
     order = await session.get(Order, ps.order_id)
-    assert order is not None  # noqa: S101
+    assert order is not None
     if order.status != OrderStatus.PENDING_PAYMENT:
         raise AppException(
             ErrorCode.ORDER_STATUS_INVALID_FOR_ACTION,
@@ -233,10 +231,10 @@ async def mock_fail(
             "payment session not pending",
         )
     order = await session.get(Order, ps.order_id)
-    assert order is not None  # noqa: S101
+    assert order is not None
 
     ps.status = PaymentStatus.FAILED
-    ps.failure_reason = "模拟支付失败：用户点击了失败按钮"
+    ps.failure_reason = "模拟支付失败: 用户点击了失败按钮"
     ps.completed_at = datetime.now(UTC)
     await session.flush()
 

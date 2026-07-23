@@ -37,6 +37,8 @@ ignore = [
     "E501",    # line-length handled by formatter
     "PLR0913", # too-many-arguments (FastAPI deps make this noisy)
     "PLR2004", # magic value comparisons
+    "PLR0911", # too-many-return-statements (state machine dispatchers legitimately have many)
+    "PLC0415", # allow local imports (used to avoid circular deps / lazy load in scripts)
     "S101",    # allow assert (used in tests)
     "B008",    # allow FastAPI Depends() in defaults
 ]

@@ -45,9 +45,7 @@ async def _seed_approved_sku(
     """Create one approved SPU + SKU and return the SKU row."""
     m_headers = await _merchant_headers(client, seed_merchant_account)
     a_headers = bearer(
-        (
-            await login_admin_get_tokens(client, "super", "super_pwd_change_me")
-        )["access_token"]
+        (await login_admin_get_tokens(client, "super", "super_pwd_change_me"))["access_token"]
     )
     _ = seed_admins
 

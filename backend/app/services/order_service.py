@@ -28,11 +28,13 @@ from app.models.merchant import MerchantAccount, Shop
 from app.models.order import CancelReason, Order, OrderStatus
 from app.models.order_item import OrderItem
 from app.models.order_status_history import ActorType, OrderStatusHistory
-from app.models.payment_session import PaymentSession, PaymentStatus
-from app.models.product import SPU, SPUStatus
+from app.models.payment_session import PaymentSession
+from app.models.product import SPU
 from app.models.shipment_event import ShipmentEvent, ShipmentEventType
 from app.models.sku import SKU
 from app.models.user import User
+from app.schemas.address import AddressOut
+from app.schemas.cart import CartShopBrief
 from app.schemas.order import (
     OrderCreatedItem,
     OrderCreateOut,
@@ -46,13 +48,10 @@ from app.schemas.order import (
     PaymentSessionBriefOut,
     ShipmentEventOut,
 )
-from app.schemas.address import AddressOut
-from app.schemas.cart import CartShopBrief
 from app.schemas.stats import AdminOrderOverviewOut, MerchantOrderStatsOut
 from app.services import cart_service
 from app.services.audit_service import write_audit
 from app.services.inventory_service import write_log_row
-
 
 # ---------------------------------------------------------------------------
 # Type helpers
@@ -95,9 +94,7 @@ async def _load_order_for_shop(
     return order
 
 
-async def _load_owned_address(
-    session: AsyncSession, user: User, address_id: int
-) -> Address:
+async def _load_owned_address(session: AsyncSession, user: User, address_id: int) -> Address:
     row = await session.get(Address, address_id)
     if row is None or row.deleted_at is not None or row.user_id != user.id:
         raise AppException(ErrorCode.ORDER_ADDRESS_INVALID, "address invalid")
@@ -275,9 +272,7 @@ async def _load_cart_items_for_checkout(
 ) -> list[_CartItemLoaded]:
     if not cart_item_ids:
         raise AppException(ErrorCode.ORDER_CART_EMPTY, "cart_item_ids empty")
-    stmt = select(CartItem).where(
-        CartItem.user_id == user.id, CartItem.id.in_(cart_item_ids)
-    )
+    stmt = select(CartItem).where(CartItem.user_id == user.id, CartItem.id.in_(cart_item_ids))
     rows = list((await session.execute(stmt)).scalars().all())
     found_ids = {r.id for r in rows}
     missing = set(cart_item_ids) - found_ids
@@ -300,9 +295,7 @@ async def _load_cart_items_for_checkout(
             valid = False
             reason = "stock_short"
         loaded.append(
-            _CartItemLoaded(
-                cart_item=r, sku=sku, spu=spu, shop=shop, valid=valid, reason=reason
-            )
+            _CartItemLoaded(cart_item=r, sku=sku, spu=spu, shop=shop, valid=valid, reason=reason)
         )
     return loaded
 
@@ -377,21 +370,15 @@ async def preview(
 
 
 def _reason_message(reason: str | None) -> str:
-    match reason:
-        case "sku_deleted":
-            return "商品已下架"
-        case "spu_deleted":
-            return "商品已下架"
-        case "spu_not_on_sale":
-            return "商品未上架销售"
-        case "sku_inactive":
-            return "该规格已停售"
-        case "out_of_stock":
-            return "库存不足"
-        case "stock_short":
-            return "库存不足"
-        case _:
-            return "商品不可下单"
+    mapping = {
+        "sku_deleted": "商品已下架",
+        "spu_deleted": "商品已下架",
+        "spu_not_on_sale": "商品未上架销售",
+        "sku_inactive": "该规格已停售",
+        "out_of_stock": "库存不足",
+        "stock_short": "库存不足",
+    }
+    return mapping.get(reason or "", "商品不可下单")
 
 
 # ---------------------------------------------------------------------------
@@ -427,9 +414,7 @@ async def create(
 
     grouped = _group_by_shop(valid_items)
 
-    receiver_address = (
-        f"{address.province}{address.city}{address.district}{address.detail}"
-    )
+    receiver_address = f"{address.province}{address.city}{address.district}{address.detail}"
     payment_deadline = datetime.now(UTC) + timedelta(minutes=settings.PAYMENT_TIMEOUT_MINUTES)
 
     created_orders: list[Order] = []
@@ -460,7 +445,8 @@ async def create(
         # Build order_items.
         order_items: list[OrderItem] = []
         for cl in items:
-            assert cl.sku is not None and cl.spu is not None  # noqa: S101
+            assert cl.sku is not None
+            assert cl.spu is not None
             oi = OrderItem(
                 order_id=order.id,
                 sku_id=cl.sku.id,
@@ -502,9 +488,7 @@ async def create(
     used_cart_ids = [cl.cart_item.id for cl in valid_items]
     if used_cart_ids:
         await session.execute(
-            delete(CartItem).where(
-                CartItem.user_id == user.id, CartItem.id.in_(used_cart_ids)
-            )
+            delete(CartItem).where(CartItem.user_id == user.id, CartItem.id.in_(used_cart_ids))
         )
         await session.flush()
 
@@ -585,17 +569,11 @@ async def _insert_order_with_unique_no(
     )
 
 
-async def _serialize_created_orders(
-    session: AsyncSession, orders: list[Order]
-) -> OrderCreateOut:
+async def _serialize_created_orders(session: AsyncSession, orders: list[Order]) -> OrderCreateOut:
     if not orders:
         return OrderCreateOut(orders=[])
     shop_ids = list({o.shop_id for o in orders})
-    shops = list(
-        (await session.execute(select(Shop).where(Shop.id.in_(shop_ids))))
-        .scalars()
-        .all()
-    )
+    shops = list((await session.execute(select(Shop).where(Shop.id.in_(shop_ids)))).scalars().all())
     shop_map = {s.id: s for s in shops}
     items = [
         OrderCreatedItem(
@@ -620,22 +598,18 @@ def _split_status_multi(value: str | None) -> list[OrderStatus] | None:
     if not value:
         return None
     out: list[OrderStatus] = []
-    for token in value.split(","):
-        token = token.strip()
+    for raw_token in value.split(","):
+        token = raw_token.strip()
         if not token:
             continue
         try:
             out.append(OrderStatus(token))
         except ValueError as exc:
-            raise AppException(
-                ErrorCode.VALIDATION_ERROR, f"unknown status '{token}'"
-            ) from exc
+            raise AppException(ErrorCode.VALIDATION_ERROR, f"unknown status '{token}'") from exc
     return out or None
 
 
-async def _lazy_expire_pending_payments(
-    session: AsyncSession, orders: list[Order]
-) -> None:
+async def _lazy_expire_pending_payments(session: AsyncSession, orders: list[Order]) -> None:
     """Flip any pending_payment orders past their deadline to cancelled."""
     now = datetime.now(UTC)
     expired = [
@@ -652,10 +626,14 @@ async def _lazy_expire_pending_payments(
 
 async def _load_order_items(session: AsyncSession, order_id: int) -> list[OrderItem]:
     rows = (
-        await session.execute(
-            select(OrderItem).where(OrderItem.order_id == order_id).order_by(OrderItem.id)
+        (
+            await session.execute(
+                select(OrderItem).where(OrderItem.order_id == order_id).order_by(OrderItem.id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return list(rows)
 
 
@@ -664,6 +642,8 @@ async def _build_list_item(
     order: Order,
     shop_map: dict[int, Shop],
 ) -> OrderListItemOut:
+    # Refresh so onupdate columns (updated_at) load post-flush.
+    await session.refresh(order)
     items = await _load_order_items(session, order.id)
     shop = shop_map.get(order.shop_id)
     return OrderListItemOut(
@@ -717,9 +697,7 @@ async def _shops_for(session: AsyncSession, orders: list[Order]) -> dict[int, Sh
     if not orders:
         return {}
     ids = list({o.shop_id for o in orders})
-    rows = list(
-        (await session.execute(select(Shop).where(Shop.id.in_(ids)))).scalars().all()
-    )
+    rows = list((await session.execute(select(Shop).where(Shop.id.in_(ids)))).scalars().all())
     return {s.id: s for s in rows}
 
 
@@ -743,18 +721,14 @@ async def list_by_user(
             or_(
                 Order.order_no.ilike(keyword_like),
                 Order.id.in_(
-                    select(OrderItem.order_id).where(
-                        OrderItem.spu_title.ilike(keyword_like)
-                    )
+                    select(OrderItem.order_id).where(OrderItem.spu_title.ilike(keyword_like))
                 ),
             )
         )
 
     stmt_base = select(Order).where(and_(*where_clauses))
     stmt_count = select(func.count(Order.id)).where(and_(*where_clauses))
-    orders, total = await _paginate(
-        session, stmt_base, stmt_count, page=page, size=size
-    )
+    orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     await _lazy_expire_pending_payments(session, orders)
     shop_map = await _shops_for(session, orders)
     items = [await _build_list_item(session, o, shop_map) for o in orders]
@@ -792,9 +766,7 @@ async def list_by_merchant(
 
     stmt_base = select(Order).where(and_(*where_clauses))
     stmt_count = select(func.count(Order.id)).where(and_(*where_clauses))
-    orders, total = await _paginate(
-        session, stmt_base, stmt_count, page=page, size=size
-    )
+    orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     shop_map = await _shops_for(session, orders)
     items = [await _build_list_item(session, o, shop_map) for o in orders]
     return items, total
@@ -828,9 +800,7 @@ async def list_by_admin(
                 Order.receiver_name.ilike(kw),
                 Order.receiver_phone.ilike(kw),
                 Order.user_id.in_(
-                    select(User.id).where(
-                        or_(User.phone.ilike(kw), User.email.ilike(kw))
-                    )
+                    select(User.id).where(or_(User.phone.ilike(kw), User.email.ilike(kw)))
                 ),
             )
         )
@@ -845,9 +815,7 @@ async def list_by_admin(
         if where_clauses
         else select(func.count(Order.id))
     )
-    orders, total = await _paginate(
-        session, stmt_base, stmt_count, page=page, size=size
-    )
+    orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     shop_map = await _shops_for(session, orders)
     items = [await _build_list_item(session, o, shop_map) for o in orders]
     return items, total
@@ -862,14 +830,15 @@ async def get_detail(
     order = await _load_order(session, order_id)
     if role_scope == "user" and order.user_id != principal_id:
         raise AppException(ErrorCode.ORDER_PERMISSION_DENIED, "not owner")
-    if role_scope == "merchant":
+    if role_scope == "merchant" and order.shop_id != principal_id:
         # principal_id here is the shop_id (looked up by the caller).
-        if order.shop_id != principal_id:
-            raise AppException(ErrorCode.ORDER_PERMISSION_DENIED, "not this shop")
+        raise AppException(ErrorCode.ORDER_PERMISSION_DENIED, "not this shop")
     # admin has global read.
 
     # lazy expire pending_payment past deadline
     await _lazy_expire_pending_payments(session, [order])
+    # Refresh so onupdate columns (updated_at) are materialised before serialize.
+    await session.refresh(order)
 
     items = await _load_order_items(session, order.id)
     history = list(
@@ -981,9 +950,7 @@ async def _cancel_common(
     # Release the idempotency key so retries can succeed for a fresh order.
     order.idempotency_key = None
     await session.flush()
-    await _release_stock(
-        session, order, actor_type=operator_type, actor_id=actor_id
-    )
+    await _release_stock(session, order, actor_type=operator_type, actor_id=actor_id)
 
 
 async def cancel_by_user(
@@ -1088,9 +1055,7 @@ async def cancel_by_admin(
     return await get_detail(session, order.id, "admin", admin.id)
 
 
-async def _system_cancel(
-    session: AsyncSession, order: Order, *, reason: CancelReason
-) -> None:
+async def _system_cancel(session: AsyncSession, order: Order, *, reason: CancelReason) -> None:
     """Cancel a pending_payment order server-side (timeout scan)."""
     if order.status != OrderStatus.PENDING_PAYMENT:
         return
@@ -1326,9 +1291,7 @@ async def add_note_admin(
 # ---------------------------------------------------------------------------
 # Shipment view
 # ---------------------------------------------------------------------------
-async def get_shipment_for_user(
-    session: AsyncSession, user: User, order_id: int
-) -> dict[str, Any]:
+async def get_shipment_for_user(session: AsyncSession, user: User, order_id: int) -> dict[str, Any]:
     order = await _load_order_for_user(session, user, order_id)
     rows = list(
         (

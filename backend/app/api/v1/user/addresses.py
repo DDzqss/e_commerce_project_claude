@@ -24,9 +24,7 @@ async def list_addresses(
     user: User = Depends(require_user_permission(Permission.USER_ADDRESS_MANAGE)),
 ) -> dict[str, Any]:
     items = await address_service.list_(session, user)
-    return envelope(
-        data={"items": [i.model_dump(mode="json") for i in items], "total": len(items)}
-    )
+    return envelope(data={"items": [i.model_dump(mode="json") for i in items], "total": len(items)})
 
 
 @router.get("/{address_id}", summary="Get one address")

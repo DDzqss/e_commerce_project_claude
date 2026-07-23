@@ -41,7 +41,7 @@ from app.models.merchant import (
     Shop,
     ShopStatus,
 )
-from app.models.order import CancelReason, Order, OrderStatus
+from app.models.order import Order, OrderStatus
 from app.models.order_item import OrderItem
 from app.models.order_status_history import ActorType, OrderStatusHistory
 from app.models.product import SPU, SPUStatus
@@ -460,7 +460,9 @@ async def _seed_addresses(session: AsyncSession) -> None:
                         Address.user_id == user_row.id, Address.deleted_at.is_(None)
                     )
                 )
-            ).scalars().all()
+            )
+            .scalars()
+            .all()
         )
         if existing:
             continue
@@ -493,9 +495,7 @@ async def _seed_addresses(session: AsyncSession) -> None:
         logger.info("seeded 2 addresses for %s", spec.phone)
 
 
-async def _seed_demo_orders(
-    session: AsyncSession, shop: Shop
-) -> None:
+async def _seed_demo_orders(session: AsyncSession, shop: Shop) -> None:
     """Insert three demo orders for the first baseline user against the demo shop."""
     user_row = (
         await session.execute(select(User).where(User.phone == USERS[0].phone))

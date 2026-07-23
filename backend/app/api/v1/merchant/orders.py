@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_client_ip, get_user_agent, require_merchant_permission
 from app.core.database import get_db
-from app.core.errors import envelope
+from app.core.errors import AppException, ErrorCode, envelope
 from app.core.rbac import Permission
 from app.models.merchant import MerchantAccount
 from app.schemas.order import OrderCancelIn, OrderNoteIn
@@ -72,9 +72,7 @@ async def get_order(
         require_merchant_permission(Permission.MERCHANT_ORDER_READ_SHOP)
     ),
 ) -> dict[str, Any]:
-    detail = await order_service.get_detail(
-        session, order_id, "merchant", account.shop_id
-    )
+    detail = await order_service.get_detail(session, order_id, "merchant", account.shop_id)
     return envelope(data=detail.model_dump(mode="json"))
 
 
@@ -84,9 +82,7 @@ async def ship_order(
     payload: ShipIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
-    account: MerchantAccount = Depends(
-        require_merchant_permission(Permission.MERCHANT_ORDER_SHIP)
-    ),
+    account: MerchantAccount = Depends(require_merchant_permission(Permission.MERCHANT_ORDER_SHIP)),
 ) -> dict[str, Any]:
     detail = await order_service.ship_by_merchant(
         session,
@@ -112,9 +108,9 @@ async def cancel_order(
 ) -> dict[str, Any]:
     if not payload.cancel_note:
         # 契约 §10.3 要求商家取消必须填理由
-        from app.core.errors import AppException, ErrorCode
-
-        raise AppException(ErrorCode.VALIDATION_ERROR, "cancel_note is required for merchant cancel")
+        raise AppException(
+            ErrorCode.VALIDATION_ERROR, "cancel_note is required for merchant cancel"
+        )
     detail = await order_service.cancel_by_merchant(
         session,
         account,

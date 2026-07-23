@@ -22,6 +22,7 @@ import argparse
 import asyncio
 import logging
 import sys
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -67,15 +68,11 @@ async def _run(dry_run: bool) -> tuple[int, int]:
             if n < 100:
                 break
 
-    logger.info(
-        "process_timeouts: expired=%d completed=%d", total_expired, total_completed
-    )
+    logger.info("process_timeouts: expired=%d completed=%d", total_expired, total_completed)
     return total_expired, total_completed
 
 
 async def _list_candidate_expired(session: AsyncSession) -> list[int]:
-    from datetime import UTC, datetime
-
     now = datetime.now(UTC)
     stmt = select(Order.id).where(
         Order.status == OrderStatus.PENDING_PAYMENT, Order.payment_deadline_at < now
@@ -84,8 +81,6 @@ async def _list_candidate_expired(session: AsyncSession) -> list[int]:
 
 
 async def _list_candidate_completed(session: AsyncSession) -> list[int]:
-    from datetime import UTC, datetime
-
     now = datetime.now(UTC)
     stmt = select(Order.id).where(
         Order.status == OrderStatus.SHIPPED,

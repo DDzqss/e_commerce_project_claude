@@ -20,9 +20,7 @@ from app.schemas.address import AddressCreateIn, AddressOut, AddressUpdateIn
 from app.services.audit_service import write_audit
 
 
-async def _load_address_owned(
-    session: AsyncSession, user: User, address_id: int
-) -> Address:
+async def _load_address_owned(session: AsyncSession, user: User, address_id: int) -> Address:
     row = await session.get(Address, address_id)
     if row is None or row.deleted_at is not None:
         raise AppException(ErrorCode.ADDRESS_NOT_FOUND, "address not found")
@@ -31,9 +29,7 @@ async def _load_address_owned(
     return row
 
 
-async def _clear_other_defaults(
-    session: AsyncSession, user_id: int, except_id: int | None
-) -> None:
+async def _clear_other_defaults(session: AsyncSession, user_id: int, except_id: int | None) -> None:
     stmt = (
         update(Address)
         .where(
