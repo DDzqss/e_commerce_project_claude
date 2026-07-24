@@ -11,8 +11,8 @@
  *   POST   /user/reviews/{id}/report           举报
  */
 
-import { apiDelete, apiGet, apiPatch, apiPost } from "./api";
-import type { PaginatedData } from "@/types";
+import { apiDelete, apiGet, apiPatch, apiPost } from './api';
+import type { PaginatedData } from '@/types';
 import type {
   CreateReviewsOut,
   CreateReviewsPayload,
@@ -23,16 +23,23 @@ import type {
   ReviewReportPayload,
   ShopReviewsQuery,
   SpuReviewsQuery,
-} from "@/types/review";
+} from '@/types/review';
 
-function toSearchParams<T extends object>(
-  q: T | undefined,
-): Record<string, string> | undefined {
+type ItemsEnvelope<T> = { items?: T[] };
+type CreateReviewsResponse = CreateReviewsOut | ItemsEnvelope<ReviewOut> | ReviewOut[];
+
+function normalizeCreateReviews(data: CreateReviewsResponse): CreateReviewsOut {
+  if (Array.isArray(data)) return { reviews: data };
+  if ('reviews' in data) return data;
+  return { reviews: data.items ?? [] };
+}
+
+function toSearchParams<T extends object>(q: T | undefined): Record<string, string> | undefined {
   if (!q) return undefined;
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(q as Record<string, unknown>)) {
-    if (v === undefined || v === null || v === "") continue;
-    out[k] = typeof v === "boolean" ? String(v) : String(v);
+    if (v === undefined || v === null || v === '') continue;
+    out[k] = typeof v === 'boolean' ? String(v) : String(v);
   }
   return Object.keys(out).length ? out : undefined;
 }
@@ -46,22 +53,19 @@ export function createReviews(
   payload: CreateReviewsPayload,
   idempotencyKey: string,
 ): Promise<CreateReviewsOut> {
-  return apiPost<CreateReviewsOut, CreateReviewsPayload>(
+  return apiPost<CreateReviewsResponse, CreateReviewsPayload>(
     `user/orders/${orderIdOrNo}/reviews`,
     payload,
     {
       headers: {
-        "Idempotency-Key": idempotencyKey,
+        'Idempotency-Key': idempotencyKey,
       },
     },
-  );
+  ).then(normalizeCreateReviews);
 }
 
 /** PATCH /user/reviews/{id} — 编辑（15 天窗口，1 次）。 */
-export function editReview(
-  id: number | string,
-  payload: EditReviewPayload,
-): Promise<ReviewOut> {
+export function editReview(id: number | string, payload: EditReviewPayload): Promise<ReviewOut> {
   return apiPatch<ReviewOut, EditReviewPayload>(`user/reviews/${id}`, payload);
 }
 
@@ -71,10 +75,8 @@ export function deleteReview(id: number | string): Promise<void> {
 }
 
 /** GET /user/reviews — 我的评价列表。 */
-export function listMyReviews(
-  query?: MyReviewsQuery,
-): Promise<PaginatedData<ReviewOut>> {
-  return apiGet<PaginatedData<ReviewOut>>("user/reviews", {
+export function listMyReviews(query?: MyReviewsQuery): Promise<PaginatedData<ReviewOut>> {
+  return apiGet<PaginatedData<ReviewOut>>('user/reviews', {
     searchParams: toSearchParams(query),
   });
 }
@@ -100,9 +102,6 @@ export function listShopReviews(
 }
 
 /** POST /user/reviews/{id}/report — 举报评价。 */
-export function reportReview(
-  id: number | string,
-  payload: ReviewReportPayload,
-): Promise<void> {
+export function reportReview(id: number | string, payload: ReviewReportPayload): Promise<void> {
   return apiPost<void, ReviewReportPayload>(`user/reviews/${id}/report`, payload);
 }

@@ -10,10 +10,10 @@
  * - Children：按需拉取；同一 parent_code 内存去重
  */
 
-import { apiGet } from "./api";
-import type { RegionOut, RegionTreeNode } from "@/types/region";
+import { apiGet } from './api';
+import type { RegionOut, RegionTreeNode } from '@/types/region';
 
-const CACHE_KEY = "region-tree:v1";
+const CACHE_KEY = 'region-tree:v1';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 
 interface CachedTree {
@@ -21,8 +21,14 @@ interface CachedTree {
   tree: RegionTreeNode[];
 }
 
+type ItemsEnvelope<T> = { items?: T[] };
+
+function unwrapItems<T>(data: T[] | ItemsEnvelope<T>): T[] {
+  return Array.isArray(data) ? data : (data.items ?? []);
+}
+
 function safeLocal(): Storage | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
     return window.localStorage;
   } catch {
@@ -59,24 +65,26 @@ function writeCache(tree: RegionTreeNode[]): void {
 /**
  * GET /regions/tree — 全量树。带 24h localStorage 缓存。
  */
-export async function getRegionTree(
-  force = false,
-): Promise<RegionTreeNode[]> {
+export async function getRegionTree(force = false): Promise<RegionTreeNode[]> {
   if (!force) {
     const cached = readCache();
     if (cached) return cached;
   }
-  const tree = await apiGet<RegionTreeNode[]>("regions/tree");
+  const data = await apiGet<RegionTreeNode[] | ItemsEnvelope<RegionTreeNode>>('regions/tree');
+  const tree = unwrapItems(data);
   writeCache(tree);
   return tree;
 }
 
 /** GET /regions/children/{parent_code} — 单层子节点。 */
-export function getRegionChildren(
-  parentCode: string | "root" | "" | null,
+export async function getRegionChildren(
+  parentCode: string | 'root' | '' | null,
 ): Promise<RegionOut[]> {
-  const key = parentCode && parentCode !== "" ? parentCode : "root";
-  return apiGet<RegionOut[]>(`regions/children/${encodeURIComponent(key)}`);
+  const key = parentCode && parentCode !== '' ? parentCode : 'root';
+  const data = await apiGet<RegionOut[] | ItemsEnvelope<RegionOut>>(
+    `regions/children/${encodeURIComponent(key)}`,
+  );
+  return unwrapItems(data);
 }
 
 /** 手动清空缓存（调试或用户主动刷新）。 */

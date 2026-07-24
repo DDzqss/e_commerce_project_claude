@@ -5,18 +5,23 @@
  * 若后续要按店铺可用范围过滤，可再切到 `/merchant/*` 端点。
  */
 
-import { api, unwrap } from "./api";
-import type { BrandOut, CategoryOut, PagedOut } from "@/types/api";
+import { api, unwrap } from './api';
+import type { BrandOut, CategoryOut, PagedOut } from '@/types/api';
+
+type ItemsEnvelope<T> = { items?: T[] };
+
+function unwrapItems<T>(data: T[] | ItemsEnvelope<T>): T[] {
+  return Array.isArray(data) ? data : (data.items ?? []);
+}
 
 /** `GET /api/v1/catalog/categories?visible=true` — 返回完整树 */
-export function listCategories(
-  onlyVisible = true,
-): Promise<CategoryOut[]> {
+export async function listCategories(onlyVisible = true): Promise<CategoryOut[]> {
   const searchParams = new URLSearchParams();
-  if (onlyVisible) searchParams.set("visible", "true");
-  return unwrap<CategoryOut[]>(
-    api.get("v1/catalog/categories", { searchParams }),
+  if (onlyVisible) searchParams.set('visible', 'true');
+  const data = await unwrap<CategoryOut[] | ItemsEnvelope<CategoryOut>>(
+    api.get('v1/catalog/categories', { searchParams }),
   );
+  return unwrapItems(data);
 }
 
 export interface ListBrandsQuery {
@@ -27,15 +32,11 @@ export interface ListBrandsQuery {
 }
 
 /** `GET /api/v1/catalog/brands` */
-export function listBrands(
-  query: ListBrandsQuery = {},
-): Promise<PagedOut<BrandOut>> {
+export function listBrands(query: ListBrandsQuery = {}): Promise<PagedOut<BrandOut>> {
   const searchParams = new URLSearchParams();
-  if (query.keyword) searchParams.set("keyword", query.keyword);
-  searchParams.set("page", String(query.page ?? 1));
-  searchParams.set("size", String(query.size ?? 50));
-  if (query.visible ?? true) searchParams.set("visible", "true");
-  return unwrap<PagedOut<BrandOut>>(
-    api.get("v1/catalog/brands", { searchParams }),
-  );
+  if (query.keyword) searchParams.set('keyword', query.keyword);
+  searchParams.set('page', String(query.page ?? 1));
+  searchParams.set('size', String(query.size ?? 50));
+  if (query.visible ?? true) searchParams.set('visible', 'true');
+  return unwrap<PagedOut<BrandOut>>(api.get('v1/catalog/brands', { searchParams }));
 }
