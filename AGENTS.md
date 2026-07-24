@@ -19,6 +19,7 @@
 8. [代码提交与 PR 规范](#8-代码提交与-pr-规范)
 9. [业务深度思考纪律](#9-业务深度思考纪律)
 10. [文档与知识沉淀](#10-文档与知识沉淀)
+11. [填坑清单（历次 Phase 沉淀）](#11-填坑清单历次-phase-沉淀)★
 
 ---
 
@@ -671,6 +672,91 @@ git commit -m "feat(backend): ..."
 git push -u origin HEAD
 gh pr create --base develop
 ```
+
+---
+
+## 11. 填坑清单（历次 Phase 沉淀）
+
+本节记录在实战中踩过的坑与对应对策，避免后续 Phase 与新增 Agent 重复失误。**Agent 在启动前应先扫一遍相关分类。**
+
+### 11.1 跨平台 / 大小写敏感
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| macOS 大小写不敏感 vs Linux CI 敏感 | 本地 build 通过，CI import 报 "Cannot find module" | Agent 在提交前必须跑 `git ls-files <dir>` 核对文件是否真的入库；命名一律 kebab-case 或明确规则 |
+| `.gitignore` 使用过宽的通用词 | Python venv 的 `lib/` 规则误伤前端 `src/lib/`；本地 Mac 无感、Linux CI 报缺文件 | **各语言/框架规则放到对应 workspace 的 `.gitignore`**，根 `.gitignore` 只放跨端通用（OS/IDE/.env/logs/db 卷）|
+| 文件路径含大写字母被 rename 大小写 | git 不感知，需要 `git mv -f` 或双步 rename | Agent 一开始就选定命名，避免大小写变更 |
+
+### 11.2 Node / pnpm / Next.js
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| pnpm 11+ 需要 Node ≥ 22（用了 `node:sqlite`） | CI `ERR_UNKNOWN_BUILTIN_MODULE: node:sqlite` | `.nvmrc` 与 CI 都用 Node 22+；`package.json.engines.node` 声明 `>=22` |
+| `pnpm/action-setup` 的 `version:` 与 `packageManager` 冲突 | CI 报 "Multiple versions of pnpm specified" | 只在一处指定：优先用 `packageManager: pnpm@x.y.z`，action 不传 `version` |
+| pnpm workspace 隐性 hoisting 让本地"能跑"但 CI 挂 | `@eslint/eslintrc` 被 A workspace 用了但只在 B workspace 声明；本地 pnpm 从 A 找到，CI strict resolution 找不到 | **每个 workspace 必须显式声明它 import 的所有包**，即便看起来在别处已装 |
+| Next.js `experimental.typedRoutes` 与 `string` href 类型不兼容 | `Type 'string' is not assignable to type 'UrlObject \| RouteImpl<string>'` | 要么全端统一开启并把 href 类型改为 `Route`；要么 Phase 0/1 不开，留到统一改造 |
+| Tailwind CSS 4 抛弃 `tailwind.config.ts` | 用旧格式配置无效 | 全部主题变量放在 `globals.css` 的 `@import "tailwindcss"` + `@theme { ... }`，PostCSS 用 `@tailwindcss/postcss` |
+| `next lint` 在 Next 15 已 deprecated | 有 warning，Next 16 会删除 | Phase 2/3 迁移到 `eslint` CLI（`next-lint-to-eslint-cli` codemod） |
+
+### 11.3 Python / FastAPI / uv
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| pydantic-settings 的 `Literal` 字段严格 | CI 传了非枚举值（如 `ENVIRONMENT=test`）就报 validation error | Settings 枚举字段要在文档写清可选值；CI 配置里的值必须匹配 |
+| `MINIO_SECRET_KEY = "minioadmin"` 触发 ruff S105 | ruff 认为是硬编码密码 | 加 `# noqa: S105  dev-only default; production must override via env` 注释说明 |
+| ruff PT018 禁止一行内多断言 | `assert x in body and isinstance(...)` 被拆 | 每个断言独占一行 |
+| **`bcrypt` 5.0+ 与 `passlib` 1.7.x 不兼容** | 测试报 `ValueError: password cannot be longer than 72 bytes` 即使密码很短 | pin `bcrypt>=4.0,<5.0`（passlib 停更多年未适配 bcrypt 4+ 的 API 变化）；长期方案是直接用 `bcrypt` 库或迁移到 `argon2-cffi` |
+| **SQLAlchemy 2.0 async 缺 greenlet** | 报 `ValueError: the greenlet library is required`；本地已装可能碰巧有，CI 全新装必挂 | 依赖里显式声明 `sqlalchemy[asyncio]` **或** `greenlet>=3.0`；两个都写更保险 |
+| **SQLite 不给 `BigInteger` 自增** | 用 aiosqlite 跑测试报 `NOT NULL constraint failed: users.id`；Postgres 无碍 | `BigInteger().with_variant(Integer, "sqlite")` 定义 `BigIntId` 类型；PK 与 FK 全部用这个 |
+| **`session.flush()` 后 Pydantic 序列化访问 `updated_at`** | `MissingGreenlet: greenlet_spawn has not been called` — 因 `onupdate=func.now()` 需要 refresh 才能拿到新值 | 状态变更后写 `await session.refresh(row)` 再返回 |
+| **Agent 本地 `.venv` 缓存旧依赖** | Agent 本地 pytest pass，CI 全新装挂 4 类问题 | Agent 在启动前必须 `uv sync --refresh --all-extras` 或删掉 `.venv` 重装；Orchestrator 派活时明确要求 |
+| **CI ruff 版本比 Agent 本地新** | 本地 `ruff check` 全绿，CI 报 25 个 PLC0415 / RUF001 / PT018 | 在 `ruff.toml` `ignore` 里加合理规则（PLC0415 局部 import 用于避免循环依赖；PLR0911 状态机 dispatcher 多返回是常态）；或本地 `uv run ruff --version` 与 CI 对齐 |
+| **`order_no` 等业务 ID 唯一冲突重试破坏外层事务** | INSERT 时 UNIQUE violation → 外层事务被标脏无法继续 | 用 `session.begin_nested()` (SAVEPOINT) 包裹 INSERT + `secrets.randbelow` 重试；失败可回退到 SAVEPOINT 而非顶层事务 |
+| **Partial UNIQUE index (`WHERE is_default=TRUE`) 声明位置** | SQLAlchemy 模型层用 `UniqueConstraint(postgresql_where=...)` 声明时，SQLite `create_all` 会退化为全表 UNIQUE 破坏"多条历史 default"测试 | **只在 Alembic 迁移里 `op.execute("CREATE UNIQUE INDEX ... WHERE ...")`**；模型层不声明；应用层加 `_clear_other_defaults` 兜底 |
+| **SQLite 存 timezone-naive datetime** | Postgres 读回来是 aware，SQLite 读回来是 naive；datetime 比较报 `TypeError: can't compare offset-naive and offset-aware` | 服务层写 `_as_aware(dt)` 小工具补 UTC；只在读到数据库结果时补，写入统一用 aware |
+| **Pydantic 字段与 ORM 列名不一致（如 `session_id` vs `id`）** | 想让接口输出 `session_id` 但 ORM 是 `id` | `Field(alias="id")` + `model_config = ConfigDict(populate_by_name=True, from_attributes=True)` |
+
+### 11.4 CI/CD
+
+| 坑 | 症状 | 对策 |
+|---|---|---|
+| 三端前端 CI matrix 只装依赖一次会互相污染 | — | 用 `pnpm --frozen-lockfile` 一次装完 workspace，然后 `pnpm --filter <ws>` 执行各步骤 |
+| `next build` 的类型检查比 `tsc --noEmit` 更严 | 本地 tsc 过，CI build 挂 | Agent 完成前必须本地跑 `pnpm --filter <ws> build`，不能只跑 tsc |
+| **CI ruff / formatter 版本几乎每次都比本地新** | Phase 3 (PLC0415/RUF001/PT018) → Phase 5 (C420/S110/ASYNC240/新 formatter) 反复挂 | Agent 交付前必须 `uv sync --refresh --all-extras` 拉新 ruff，再跑 `ruff check .` + `ruff format --check .`；本地缓存严禁作为"绿了"的依据 |
+| **Agent API 中断** | 长任务 agent 因厂商 API InternalServerException 中断 | 用 `SendMessage(agentId, focused-prompt)` 缩小 scope 续跑（Phase 4 Admin agent 首创），比重启节省大量 tokens |
+| **Kotlin package 路径 vs import 路径不一致** | Agent 在 `data/network/ApiEnvelope.kt`（包 `data.network`）声明了 `PageData`，但 5 处消费者从 `data.network.dto.PageData` 导 → Kotlin 编译 "Unresolved reference" | 交付前 `grep -r "import com.jdclone" ..` 与实际文件所在包一致性核对；Agent 尤其 Android 需自检 |
+| **Compose Material3 experimental API 缺 OptIn** | `SecondaryTabRow` / `PrimaryTabRow` / `TopAppBar` / `PullToRefresh` 需要 `@OptIn(ExperimentalMaterial3Api::class)`；CI kotlinc 严格模式视 error | Agent 用 M3 未稳定 API 时**必须在函数或文件级加 OptIn**；或整个模块 `-opt-in=` compiler flag |
+| **Android 多 agent 并行 → NavHost/ApiService 冲突严重** | 3 agent 并行改 `MainActivity`/`AppNavGraph`/`ApiService.kt` 会互相破坏 | Android 复杂客户端项目**用单 agent 全权交付**（配合 SendMessage 续跑处理 API 错误），避免多 agent 抢改共享基建 |
+
+### 11.5 Agent 行为规范增强（Prompt 模板必附）
+
+启动 subagent 时，除 §3.3 标准模板外，**必须额外强调**：
+
+```
+【交付前自检】
+1. 跑 `git ls-files <你的目录>` 核对所有交付文件都已被 git 追踪，尤其是 lib/、utils/ 等易被 .gitignore 误伤的目录
+2. 后端：跑 `uv run ruff check .` + `uv run pytest -v`；前端：跑 `pnpm --filter <ws> tsc --noEmit` + `pnpm --filter <ws> build`
+3. 显式列出你新增依赖的 npm/PyPI 包，Orchestrator 需据此更新 lockfile
+4. 命名一律 kebab-case（文件）、snake_case（Python）、camelCase（JS/TS 变量）、PascalCase（组件/类）
+5. 主动汇报**契约偏差点**：若你发现契约不明确、必须假定或调整某字段/端点，在返回时**单独列出**，Orchestrator 用于对齐其他 agent
+```
+
+### 11.5.1 中断 agent 的恢复策略
+
+**Phase 4 教训**：Admin agent 因供应商 API `InternalServerException` 中断 2 次。
+
+- **首选：SendMessage 续跑**（`SendMessage(to=agentId, message=...)`）比重启新 agent 便宜得多，因为它保留 transcript
+- **续跑提示词要缩小 scope**：先 `git ls-files` 或 `Bash ls` 确认已产出文件，只让它做剩余部分
+- 续跑提示词末尾加"如果又遇到 API 错误，直接返回你写到哪里就 OK"避免陷入死循环
+- 若 SendMessage 续跑连续失败 2 次以上，才考虑 fresh 新 agent（此时提示词要明确"已完成 X / 只做 Y"）
+
+### 11.6 沉淀更新流程
+
+每个 Phase 完成后，Orchestrator 必须：
+1. 回顾本 Phase 遇到的所有 CI 挂/回滚/返工
+2. 提炼 1-3 条填坑规则加到本节
+3. 相应更新对应 workspace 的 `CLAUDE.md`（如有）
+4. 与 Phase merge commit 一起提交
 
 ---
 

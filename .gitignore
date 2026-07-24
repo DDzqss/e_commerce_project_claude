@@ -1,3 +1,9 @@
+# 根 .gitignore：只放跨端通用规则
+# 各语言/框架专属规则放在对应 workspace 的 .gitignore
+#   - Python:  backend/.gitignore
+#   - Node/Next.js: 各 frontend-*/.gitignore
+#   - Android/Gradle: android-app/.gitignore
+
 # ============ OS ============
 .DS_Store
 Thumbs.db
@@ -12,6 +18,7 @@ Thumbs.db
 .claude/settings.local.json
 .claude/*.local.json
 *.code-workspace
+.history/
 
 # ============ Env / Secrets ============
 .env
@@ -21,182 +28,32 @@ Thumbs.db
 *.key
 credentials.json
 secrets/
-
-# ============ Python / FastAPI ============
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-htmlcov/
-.mypy_cache/
-.ruff_cache/
-.dmypy.json
-dmypy.json
-.pytype/
-cython_debug/
-
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-.python-version
-
-# uv / poetry
-.uv/
-poetry.lock.local
-
-# Alembic - keep migrations, ignore local overrides
-alembic.local.ini
-
-# ============ Node / Next.js / React ============
-node_modules/
-.pnp
-.pnp.js
-.pnp.cjs
-.yarn/install-state.gz
-
-# Testing
-/coverage
-.nyc_output
-
-# Next.js
-.next/
-out/
-next-env.d.ts
-
-# Nuxt
-.nuxt/
-
-# Production
-build/
-
-# Misc
-.eslintcache
-.stylelintcache
-*.tsbuildinfo
-
-# pnpm
-.pnpm-store/
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Turbo
-.turbo/
-
-# Vercel
-.vercel
-
-# ============ Android / Kotlin ============
-*.apk
-*.aab
-*.ap_
-*.aar
-*.dex
-*.class
-bin/
-gen/
-out/
-release/
-.gradle/
-build/
-local.properties
-proguard/
-*.log
-.navigation/
-captures/
-freeline.py
-freeline/
-freeline_project_description.json
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots
-fastlane/test_output
-lint/intermediates/
-lint/generated/
-lint/outputs/
-lint/tmp/
-lint/reports/
-
-# Android Studio / IntelliJ
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/caches
-.idea/modules.xml
-.idea/navEditor.xml
-.idea/misc.xml
-
-# Keystore
 *.jks
 *.keystore
+
+# ============ Logs & Temp ============
+*.log
+logs/
+tmp/
+temp/
+*.bak
 
 # ============ Docker ============
 docker-compose.override.yml
 .docker/
 
-# ============ Database / Storage ============
+# ============ Node / pnpm workspace 虚拟 store ============
+# 各 workspace 自己的 node_modules 由各自的 .gitignore 兜底，这里防止
+# pnpm 在根目录建 node_modules/.pnpm/ 时被误提交
+node_modules/
+.pnpm-store/
+
+# ============ Database / Storage (本地卷) ============
 *.sqlite
 *.sqlite3
 *.db
 dumps/
 backups/
-
-# MinIO / Local storage
 minio-data/
 storage/
 uploads/
-
-# ============ Logs ============
-*.log
-logs/
-
-# ============ CI / Coverage ============
-coverage/
-.coverage
-htmlcov/
-.pytest_cache/
-
-# ============ Misc ============
-tmp/
-temp/
-*.bak
-.history/

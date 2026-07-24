@@ -1,0 +1,45 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv
+env
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
+.coverage.*
+htmlcov
+*.egg-info
+build
+dist
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.swp
+.DS_Store
+
+# Tests / docs (kept out of the runtime image)
+tests
+docs
+*.md
+!README.md
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml

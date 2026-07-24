@@ -1,0 +1,62 @@
+# Backend .gitignore — Python / FastAPI / uv 专属规则
+# 通用规则（.env / OS / IDE / logs）在根 .gitignore
+
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Testing / coverage / type-checking / linting caches
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+cython_debug/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# uv / poetry local overrides
+.uv/
+poetry.lock.local
+
+# Alembic 本地覆盖（保留 migrations 与 alembic.ini）
+alembic.local.ini

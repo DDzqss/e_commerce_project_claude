@@ -1,0 +1,16 @@
+packages:
+  - "frontend-user-web"
+  - "frontend-merchant"
+  - "frontend-admin"
+  - "e2e"
+  - "packages/*"
+
+# 允许这些依赖的 postinstall 构建脚本执行
+# 这些都是 Next.js 生态所需：
+#   esbuild        - JS/TS 打包与转译（Vitest 内部使用）
+#   sharp          - Next.js Image 优化的原生图像处理
+#   unrs-resolver  - Rspack/oxc 依赖解析器（ESLint / Next 内部使用）
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
