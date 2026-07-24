@@ -62,6 +62,17 @@ async def list_aftersales(
     )
 
 
+@router.get("/stats/summary", summary="Merchant aftersales dashboard summary")
+async def stats_summary(
+    session: AsyncSession = Depends(get_db),
+    account: MerchantAccount = Depends(
+        require_merchant_permission(Permission.MERCHANT_AFTERSALES_READ_SHOP)
+    ),
+) -> dict[str, Any]:
+    result = await aftersales_service.merchant_stats_summary(session, account)
+    return envelope(data=result.model_dump())
+
+
 @router.get("/{aftersales_id}", summary="Aftersales detail (merchant view)")
 async def get_aftersales(
     aftersales_id: int,
