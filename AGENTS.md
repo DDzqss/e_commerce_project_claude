@@ -724,6 +724,9 @@ gh pr create --base develop
 | `next build` 的类型检查比 `tsc --noEmit` 更严 | 本地 tsc 过，CI build 挂 | Agent 完成前必须本地跑 `pnpm --filter <ws> build`，不能只跑 tsc |
 | **CI ruff / formatter 版本几乎每次都比本地新** | Phase 3 (PLC0415/RUF001/PT018) → Phase 5 (C420/S110/ASYNC240/新 formatter) 反复挂 | Agent 交付前必须 `uv sync --refresh --all-extras` 拉新 ruff，再跑 `ruff check .` + `ruff format --check .`；本地缓存严禁作为"绿了"的依据 |
 | **Agent API 中断** | 长任务 agent 因厂商 API InternalServerException 中断 | 用 `SendMessage(agentId, focused-prompt)` 缩小 scope 续跑（Phase 4 Admin agent 首创），比重启节省大量 tokens |
+| **Kotlin package 路径 vs import 路径不一致** | Agent 在 `data/network/ApiEnvelope.kt`（包 `data.network`）声明了 `PageData`，但 5 处消费者从 `data.network.dto.PageData` 导 → Kotlin 编译 "Unresolved reference" | 交付前 `grep -r "import com.jdclone" ..` 与实际文件所在包一致性核对；Agent 尤其 Android 需自检 |
+| **Compose Material3 experimental API 缺 OptIn** | `SecondaryTabRow` / `PrimaryTabRow` / `TopAppBar` / `PullToRefresh` 需要 `@OptIn(ExperimentalMaterial3Api::class)`；CI kotlinc 严格模式视 error | Agent 用 M3 未稳定 API 时**必须在函数或文件级加 OptIn**；或整个模块 `-opt-in=` compiler flag |
+| **Android 多 agent 并行 → NavHost/ApiService 冲突严重** | 3 agent 并行改 `MainActivity`/`AppNavGraph`/`ApiService.kt` 会互相破坏 | Android 复杂客户端项目**用单 agent 全权交付**（配合 SendMessage 续跑处理 API 错误），避免多 agent 抢改共享基建 |
 
 ### 11.5 Agent 行为规范增强（Prompt 模板必附）
 

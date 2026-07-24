@@ -20,6 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <input
       ref={ref}
       aria-invalid={invalid || undefined}
+      aria-required={rest.required || undefined}
       className={clsx(
         "block h-8 w-full rounded border bg-white px-3 text-sm text-neutral-900 shadow-sm outline-none transition",
         "placeholder:text-neutral-400",

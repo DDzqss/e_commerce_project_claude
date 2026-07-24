@@ -46,6 +46,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           className="mb-1.5 block text-sm font-medium text-neutral-800"
         >
           {label}
+          {rest.required ? (
+            <span
+              aria-hidden
+              className="ml-0.5 text-[color:var(--color-danger)]"
+            >
+              *
+            </span>
+          ) : null}
         </label>
       )}
       <div
@@ -68,6 +76,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           ref={ref}
           id={inputId}
           aria-invalid={Boolean(error) || undefined}
+          aria-required={rest.required || undefined}
           aria-describedby={describedById}
           className="min-w-0 flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
           {...rest}

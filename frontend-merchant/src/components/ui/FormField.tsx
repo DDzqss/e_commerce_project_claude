@@ -39,7 +39,10 @@ export function FormField({
       >
         {label}
         {required ? (
-          <span aria-hidden className="ml-0.5 text-red-500">
+          <span
+            aria-hidden
+            className="ml-0.5 text-[color:var(--color-danger)]"
+          >
             *
           </span>
         ) : null}
@@ -49,7 +52,8 @@ export function FormField({
         <p
           id={describedById}
           role="alert"
-          className="text-xs text-red-600"
+          aria-live="polite"
+          className="text-xs text-[color:var(--color-danger)]"
         >
           {error}
         </p>

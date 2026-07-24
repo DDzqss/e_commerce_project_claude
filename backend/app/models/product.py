@@ -88,4 +88,9 @@ class SPU(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
         Index("ix_spus_category_status", "category_id", "status"),
         Index("ix_spus_brand_status", "brand_id", "status"),
         Index("ix_spus_status_published", "status", "published_at"),
+        # Phase 7 · perf indexes covering catalog list + list_related hot paths.
+        Index("ix_spus_status_category_published", "status", "category_id", "published_at"),
+        Index("ix_spus_status_brand_published", "status", "brand_id", "published_at"),
+        Index("ix_spus_status_sales", "status", "sales_count"),
+        Index("ix_spus_status_min_price", "status", "min_price_cents"),
     )

@@ -69,18 +69,35 @@ async def _serialize_review(
     *,
     include_reply: bool = True,
     include_user_name: bool = True,
+    reply_map: dict[int, ReviewReply] | None = None,
+    user_map: dict[int, User] | None = None,
 ) -> ReviewOut:
+    """Serialise a single review.
+
+    ``reply_map`` / ``user_map`` are optional preloaded dicts populated by
+    :func:`_preload_related` — passing them lets a caller serialise a whole
+    page with 2 extra IN-queries instead of ``2 * N`` per-row round-trips
+    (see :func:`_paginate`). When the maps are omitted we fall back to the
+    per-row loads so single-review callers (create / edit / hide / restore)
+    still work.
+    """
     await session.refresh(review)
     reply_brief: ReviewReplyBrief | None = None
     if include_reply:
-        stmt = select(ReviewReply).where(ReviewReply.review_id == review.id).limit(1)
-        reply = (await session.execute(stmt)).scalar_one_or_none()
+        if reply_map is not None:
+            reply = reply_map.get(review.id)
+        else:
+            stmt = select(ReviewReply).where(ReviewReply.review_id == review.id).limit(1)
+            reply = (await session.execute(stmt)).scalar_one_or_none()
         if reply is not None:
             reply_brief = ReviewReplyBrief.model_validate(reply)
 
     user_display_name: str | None = None
     if include_user_name:
-        user = await session.get(User, review.user_id)
+        if user_map is not None:
+            user = user_map.get(review.user_id)
+        else:
+            user = await session.get(User, review.user_id)
         if review.is_anonymous:
             user_display_name = _mask_nickname(user.nickname if user else None)
         elif user is not None:
@@ -107,6 +124,38 @@ async def _serialize_review(
         updated_at=review.updated_at,
         reply=reply_brief,
     )
+
+
+async def _preload_related(
+    session: AsyncSession,
+    reviews: list[Review],
+    *,
+    include_reply: bool,
+    include_user_name: bool,
+) -> tuple[dict[int, ReviewReply], dict[int, User]]:
+    """Batch-load ReviewReply + User for a whole page of reviews.
+
+    Kills the ``2 * N`` round-trips in :func:`_paginate` (one per review for
+    the reply, one for the display-name user). Uses two ``IN`` queries —
+    same shape SQLAlchemy ``selectinload`` would emit — without needing a
+    declared ``relationship()`` on :class:`Review` (the project deliberately
+    keeps ORM lightweight).
+    """
+    reply_map: dict[int, ReviewReply] = {}
+    user_map: dict[int, User] = {}
+    if not reviews:
+        return reply_map, user_map
+    if include_reply:
+        review_ids = [r.id for r in reviews]
+        stmt = select(ReviewReply).where(ReviewReply.review_id.in_(review_ids))
+        for reply in (await session.execute(stmt)).scalars().all():
+            reply_map[reply.review_id] = reply
+    if include_user_name:
+        user_ids = list({r.user_id for r in reviews})
+        u_stmt = select(User).where(User.id.in_(user_ids))
+        for user in (await session.execute(u_stmt)).scalars().all():
+            user_map[user.id] = user
+    return reply_map, user_map
 
 
 async def _summarize(session: AsyncSession, where: list[Any]) -> ReviewRatingSummary:
@@ -391,9 +440,20 @@ async def _paginate(
         .limit(size)
     )
     rows = list((await session.execute(stmt)).scalars().all())
+    reply_map, user_map = await _preload_related(
+        session,
+        rows,
+        include_reply=include_reply,
+        include_user_name=include_user_name,
+    )
     items = [
         await _serialize_review(
-            session, r, include_reply=include_reply, include_user_name=include_user_name
+            session,
+            r,
+            include_reply=include_reply,
+            include_user_name=include_user_name,
+            reply_map=reply_map,
+            user_map=user_map,
         )
         for r in rows
     ]

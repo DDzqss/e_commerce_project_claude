@@ -4,7 +4,16 @@ import { create } from "zustand";
 import { useEffect } from "react";
 import { cn } from "@/lib/cn";
 
-export type ToastVariant = "success" | "error" | "info";
+/**
+ * 全局 Toast 组件 —— Phase 7 三端一致性。
+ *
+ * 规范（对齐 §5.1）：
+ * - 位置：右上角固定（top-4 right-4）
+ * - 颜色：error red-600 / success green-600 / warning amber-600 / info sky-600
+ * - 动画：300ms 淡入
+ * - 错误 role="alert" + aria-live="assertive"；其他 role="status" + aria-live="polite"
+ */
+export type ToastVariant = "success" | "error" | "info" | "warning";
 
 export interface ToastItem {
   id: string;
@@ -31,7 +40,7 @@ export const useToastStore = create<ToastState>((set, get) => ({
       id,
       message,
       variant,
-      duration: duration ?? 3000,
+      duration: duration ?? (variant === "error" ? 4000 : 3000),
     };
     set({ items: [...get().items, item] });
     return id;
@@ -52,6 +61,16 @@ export const toast = {
     useToastStore.getState().push({ message, variant: "error", duration }),
   info: (message: string, duration?: number) =>
     useToastStore.getState().push({ message, variant: "info", duration }),
+  warning: (message: string, duration?: number) =>
+    useToastStore.getState().push({ message, variant: "warning", duration }),
+  dismiss: (id: string) => useToastStore.getState().dismiss(id),
+};
+
+const VARIANT_CLASS: Record<ToastVariant, string> = {
+  success: "bg-green-600 text-white border-green-700",
+  error: "bg-red-600 text-white border-red-700",
+  warning: "bg-amber-600 text-white border-amber-700",
+  info: "bg-sky-600 text-white border-sky-700",
 };
 
 /**
@@ -66,7 +85,7 @@ export function ToastViewport() {
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="pointer-events-none fixed inset-x-0 top-4 z-[9999] flex flex-col items-center gap-2 px-4"
+      className="pointer-events-none fixed right-4 top-4 z-[9999] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2"
     >
       {items.map((t) => (
         <ToastCard key={t.id} item={t} onDismiss={() => dismiss(t.id)} />
@@ -90,15 +109,22 @@ function ToastCard({
   return (
     <div
       role={item.variant === "error" ? "alert" : "status"}
+      aria-live={item.variant === "error" ? "assertive" : "polite"}
       className={cn(
-        "pointer-events-auto max-w-sm rounded-md border px-4 py-2 text-sm shadow-lg",
-        item.variant === "success" && "border-green-300 bg-green-50 text-green-800",
-        item.variant === "error" &&
-          "border-[color:var(--color-primary)] bg-[color:var(--color-primary-50)] text-[color:var(--color-primary-700)]",
-        item.variant === "info" && "border-neutral-300 bg-white text-neutral-800",
+        "pointer-events-auto flex items-start gap-3 rounded-md border px-4 py-2 text-sm shadow-lg",
+        "animate-[fade-in_300ms_ease-out]",
+        VARIANT_CLASS[item.variant],
       )}
     >
-      {item.message}
+      <span className="flex-1 whitespace-pre-line">{item.message}</span>
+      <button
+        type="button"
+        aria-label="关闭提示"
+        onClick={onDismiss}
+        className="text-white/80 hover:text-white"
+      >
+        ×
+      </button>
     </div>
   );
 }

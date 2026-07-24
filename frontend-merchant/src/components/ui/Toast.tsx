@@ -1,7 +1,14 @@
 "use client";
 
 /**
- * 轻量 Toast 组件与 provider。
+ * 轻量 Toast 组件与 provider —— Phase 7 三端一致性。
+ *
+ * 规范（对齐 §5.1）：
+ * - 位置：右上角固定（top-4 right-4）
+ * - 颜色：error red-600 / success green-600 / warning amber-600 / info sky-600
+ * - 动画：300ms 淡入
+ * - 错误 role="alert" + aria-live="assertive"；其他 role="status" + aria-live="polite"
+ *
  * 采用 zustand store 管理 toast 队列；无第三方依赖。
  * 使用方式：
  *   ```tsx
@@ -69,10 +76,10 @@ export const toast = {
 };
 
 const TONE_STYLES: Record<ToastTone, string> = {
-  success: "bg-emerald-600 text-white",
-  error: "bg-red-600 text-white",
-  info: "bg-sky-600 text-white",
-  warning: "bg-amber-500 text-white",
+  success: "bg-green-600 text-white border-green-700",
+  error: "bg-red-600 text-white border-red-700",
+  info: "bg-sky-600 text-white border-sky-700",
+  warning: "bg-amber-600 text-white border-amber-700",
 };
 
 function ToastCard({ item }: { item: ToastItem }) {
@@ -88,8 +95,10 @@ function ToastCard({ item }: { item: ToastItem }) {
   return (
     <div
       role={item.tone === "error" ? "alert" : "status"}
+      aria-live={item.tone === "error" ? "assertive" : "polite"}
       className={cn(
-        "pointer-events-auto flex min-w-[240px] max-w-sm items-start gap-3 rounded-md px-4 py-3 text-sm shadow-lg",
+        "pointer-events-auto flex min-w-[240px] max-w-sm items-start gap-3 rounded-md border px-4 py-3 text-sm shadow-lg",
+        "animate-[fade-in_300ms_ease-out]",
         TONE_STYLES[item.tone],
       )}
     >
@@ -115,7 +124,7 @@ export function ToastRegion() {
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 top-4 z-[100] flex flex-col items-center gap-2 px-4"
+      className="pointer-events-none fixed right-4 top-4 z-[100] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2"
     >
       {items.map((it) => (
         <ToastCard key={it.id} item={it} />

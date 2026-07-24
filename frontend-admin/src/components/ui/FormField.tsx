@@ -41,7 +41,7 @@ export function FormField({
         >
           {label}
           {required ? (
-            <span aria-label="必填" className="ml-1 text-[color:var(--color-danger)]">
+            <span aria-hidden className="ml-1 text-[color:var(--color-danger)]">
               *
             </span>
           ) : null}
@@ -52,6 +52,7 @@ export function FormField({
         <p
           className="text-xs text-[color:var(--color-danger)]"
           role="alert"
+          aria-live="polite"
         >
           {error}
         </p>

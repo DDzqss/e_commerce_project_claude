@@ -7,7 +7,7 @@ import {
 } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps
@@ -21,10 +21,11 @@ export interface ButtonProps
 }
 
 /**
- * 通用按钮：三种 variant + loading 三态。
+ * 通用按钮：四种 variant + loading 三态。
  * - primary：京东红主按钮，页面主 CTA
  * - secondary：白底灰边，中性操作
  * - ghost：透明背景，用于弹窗次按钮或表格行内操作
+ * - danger：破坏性操作（取消订单、删除地址等），走 --color-danger
  *
  * loading=true 时：禁用点击 + 显示 spinner + 保持宽度。
  */
@@ -68,6 +69,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             "border border-neutral-300 bg-white text-neutral-800 shadow-sm hover:bg-neutral-100",
           variant === "ghost" &&
             "bg-transparent text-neutral-700 hover:bg-neutral-100",
+          variant === "danger" &&
+            "bg-[color:var(--color-danger)] text-white shadow-sm hover:bg-red-700 active:bg-red-800",
           fullWidth && "w-full",
           className,
         )}

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Price, formatYuan } from "@/components/ui/Price";
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -180,16 +181,11 @@ function CartContent() {
       {isLoading && <CartSkeleton />}
 
       {isError && (
-        <div className="rounded-md border border-[color:var(--color-primary-200)] bg-[color:var(--color-primary-50)] px-4 py-3 text-sm text-[color:var(--color-primary-700)]">
-          加载失败，
-          <button
-            type="button"
-            className="ml-1 underline"
-            onClick={() => refetch()}
-          >
-            重试
-          </button>
-        </div>
+        <ErrorScreen
+          title="购物车加载失败"
+          description="网络不稳定或服务暂时不可用，请稍后重试。"
+          onRetry={() => refetch()}
+        />
       )}
 
       {data && groups.length === 0 && (
