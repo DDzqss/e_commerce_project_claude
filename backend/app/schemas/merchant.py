@@ -124,11 +124,18 @@ class MerchantAccountOut(BaseModel):
 
 
 class MerchantMeOut(BaseModel):
-    """``GET /merchant/me`` response — account + shop + perms."""
+    """``GET /merchant/me`` response — merchant account + shop + perms."""
 
-    account: MerchantAccountOut
+    model_config = ConfigDict(populate_by_name=True)
+
+    merchant_account: MerchantAccountOut = Field(alias="account")
     shop: ShopOut
     permissions: list[str]
+
+    @property
+    def account(self) -> MerchantAccountOut:
+        """Backward-compatible Python attribute for existing service code."""
+        return self.merchant_account
 
 
 class MerchantAccountWithPasswordOut(MerchantAccountOut):

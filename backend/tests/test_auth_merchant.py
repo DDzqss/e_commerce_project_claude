@@ -16,11 +16,13 @@ async def test_merchant_can_login_and_read_me(
 ) -> None:
     account, shop = seed_merchant_account
     tokens = await login_merchant_get_tokens(client, account.login_name, "Merch1234")
+    assert tokens["merchant_account"]["login_name"] == account.login_name
+    assert tokens["shop"]["id"] == shop.id
 
     resp = await client.get("/api/v1/merchant/me", headers=bearer(tokens["access_token"]))
     body = resp.json()
     assert body["code"] == 0
-    assert body["data"]["account"]["login_name"] == account.login_name
+    assert body["data"]["merchant_account"]["login_name"] == account.login_name
     assert body["data"]["shop"]["id"] == shop.id
     assert "merchant:shop:update" in body["data"]["permissions"]
 

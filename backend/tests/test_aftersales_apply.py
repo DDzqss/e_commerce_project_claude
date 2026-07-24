@@ -58,6 +58,15 @@ async def test_refund_only_apply_paid_order(
     assert len(body["data"]["items"]) == 1
     assert len(body["data"]["evidences"]) == 1
 
+    stats = await client.get(
+        "/api/v1/merchant/aftersales/stats/summary",
+        headers=ctx["m_headers"],
+    )
+    assert stats.status_code == 200
+    stats_body = stats.json()
+    assert stats_body["code"] == 0
+    assert stats_body["data"]["pending_review_count"] >= 1
+
 
 @pytest.mark.asyncio
 async def test_return_refund_apply_completed_order(

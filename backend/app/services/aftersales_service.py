@@ -69,6 +69,7 @@ from app.schemas.aftersales import (
     AftersalesStatsOverviewOut,
     AftersalesStatusHistoryOut,
     AftersalesSubmitTrackingIn,
+    MerchantAftersalesStatsOut,
 )
 from app.services import refund_service, risk_service
 from app.services.audit_service import write_audit
@@ -1102,6 +1103,48 @@ async def merchant_list(
     return _serialize_list(rows), total
 
 
+async def merchant_stats_summary(
+    session: AsyncSession, account: MerchantAccount
+) -> MerchantAftersalesStatsOut:
+    """Build the merchant aftersales dashboard summary for one shop."""
+    now = _now()
+    soon = now + timedelta(hours=24)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    async def _c(*conds: Any) -> int:
+        stmt = select(func.count(Aftersales.id)).where(
+            Aftersales.shop_id == account.shop_id,
+            Aftersales.deleted_at.is_(None),
+            *conds,
+        )
+        return int((await session.execute(stmt)).scalar_one())
+
+    pending_review = await _c(Aftersales.status == AftersalesStatus.PENDING_MERCHANT_REVIEW)
+    overdue_soon = await _c(
+        Aftersales.status == AftersalesStatus.PENDING_MERCHANT_REVIEW,
+        Aftersales.merchant_review_deadline < soon,
+    )
+    waiting_receive = await _c(Aftersales.status == AftersalesStatus.RETURN_SHIPPED_WAITING_RECEIVE)
+    waiting_ship = await _c(Aftersales.status == AftersalesStatus.MERCHANT_AGREED_WAITING_SHIP)
+    completed_this_month = await _c(
+        Aftersales.status.in_(
+            [
+                AftersalesStatus.COMPLETED_REFUNDED,
+                AftersalesStatus.COMPLETED_EXCHANGED,
+            ]
+        ),
+        Aftersales.closed_at.is_not(None),
+        Aftersales.closed_at >= month_start,
+    )
+    return MerchantAftersalesStatsOut(
+        pending_review_count=pending_review,
+        overdue_soon_count=overdue_soon,
+        waiting_receive_count=waiting_receive,
+        waiting_ship_count=waiting_ship,
+        completed_this_month_count=completed_this_month,
+    )
+
+
 async def merchant_get_detail(
     session: AsyncSession, account: MerchantAccount, aftersales_id: int
 ) -> AftersalesDetailOut:
@@ -1885,6 +1928,7 @@ __all__ = [
     "merchant_refuse_receive",
     "merchant_reject",
     "merchant_ship_exchange",
+    "merchant_stats_summary",
     "scan_exchange_confirm_timeouts",
     "scan_merchant_receive_timeouts",
     "scan_merchant_review_timeouts",

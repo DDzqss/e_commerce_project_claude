@@ -274,6 +274,16 @@ class AftersalesStatsOverviewOut(BaseModel):
     avg_resolution_hours: float
 
 
+class MerchantAftersalesStatsOut(BaseModel):
+    """Merchant dashboard summary for the current shop."""
+
+    pending_review_count: int
+    overdue_soon_count: int
+    waiting_receive_count: int
+    waiting_ship_count: int
+    completed_this_month_count: int
+
+
 __all__ = [
     "AftersalesAppealIn",
     "AftersalesCancelIn",
@@ -297,4 +307,5 @@ __all__ = [
     "AftersalesStatsOverviewOut",
     "AftersalesStatusHistoryOut",
     "AftersalesSubmitTrackingIn",
+    "MerchantAftersalesStatsOut",
 ]

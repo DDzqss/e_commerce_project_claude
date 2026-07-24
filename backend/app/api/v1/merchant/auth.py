@@ -25,14 +25,21 @@ async def login(
     request: Request,
     session: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
-    _, tokens = await auth_service.login_merchant(
+    account, tokens = await auth_service.login_merchant(
         session,
         payload.login_name,
         payload.password,
         ip=get_client_ip(request),
         user_agent=get_user_agent(request),
     )
-    return envelope(data=tokens.model_dump())
+    me = await merchant_service.get_me(session, account)
+    return envelope(
+        data={
+            **tokens.model_dump(),
+            "merchant_account": me.merchant_account.model_dump(mode="json"),
+            "shop": me.shop.model_dump(mode="json"),
+        }
+    )
 
 
 @router.post("/refresh", summary="Rotate merchant refresh token")
