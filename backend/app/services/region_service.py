@@ -21,7 +21,7 @@ from app.schemas.region import RegionOut, RegionTreeNode
 async def get_children(session: AsyncSession, parent_code: str | None) -> list[RegionOut]:
     """Return direct children of ``parent_code`` (None → top-level)."""
     stmt = select(Region)
-    if parent_code is None or parent_code == "" or parent_code == "root":
+    if parent_code is None or parent_code in {"", "root"}:
         stmt = stmt.where(Region.parent_code.is_(None))
     else:
         parent = await session.get(Region, parent_code)

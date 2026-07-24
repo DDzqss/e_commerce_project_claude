@@ -214,7 +214,7 @@ async def mock_succeed(
         from app.services import order_service as _order_service
 
         await _order_service._notify_order_event(session, order, event="paid")
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
     return PaymentAmountOnlyOut(
         session_id=ps.id,

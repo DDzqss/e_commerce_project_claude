@@ -136,7 +136,7 @@ async def _notify_order_event(
                 related_type="order",
                 related_id=order.id,
             )
-    except Exception:  # noqa: BLE001  best-effort, must not block main flow
+    except Exception:
         pass
 
 # ---------------------------------------------------------------------------

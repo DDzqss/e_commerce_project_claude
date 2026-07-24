@@ -157,8 +157,8 @@ async def admin_uphold(
         await review_service.update_shop_rating(session, review.shop_id)
 
         # notify author
-        from app.services import notification_service
         from app.models.notification import NotificationCategory
+        from app.services import notification_service
 
         await notification_service.notify_user(
             session,

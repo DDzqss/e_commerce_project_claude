@@ -134,7 +134,7 @@ async def _notify_aftersales_event(
                 related_type="aftersales",
                 related_id=aftersales.id,
             )
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
 
 # ---------------------------------------------------------------------------

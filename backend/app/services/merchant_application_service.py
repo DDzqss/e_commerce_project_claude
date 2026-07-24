@@ -301,7 +301,7 @@ async def admin_approve(
             related_type="merchant_application",
             related_id=row.id,
         )
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
 
     account_out = MerchantAccountWithPasswordOut.model_validate(
@@ -374,7 +374,7 @@ async def admin_reject(
             related_type="merchant_application",
             related_id=row.id,
         )
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
     return MerchantApplicationOut.model_validate(row)
 

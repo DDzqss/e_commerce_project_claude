@@ -115,10 +115,10 @@ async def _summarize(session: AsyncSession, where: list[Any]) -> ReviewRatingSum
     avg_stmt = select(func.coalesce(func.avg(Review.rating), 0)).where(and_(*conds))
     count = int((await session.execute(count_stmt)).scalar_one())
     if count == 0:
-        return ReviewRatingSummary(avg=0.0, count=0, distribution={i: 0 for i in range(1, 6)})
+        return ReviewRatingSummary(avg=0.0, count=0, distribution=dict.fromkeys(range(1, 6), 0))
     avg = float((await session.execute(avg_stmt)).scalar_one())
 
-    dist: dict[int, int] = {i: 0 for i in range(1, 6)}
+    dist: dict[int, int] = dict.fromkeys(range(1, 6), 0)
     dist_stmt = (
         select(Review.rating, func.count(Review.id))
         .where(and_(*conds))

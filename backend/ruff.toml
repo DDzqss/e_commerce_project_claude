@@ -43,7 +43,11 @@ ignore = [
     "PLC0415", # allow local imports (used to avoid circular deps / lazy load in scripts)
     "RUF001",  # allow ambiguous Chinese punctuation (fullwidth ，：) — intentional in i18n strings
     "S101",    # allow assert (used in tests)
+    "S110",    # allow try/except/pass for best-effort notification / audit hooks (business
+               # code intentionally swallows so a notification bug never breaks the main flow)
     "B008",    # allow FastAPI Depends() in defaults
+    "ASYNC240",# region JSON is loaded once at startup with pathlib; anyio would add complexity
+               # without benefit for a synchronous one-shot boot-time read
 ]
 
 [lint.per-file-ignores]
