@@ -6,6 +6,7 @@
 export * from "./api";
 export * from "./errors";
 export * from "./order";
+export * from "./aftersales";
 
 /** 后端统一响应包裹结构（与 backend Pydantic 响应约定保持一致）。 */
 export interface ApiResponse<T> {

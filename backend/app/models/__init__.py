@@ -6,6 +6,30 @@ up via ``Base.metadata``. Feature branches append their imports below.
 
 from app.models.address import Address
 from app.models.admin_user import AdminRole, AdminStatus, AdminUser
+from app.models.aftersales import (
+    Aftersales,
+    AftersalesArbitrationOutcome,
+    AftersalesCloseReason,
+    AftersalesEscalationReason,
+    AftersalesReasonCategory,
+    AftersalesStatus,
+    AftersalesType,
+)
+from app.models.aftersales_evidence import (
+    AftersalesEvidence,
+    AftersalesEvidenceStage,
+    AftersalesEvidenceUploaderType,
+)
+from app.models.aftersales_item import AftersalesItem
+from app.models.aftersales_message import (
+    AftersalesMessage,
+    AftersalesMessageKind,
+    AftersalesMessageSenderType,
+)
+from app.models.aftersales_status_history import (
+    AftersalesActorType,
+    AftersalesStatusHistory,
+)
 from app.models.audit_log import AuditActorType, AuditLog
 from app.models.base import Base, IdMixin, SoftDeleteMixin, TimestampMixin
 from app.models.brand import Brand
@@ -38,6 +62,22 @@ __all__ = [
     "AdminRole",
     "AdminStatus",
     "AdminUser",
+    "Aftersales",
+    "AftersalesActorType",
+    "AftersalesArbitrationOutcome",
+    "AftersalesCloseReason",
+    "AftersalesEscalationReason",
+    "AftersalesEvidence",
+    "AftersalesEvidenceStage",
+    "AftersalesEvidenceUploaderType",
+    "AftersalesItem",
+    "AftersalesMessage",
+    "AftersalesMessageKind",
+    "AftersalesMessageSenderType",
+    "AftersalesReasonCategory",
+    "AftersalesStatus",
+    "AftersalesStatusHistory",
+    "AftersalesType",
     "AuditActorType",
     "AuditLog",
     "Base",

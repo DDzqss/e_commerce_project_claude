@@ -32,6 +32,23 @@ from app.core.database import async_session_factory, dispose_engine
 from app.core.security import hash_password
 from app.models.address import Address
 from app.models.admin_user import AdminRole, AdminUser
+from app.models.aftersales import (
+    Aftersales,
+    AftersalesEscalationReason,
+    AftersalesReasonCategory,
+    AftersalesStatus,
+    AftersalesType,
+)
+from app.models.aftersales_evidence import (
+    AftersalesEvidence,
+    AftersalesEvidenceStage,
+    AftersalesEvidenceUploaderType,
+)
+from app.models.aftersales_item import AftersalesItem
+from app.models.aftersales_status_history import (
+    AftersalesActorType,
+    AftersalesStatusHistory,
+)
 from app.models.brand import Brand
 from app.models.category import Category
 from app.models.merchant import (
@@ -616,6 +633,156 @@ async def _seed_demo_orders(session: AsyncSession, shop: Shop) -> None:
     logger.info("seeded %d demo orders for shop %s", len(demos), shop.name)
 
 
+async def _seed_aftersales_examples(session: AsyncSession, shop: Shop) -> None:
+    """Insert example aftersales cases for Phase 4 联调.
+
+    Idempotent: skips creation if any aftersales rows exist for this shop.
+    """
+    existing = int(
+        (
+            await session.execute(
+                select(func.count(Aftersales.id)).where(Aftersales.shop_id == shop.id)
+            )
+        ).scalar_one()
+    )
+    if existing > 0:
+        return
+
+    user_row = (
+        await session.execute(select(User).where(User.phone == USERS[0].phone))
+    ).scalar_one_or_none()
+    if user_row is None:
+        return
+
+    # Grab any three orders in different statuses for realistic seed.
+    orders_stmt = (
+        select(Order)
+        .where(Order.user_id == user_row.id, Order.shop_id == shop.id)
+        .order_by(Order.created_at.desc())
+    )
+    orders = list((await session.execute(orders_stmt)).scalars().all())
+    if not orders:
+        return
+
+    now = datetime.now(UTC)
+
+    async def _make_case(
+        order: Order,
+        *,
+        as_type: AftersalesType,
+        as_status: AftersalesStatus,
+        stage: AftersalesEvidenceStage,
+        idx: int,
+        refunded: bool = False,
+        escalated: bool = False,
+    ) -> None:
+        oi_stmt = select(OrderItem).where(OrderItem.order_id == order.id).limit(1)
+        oi = (await session.execute(oi_stmt)).scalar_one_or_none()
+        if oi is None:
+            return
+        review_deadline = now + timedelta(hours=72)
+        case = Aftersales(
+            aftersales_no=f"AS{now.strftime('%Y%m%d')}{idx:010d}",
+            order_id=order.id,
+            user_id=user_row.id,
+            shop_id=shop.id,
+            type=as_type,
+            status=as_status,
+            reason_category=AftersalesReasonCategory.QUALITY_ISSUE,
+            reason_note="演示售后单：商品外观有轻微瑕疵",
+            refund_amount_cents=oi.subtotal_cents,
+            actual_refund_cents=oi.subtotal_cents if refunded else None,
+            merchant_review_deadline=review_deadline,
+        )
+        if refunded:
+            case.refunded_at = now - timedelta(days=1)
+            case.refund_txn_no = f"REFUND-SEED{idx:04d}"
+            case.closed_at = case.refunded_at
+        if escalated:
+            case.escalated_at = now - timedelta(hours=1)
+            case.escalation_reason = AftersalesEscalationReason.MERCHANT_TIMEOUT
+        session.add(case)
+        await session.flush()
+
+        session.add(
+            AftersalesItem(
+                aftersales_id=case.id,
+                order_item_id=oi.id,
+                quantity=oi.quantity,
+                refund_amount_cents=oi.subtotal_cents,
+            )
+        )
+        session.add(
+            AftersalesStatusHistory(
+                aftersales_id=case.id,
+                from_status=None,
+                to_status=as_status.value,
+                actor_type=AftersalesActorType.SYSTEM,
+                actor_id=None,
+                note="seed",
+            )
+        )
+        session.add(
+            AftersalesEvidence(
+                aftersales_id=case.id,
+                uploader_type=AftersalesEvidenceUploaderType.USER,
+                uploader_id=user_row.id,
+                stage=stage,
+                image_url=f"aftersales/seed/example-{idx}-a.jpg",
+            )
+        )
+        session.add(
+            AftersalesEvidence(
+                aftersales_id=case.id,
+                uploader_type=AftersalesEvidenceUploaderType.USER,
+                uploader_id=user_row.id,
+                stage=stage,
+                image_url=f"aftersales/seed/example-{idx}-b.jpg",
+            )
+        )
+        await session.flush()
+
+    # 1) completed_refunded for the completed order (if any).
+    completed_orders = [o for o in orders if o.status == OrderStatus.COMPLETED]
+    if completed_orders:
+        await _make_case(
+            completed_orders[0],
+            as_type=AftersalesType.REFUND_ONLY,
+            as_status=AftersalesStatus.COMPLETED_REFUNDED,
+            stage=AftersalesEvidenceStage.APPLY,
+            idx=1,
+            refunded=True,
+        )
+
+    # 2) pending_merchant_review for the paid order (merchant联调).
+    paid_orders = [o for o in orders if o.status == OrderStatus.PAID]
+    if paid_orders:
+        await _make_case(
+            paid_orders[0],
+            as_type=AftersalesType.REFUND_ONLY,
+            as_status=AftersalesStatus.PENDING_MERCHANT_REVIEW,
+            stage=AftersalesEvidenceStage.APPLY,
+            idx=2,
+        )
+
+    # 3) admin_arbitrating for the pending_payment order (admin联调).
+    # Note: pending_payment technically can't have aftersales; use a
+    # completed_refunded fallback if no pending is available.
+    for o in orders:
+        if o.status in (OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.SHIPPED):
+            await _make_case(
+                o,
+                as_type=AftersalesType.RETURN_REFUND,
+                as_status=AftersalesStatus.ADMIN_ARBITRATING,
+                stage=AftersalesEvidenceStage.APPEAL,
+                idx=3,
+                escalated=True,
+            )
+            break
+
+    logger.info("seeded aftersales example cases for shop %s", shop.name)
+
+
 async def _seed() -> None:
     settings = get_settings()
     if settings.ENVIRONMENT == "production":
@@ -639,6 +806,10 @@ async def _seed() -> None:
         await _seed_addresses(session)
         await session.commit()
         await _seed_demo_orders(session, shop)
+        await session.commit()
+
+        # Phase 4 seed data
+        await _seed_aftersales_examples(session, shop)
         await session.commit()
 
     await dispose_engine()

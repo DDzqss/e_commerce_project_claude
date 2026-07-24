@@ -710,6 +710,11 @@ gh pr create --base develop
 | **SQLite 不给 `BigInteger` 自增** | 用 aiosqlite 跑测试报 `NOT NULL constraint failed: users.id`；Postgres 无碍 | `BigInteger().with_variant(Integer, "sqlite")` 定义 `BigIntId` 类型；PK 与 FK 全部用这个 |
 | **`session.flush()` 后 Pydantic 序列化访问 `updated_at`** | `MissingGreenlet: greenlet_spawn has not been called` — 因 `onupdate=func.now()` 需要 refresh 才能拿到新值 | 状态变更后写 `await session.refresh(row)` 再返回 |
 | **Agent 本地 `.venv` 缓存旧依赖** | Agent 本地 pytest pass，CI 全新装挂 4 类问题 | Agent 在启动前必须 `uv sync --refresh --all-extras` 或删掉 `.venv` 重装；Orchestrator 派活时明确要求 |
+| **CI ruff 版本比 Agent 本地新** | 本地 `ruff check` 全绿，CI 报 25 个 PLC0415 / RUF001 / PT018 | 在 `ruff.toml` `ignore` 里加合理规则（PLC0415 局部 import 用于避免循环依赖；PLR0911 状态机 dispatcher 多返回是常态）；或本地 `uv run ruff --version` 与 CI 对齐 |
+| **`order_no` 等业务 ID 唯一冲突重试破坏外层事务** | INSERT 时 UNIQUE violation → 外层事务被标脏无法继续 | 用 `session.begin_nested()` (SAVEPOINT) 包裹 INSERT + `secrets.randbelow` 重试；失败可回退到 SAVEPOINT 而非顶层事务 |
+| **Partial UNIQUE index (`WHERE is_default=TRUE`) 声明位置** | SQLAlchemy 模型层用 `UniqueConstraint(postgresql_where=...)` 声明时，SQLite `create_all` 会退化为全表 UNIQUE 破坏"多条历史 default"测试 | **只在 Alembic 迁移里 `op.execute("CREATE UNIQUE INDEX ... WHERE ...")`**；模型层不声明；应用层加 `_clear_other_defaults` 兜底 |
+| **SQLite 存 timezone-naive datetime** | Postgres 读回来是 aware，SQLite 读回来是 naive；datetime 比较报 `TypeError: can't compare offset-naive and offset-aware` | 服务层写 `_as_aware(dt)` 小工具补 UTC；只在读到数据库结果时补，写入统一用 aware |
+| **Pydantic 字段与 ORM 列名不一致（如 `session_id` vs `id`）** | 想让接口输出 `session_id` 但 ORM 是 `id` | `Field(alias="id")` + `model_config = ConfigDict(populate_by_name=True, from_attributes=True)` |
 
 ### 11.4 CI/CD
 

@@ -52,3 +52,4 @@ export * from "./api";
 export * from "./errors";
 export * from "./catalog";
 export * from "./order";
+export * from "./aftersales";

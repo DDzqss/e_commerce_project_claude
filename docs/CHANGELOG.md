@@ -13,6 +13,88 @@
 
 ---
 
+## [0.5.0-phase4] — 2026-07-24
+
+### Phase 4：售后闭环（退款 / 退货退款 / 换货 · 三方联动 · 平台仲裁 · 超时升级）
+
+**这是本项目"做深做透"的核心 phase**。原始需求中最强调的示例——用户申请退款、商家审核、超时升级客服、拒收申诉、恶意退款检测——本 Phase 全部实现。
+
+#### 契约先行
+- `docs/API/phase-4-contracts.md`（900+ 行）：3 种售后类型、12 态状态机、
+  4 类超时升级、凭证系统、平台仲裁、催办/申诉、风控占位、订单侧联动
+
+#### Backend
+- **5 张新表**：aftersales / aftersales_items / aftersales_status_history /
+  aftersales_evidences / aftersales_messages
+- **Alembic 0004**：11 native enum + partial UNIQUE(order_id) WHERE 非终态
+  + ALTER orders 加 `has_partial_refund` + `total_refunded_cents`
+- **12 态状态机**（`AftersalesStatus`）：pending_merchant_review → merchant_rejected /
+  merchant_agreed_waiting_return / refunding / completed_refunded / completed_exchanged /
+  admin_arbitrating / return_shipped_waiting_receive / merchant_agreed_waiting_ship /
+  exchange_shipped_waiting_receive / user_cancelled / system_closed
+- **3 类售后**：REFUND_ONLY / RETURN_REFUND / EXCHANGE，各有严格允许的订单状态入口
+- **服务层核心 aftersales_service.py**（~1050 行）+ refund_service（模拟退款）+ risk_service（30 天 3 单自动升级仲裁）
+- **24 个新端点**（user 9 + upload 1 + merchant 8 + admin 7）
+- **4 类超时扫描扩展**（process_timeouts.py）：
+  - 商家 72h 未审 → 自动升级客服（escalation_reason=merchant_timeout）
+  - 用户 7 天未寄回 → system_closed
+  - 商家 15 天未确认收货 → 默认收货推进（RETURN_REFUND→refunding / EXCHANGE→wait_ship）
+  - 换货 15 天未确认 → 自动 completed_exchanged
+- **平台仲裁**：认领 + 3 outcome 裁决（side_with_user / side_with_merchant / partial_refund）+ 强制退款
+- **催办 & 申诉**：24h 3 次频控 + 单次申诉上限（appeal_count 限制）
+- **凭证系统**：复用 Phase 2 MinIO presign + **新增 user 端** `/user/uploads/presign` + 6 stage 分类存储
+- **订单侧联动**：全额退款→order 转 closed；部分退款→has_partial_refund=TRUE 冗余
+- **审计完整**：status_history + messages 覆盖所有触发方（user / merchant / admin / system）
+- **依赖**：无新增
+- **测试**：31 个新测试，累计 **115/115 全绿**（Phase 1-3 84 + Phase 4 31）
+- **Seed 扩展**：3 条示例售后（completed_refunded 历史 / pending 供 merchant 联调 / arbitrating 供 admin 联调）
+
+#### Frontend · User-Web（15 新，66 测试）
+- **API 层**：aftersales-api（含 Idempotency-Key 强制）+ user-upload-api（新 user 端 presign）
+- **通用组件**：AftersalesStatusBadge / TypeIcon / ReasonCategoryPicker / EvidenceUploader（多图并发）/ Timeline / ReturnTrackingForm
+- **申请页**：类型联动订单状态（allowedAftersalesTypes）+ 部分退款数量选择 + 金额上限 + 凭证上传 + 幂等 key sessionStorage
+- **详情页**：状态驱动操作按钮集合（USER_CAN_CANCEL/NUDGE/APPEAL/SUBMIT_TRACKING/CONFIRM_EXCHANGE）+ 完整 Timeline + Messages + 凭证画廊按 stage 分组
+- **我的售后列表**：语义 Status tab（pending/in_progress/done/closed）
+- **申诉 Modal**：明确"仅 1 次机会"警告
+- **打通订单详情**："申请售后"按钮
+
+#### Frontend · Merchant-Web（14 新 + 5 改，40 测试）
+- **API 层**：aftersales-api（8 mutation）+ aftersales-utils（脱敏 / 剩余时间彩色）
+- **通用组件**：StatusBadge / TypeIcon / Timeline / EvidenceGallery / NoteEditor
+- **5 类操作 Modal**：Approve（return_address RETURN_REFUND/EXCHANGE 必填）/ Reject（≥5 字 + 二次确认）/ ConfirmReceived / RefuseReceive（≥10 字 + 二次勾选强警告"自动升级仲裁"）/ ShipExchange（快递校验）
+- **工单列表**：即将超时红标 + 剩余审核时间彩色（<12h 红/<24h 橙/其他绿）+ 4 张统计卡
+- **详情页**：状态驱动按钮组
+- **Sidebar** "售后处理" 从禁用改为启用 + 红点数量
+- **Dashboard** 追加"待审核售后"卡片
+
+#### Frontend · Admin-Web（11 新 + 4 改，45 测试）
+- **API 层**：aftersales-api（7 mutation）
+- **RBAC 扩展**：4 权限键（read_all / arbitrate / force_refund / add_note）
+- **仲裁 Modal**：3 outcome radio 联动 actual_refund_cents + conclusion ≥20 字 + 二次勾选"仲裁不可撤销"
+- **强制退款 Modal**：note ≥10 字 + 金额校验 + 二次勾选
+- **认领仲裁**：arbitrator_admin_id 已认领的其他 admin 前端禁用
+- **客服工作台**：4 张统计卡（待仲裁红 / 待商家审 / 处理中 / 今日已解决 + 平均时长）+ 高级筛选 + URL 同步
+- **仲裁详情**：证据画廊按 stage 分组 + Timeline 混合 messages + 4 actor 徽章色
+- **Sidebar** "售后仲裁" 链接 + 待仲裁徽章
+
+### 沉淀（AGENTS.md §11.3 新增 5 条 Phase 3 后端沉淀）
+- CI ruff 版本漂移（PLC0415 / RUF001 / PT018）
+- SAVEPOINT (session.begin_nested) 用于 UNIQUE 冲突重试
+- Partial UNIQUE index 只声明在 alembic（SQLite create_all 退化坑）
+- SQLite timezone-naive datetime `_as_aware` 兜底
+- Pydantic Field(alias) 处理 ORM 列名不一致
+
+### 验证结果
+- 后端：ruff ✓ · format ✓ · pytest 115/115 ✓
+- 三前端：pnpm build ✓ · vitest 合计 **151 用例**（user 66 + merchant 40 + admin 45）
+
+### Multi-Agent 复盘（Phase 4）
+- **4 subagent 并行开发**；Admin agent 因 API 错误中断 2 次，通过 SendMessage 续跑最终完成
+- 契约 900+ 行是本项目至今最长；12 态状态机 × 3 类型 × 4 角色触发矩阵复杂度最高
+- Backend 一次跑通（sediment + agent 严格遵守 §11.3 五大 backend 陷阱）
+
+---
+
 ## [0.4.0-phase3] — 2026-07-23
 
 ### Phase 3：交易核心（地址簿 / 购物车 / 下单 / 状态机 / 支付模拟 / 物流模拟 / 超时任务）

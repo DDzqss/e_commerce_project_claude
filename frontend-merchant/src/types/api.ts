@@ -247,7 +247,14 @@ export type UploadPurpose =
   | "spu_main"
   | "spu_gallery"
   | "brand_logo"
-  | "category_icon";
+  | "category_icon"
+  // ----- Phase 4 售后凭证（§10） -----
+  | "aftersales_apply"
+  | "aftersales_user_return"
+  | "aftersales_merchant_receive"
+  | "aftersales_exchange_ship"
+  | "aftersales_appeal"
+  | "aftersales_arbitration";
 
 export interface PresignUploadIn {
   purpose: UploadPurpose;

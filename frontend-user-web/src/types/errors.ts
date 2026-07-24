@@ -77,6 +77,31 @@ export enum ErrorCode {
   PaymentChannelUnsupported = 14003,
   PaymentMockFailed = 14004,
 
+  // 15xxx Phase 4 售后申请
+  AftersalesNotFound = 15001,
+  AftersalesForbidden = 15002,
+  AftersalesStatusIllegal = 15003,
+  OrderTypeNotAllowedForAftersales = 15004,
+  OrderHasActiveAftersales = 15005,
+  RefundAmountExceed = 15006,
+  AftersalesTypeMismatch = 15007,
+  AftersalesNoItemSelected = 15008,
+  AftersalesArbitratingCannotCancel = 15009,
+
+  // 16xxx Phase 4 凭证
+  EvidenceOverLimit = 16001,
+  EvidenceNotBelong = 16002,
+
+  // 17xxx Phase 4 物流回填
+  AftersalesTrackingInvalid = 17001,
+  AftersalesReturnNotAgreed = 17002,
+  AftersalesTrackingAlreadyFilled = 17003,
+
+  // 18xxx Phase 4 仲裁
+  AftersalesNotEscalated = 18001,
+  AftersalesArbitrationDone = 18002,
+  AftersalesForceRefundInvalid = 18003,
+
   // 9xxx 服务端
   InternalError = 9000,
 }
@@ -140,6 +165,33 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.PaymentSessionFinalized]: "此支付已完成或已失败，不可重试",
   [ErrorCode.PaymentChannelUnsupported]: "该支付方式暂不支持",
   [ErrorCode.PaymentMockFailed]: "模拟支付失败",
+
+  // 15xxx 售后申请
+  [ErrorCode.AftersalesNotFound]: "售后单不存在",
+  [ErrorCode.AftersalesForbidden]: "无权访问该售后单",
+  [ErrorCode.AftersalesStatusIllegal]: "当前售后状态不允许该操作",
+  [ErrorCode.OrderTypeNotAllowedForAftersales]:
+    "当前订单状态不支持发起此类型售后",
+  [ErrorCode.OrderHasActiveAftersales]: "该订单已有正在处理中的售后单",
+  [ErrorCode.RefundAmountExceed]: "退款金额超过订单可退金额",
+  [ErrorCode.AftersalesTypeMismatch]: "售后类型与订单状态不匹配",
+  [ErrorCode.AftersalesNoItemSelected]: "请至少选择一件商品",
+  [ErrorCode.AftersalesArbitratingCannotCancel]:
+    "售后已进入平台仲裁，不可撤销",
+
+  // 16xxx 凭证
+  [ErrorCode.EvidenceOverLimit]: "凭证数量已达上限 8 张",
+  [ErrorCode.EvidenceNotBelong]: "凭证不属于此售后单",
+
+  // 17xxx 物流回填
+  [ErrorCode.AftersalesTrackingInvalid]: "快递单号格式无效",
+  [ErrorCode.AftersalesReturnNotAgreed]: "售后单尚未同意退货，暂不能回填快递",
+  [ErrorCode.AftersalesTrackingAlreadyFilled]: "已回填过快递单号，不可重复回填",
+
+  // 18xxx 仲裁
+  [ErrorCode.AftersalesNotEscalated]: "尚未升级至平台，不能仲裁",
+  [ErrorCode.AftersalesArbitrationDone]: "仲裁已完成",
+  [ErrorCode.AftersalesForceRefundInvalid]: "强制退款金额非法",
 
   [ErrorCode.InternalError]: "服务器开小差了，请稍后重试",
 };

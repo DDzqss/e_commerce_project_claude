@@ -175,7 +175,7 @@ async def test_create_missing_idempotency_key(
         headers=u_headers,  # no Idempotency-Key
         json={"cart_item_ids": [cart_item["id"]], "address_id": addr_id},
     )
-    assert resp.json()["code"] == 15001
+    assert resp.json()["code"] == 5010
 
 
 @pytest.mark.asyncio

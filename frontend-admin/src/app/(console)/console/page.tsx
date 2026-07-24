@@ -26,6 +26,7 @@ import { listAllSPUs } from "@/lib/product-api";
 import { listAllCategories } from "@/lib/category-api";
 import { countTreeNodes } from "@/components/ui/CategoryTreeEditor";
 import { useOrderOverview } from "@/hooks/useOrders";
+import { useAftersalesStats } from "@/hooks/useAftersales";
 import { usePermission } from "@/hooks/useAuth";
 
 export default function ConsoleHomePage() {
@@ -33,6 +34,7 @@ export default function ConsoleHomePage() {
   const canReadSPUs = usePermission("admin:spu:read_all");
   const canManageCategory = usePermission("admin:category:manage");
   const canReadOrders = usePermission("admin:order:read_all");
+  const canReadAftersales = usePermission("admin:aftersales:read_all");
 
   const pendingApplications = useQuery({
     queryKey: ["dashboard", "pending-applications-count"],
@@ -65,6 +67,7 @@ export default function ConsoleHomePage() {
   });
 
   const orderOverview = useOrderOverview({ enabled: canReadOrders });
+  const aftersalesStats = useAftersalesStats({ enabled: canReadAftersales });
 
   return (
     <div className="flex flex-col gap-6">
@@ -76,7 +79,7 @@ export default function ConsoleHomePage() {
           </p>
         </div>
         <span className="rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500">
-          Phase 3
+          Phase 4
         </span>
       </header>
 
@@ -346,14 +349,136 @@ export default function ConsoleHomePage() {
         </div>
       </section>
 
-      <section className="rounded-md border border-dashed border-[color:var(--color-border)] bg-white p-6 text-sm text-neutral-500">
-        <div className="mb-1 text-neutral-700 font-medium">
-          Phase 4 售后仲裁台正在筹备中
+      {/* Phase 4 · 售后仲裁 */}
+      <section aria-label="售后仲裁">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+          售后仲裁（实时）
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* 待仲裁（红色标注） */}
+          {canReadAftersales ? (
+            <Link
+              href="/console/aftersales?status=admin_arbitrating"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待仲裁售后单"
+            >
+              <StatCard
+                label="待仲裁"
+                value={
+                  aftersalesStats.isLoading
+                    ? "…"
+                    : aftersalesStats.isError
+                      ? "—"
+                      : String(
+                          aftersalesStats.data?.escalated_pending_count ?? 0,
+                        )
+                }
+                hint="已升级至平台且尚未认领（点击立即处理）"
+                tone="danger"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待仲裁"
+              value="—"
+              hint="您当前无查看权限"
+              tone="danger"
+            />
+          )}
+
+          {/* 处理中售后 */}
+          {canReadAftersales ? (
+            <Link
+              href="/console/aftersales"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看处理中售后"
+            >
+              <StatCard
+                label="处理中售后"
+                value={
+                  aftersalesStats.isLoading
+                    ? "…"
+                    : aftersalesStats.isError
+                      ? "—"
+                      : String(aftersalesStats.data?.in_progress_count ?? 0)
+                }
+                hint="所有非最终态售后单（点击查看）"
+                tone="info"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="处理中售后"
+              value="—"
+              hint="您当前无查看权限"
+              tone="info"
+            />
+          )}
+
+          {/* 待商家审核 */}
+          {canReadAftersales ? (
+            <Link
+              href="/console/aftersales?status=pending_merchant_review"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待商家审核售后"
+            >
+              <StatCard
+                label="待商家审核"
+                value={
+                  aftersalesStats.isLoading
+                    ? "…"
+                    : aftersalesStats.isError
+                      ? "—"
+                      : String(aftersalesStats.data?.pending_review_count ?? 0)
+                }
+                hint="等待商家 72h 内响应；超时自动升级"
+                tone="warning"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待商家审核"
+              value="—"
+              hint="您当前无查看权限"
+              tone="warning"
+            />
+          )}
+
+          {/* 今日已解决 + 平均解决时长 */}
+          {canReadAftersales ? (
+            <Link
+              href="/console/aftersales"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看今日已解决售后"
+            >
+              <StatCard
+                label="今日已解决"
+                value={
+                  aftersalesStats.isLoading
+                    ? "…"
+                    : aftersalesStats.isError
+                      ? "—"
+                      : String(aftersalesStats.data?.resolved_today_count ?? 0)
+                }
+                hint={
+                  aftersalesStats.isLoading || aftersalesStats.isError
+                    ? "平均解决时长 —"
+                    : `平均解决时长 ${(
+                        aftersalesStats.data?.avg_resolution_hours ?? 0
+                      ).toFixed(1)} h`
+                }
+                tone="success"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="今日已解决"
+              value="—"
+              hint="您当前无查看权限"
+              tone="success"
+            />
+          )}
         </div>
-        <p>
-          售后申请、商家超时升级、平台强制退款等能力将在下一个 Phase
-          开放，敬请关注开发规划文档。
-        </p>
       </section>
     </div>
   );

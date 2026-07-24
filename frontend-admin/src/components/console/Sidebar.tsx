@@ -15,7 +15,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuthStore } from "@/lib/auth-store";
-import { hasAnyPermission, type Permission } from "@/lib/rbac";
+import { hasAnyPermission, hasPermission, type Permission } from "@/lib/rbac";
+import { useAftersalesStats } from "@/hooks/useAftersales";
 
 interface NavItem {
   href: string;
@@ -72,11 +73,11 @@ const NAV_ITEMS: readonly NavItem[] = [
     available: true,
   },
   {
-    href: "/console/refunds",
+    href: "/console/aftersales",
     label: "售后仲裁",
-    requires: ["admin:refund:arbitrate"],
+    requires: ["admin:aftersales:read_all"],
     group: "operation",
-    available: false,
+    available: true,
   },
   {
     href: "/console/users",
@@ -110,6 +111,18 @@ const GROUP_LABEL: Record<NavItem["group"], string> = {
 export function Sidebar() {
   const permissions = useAuthStore((s) => s.permissions);
   const pathname = usePathname();
+
+  // 已授权的 admin 才拉售后大盘（否则 hook 也会因 401 拉不到）
+  const canReadAftersales = hasPermission(
+    permissions,
+    "admin:aftersales:read_all",
+  );
+  const aftersalesStats = useAftersalesStats({
+    enabled: canReadAftersales,
+    // 30s 与其他 dashboard 卡片保持一致；staleTime 已在 hook 内设置
+  });
+  const pendingArbitration =
+    aftersalesStats.data?.escalated_pending_count ?? 0;
 
   // 权限过滤：Phase 1 未开放的项目仍然显示（disabled），但没有权限的项目直接隐藏
   const visible = NAV_ITEMS.filter((item) =>
@@ -172,13 +185,22 @@ export function Sidebar() {
                         href={item.href}
                         aria-current={active ? "page" : undefined}
                         className={clsx(
-                          "flex items-center rounded px-3 py-2 text-sm transition",
+                          "flex items-center justify-between rounded px-3 py-2 text-sm transition",
                           active
                             ? "bg-[color:var(--color-primary-100)] text-[color:var(--color-primary)] font-medium"
                             : "text-neutral-700 hover:bg-neutral-100 hover:text-[color:var(--color-primary)]",
                         )}
                       >
-                        {item.label}
+                        <span>{item.label}</span>
+                        {item.href === "/console/aftersales" &&
+                        pendingArbitration > 0 ? (
+                          <span
+                            aria-label={`待仲裁 ${pendingArbitration} 条`}
+                            className="ml-2 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--color-danger)] px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                          >
+                            {pendingArbitration > 99 ? "99+" : pendingArbitration}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   );
@@ -190,7 +212,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-[color:var(--color-border)] px-4 py-3 text-[11px] text-neutral-400">
-        Phase 3 · 交易核心已上线
+        Phase 4 · 售后闭环
       </div>
     </aside>
   );

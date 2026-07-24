@@ -4,7 +4,17 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.user import addresses, auth, cart, me, merchant_applications, orders, payments
+from app.api.v1.user import (
+    addresses,
+    aftersales,
+    auth,
+    cart,
+    me,
+    merchant_applications,
+    orders,
+    payments,
+    uploads,
+)
 
 router = APIRouter()
 
@@ -21,5 +31,8 @@ router.include_router(orders.router, prefix="/orders", tags=["user.orders"])
 # Payments mount at the user root so both /orders/{id}/pay and
 # /payment-sessions/{id}/... live in one router.
 router.include_router(payments.router, prefix="", tags=["user.payments"])
+# Aftersales router owns both /orders/{id}/aftersales and /aftersales/*.
+router.include_router(aftersales.router, prefix="", tags=["user.aftersales"])
+router.include_router(uploads.router, prefix="/uploads", tags=["user.uploads"])
 
 __all__ = ["router"]

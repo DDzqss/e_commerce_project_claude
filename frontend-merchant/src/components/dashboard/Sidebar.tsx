@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/useAuth";
+import { useAftersalesStats } from "@/hooks/useMerchantAftersales";
 import { toast } from "@/components/ui/Toast";
 
 type NavItem = {
@@ -15,9 +16,11 @@ type NavItem = {
   icon: string;
   /** 未来阶段开放的项目：禁用点击 + tooltip 说明 */
   comingSoonNote?: string;
+  /** 徽章数字（如未审核数） */
+  badgeCount?: number;
 };
 
-const NAV_ITEMS: readonly NavItem[] = [
+const BASE_NAV_ITEMS: readonly Omit<NavItem, "badgeCount">[] = [
   { href: "/dashboard", label: "店铺看板", icon: "▮" },
   {
     href: "/orders",
@@ -31,10 +34,9 @@ const NAV_ITEMS: readonly NavItem[] = [
   },
   { href: "/shop", label: "店铺信息", icon: "◉" },
   {
-    href: "/refunds",
+    href: "/aftersales",
     label: "售后处理",
     icon: "⟲",
-    comingSoonNote: "Phase 4 开放",
   },
 ];
 
@@ -66,6 +68,8 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
     );
   }
 
+  const hasBadge = typeof item.badgeCount === "number" && item.badgeCount > 0;
+
   return (
     <Link
       href={item.href}
@@ -75,7 +79,15 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       <span aria-hidden className="w-4 text-center text-xs opacity-70">
         {item.icon}
       </span>
-      <span>{item.label}</span>
+      <span className="flex-1">{item.label}</span>
+      {hasBadge ? (
+        <span
+          aria-label={`${item.badgeCount} 未处理`}
+          className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white"
+        >
+          {item.badgeCount! > 99 ? "99+" : item.badgeCount}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -149,6 +161,15 @@ function AccountBottomMenu() {
 
 export function Sidebar() {
   const pathname = usePathname();
+  // 未审核数量（红点）—— stats 内部有 refetchInterval，故 sidebar 会准实时更新
+  const statsQuery = useAftersalesStats();
+  const pendingCount = statsQuery.data?.pending_review_count ?? 0;
+
+  const items: NavItem[] = BASE_NAV_ITEMS.map((it) =>
+    it.href === "/aftersales"
+      ? { ...it, badgeCount: pendingCount }
+      : { ...it },
+  );
 
   return (
     <nav
@@ -164,7 +185,7 @@ export function Sidebar() {
 
       {/* 导航列表 */}
       <ul className="flex-1 space-y-1 overflow-y-auto p-3">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active =
             !item.comingSoonNote &&
             (pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -180,7 +201,7 @@ export function Sidebar() {
       <div className="border-t border-white/10 p-3">
         <AccountBottomMenu />
         <div className="mt-2 text-[11px] text-white/50">
-          v0.3.0 · Phase 3
+          v0.4.0 · Phase 4
         </div>
       </div>
     </nav>
