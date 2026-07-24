@@ -722,6 +722,8 @@ gh pr create --base develop
 |---|---|---|
 | 三端前端 CI matrix 只装依赖一次会互相污染 | — | 用 `pnpm --frozen-lockfile` 一次装完 workspace，然后 `pnpm --filter <ws>` 执行各步骤 |
 | `next build` 的类型检查比 `tsc --noEmit` 更严 | 本地 tsc 过，CI build 挂 | Agent 完成前必须本地跑 `pnpm --filter <ws> build`，不能只跑 tsc |
+| **CI ruff / formatter 版本几乎每次都比本地新** | Phase 3 (PLC0415/RUF001/PT018) → Phase 5 (C420/S110/ASYNC240/新 formatter) 反复挂 | Agent 交付前必须 `uv sync --refresh --all-extras` 拉新 ruff，再跑 `ruff check .` + `ruff format --check .`；本地缓存严禁作为"绿了"的依据 |
+| **Agent API 中断** | 长任务 agent 因厂商 API InternalServerException 中断 | 用 `SendMessage(agentId, focused-prompt)` 缩小 scope 续跑（Phase 4 Admin agent 首创），比重启节省大量 tokens |
 
 ### 11.5 Agent 行为规范增强（Prompt 模板必附）
 
