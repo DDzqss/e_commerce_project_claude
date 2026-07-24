@@ -55,7 +55,7 @@ export function ConfirmModal({
             {cancelText}
           </Button>
           <Button
-            variant={danger ? "primary" : "primary"}
+            variant={danger ? "danger" : "primary"}
             onClick={() => void onConfirm()}
             loading={loading}
           >

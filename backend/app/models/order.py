@@ -123,6 +123,8 @@ class Order(IdMixin, TimestampMixin, Base):
         Index("ix_orders_shop_status_created", "shop_id", "status", "created_at"),
         Index("ix_orders_status_payment_deadline", "status", "payment_deadline_at"),
         Index("ix_orders_status_auto_complete", "status", "auto_complete_at"),
+        # Phase 7 · covers list_by_user with status filter (very common in UI).
+        Index("ix_orders_user_status_created", "user_id", "status", "created_at"),
         UniqueConstraint(
             "user_id",
             "idempotency_key",

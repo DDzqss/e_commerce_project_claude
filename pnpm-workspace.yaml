@@ -2,6 +2,7 @@ packages:
   - "frontend-user-web"
   - "frontend-merchant"
   - "frontend-admin"
+  - "e2e"
   - "packages/*"
 
 # 允许这些依赖的 postinstall 构建脚本执行

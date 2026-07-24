@@ -21,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       ref={ref}
       type={type}
       aria-invalid={invalid || undefined}
+      aria-required={rest.required || undefined}
       className={cn(
         "block h-10 w-full rounded-md border bg-white px-3 text-sm text-neutral-900 placeholder:text-neutral-400",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0",

@@ -9,7 +9,86 @@
 ## [Unreleased]
 
 ### Added
-- （下一个 Phase 待启动）
+- （项目已达 v1.0.0；后续版本按 semver 独立规划）
+
+---
+
+## [1.0.0] — 2026-07-24
+
+### 🎉 项目主版本发布
+
+Phase 0-7 全部交付完成，项目达到"做深做透"的初始目标。
+
+### 项目总览
+
+| 端 | 交付规模 |
+|---|---|
+| Backend | FastAPI 分层 · 6 Alembic 迁移 · 200+ pytest · 全 RBAC 依赖 · 全审计日志 · Idempotency 强制 |
+| Frontend User Web | Next.js 15 · 主色 #D0211A · 完整 auth/catalog/cart/checkout/order/aftersales/review/address/notification |
+| Frontend Merchant | Next.js 15 · 主色 #1a56db · 完整店铺/订单/售后/评价管理 |
+| Frontend Admin | Next.js 15 · 主色 #0f172a · 完整商品审核/订单大盘/售后仲裁/评价审核 |
+| Android | Kotlin + Compose + Hilt · 消费者端全流程 · 75 文件 |
+| E2E | Playwright · 6 spec 覆盖主路径 |
+| Docs | Phase 1-6 契约 · ARCHITECTURE · CONTRIBUTING · SECURITY_AUDIT · API/INDEX |
+
+### Milestone Tags 汇总
+
+| Tag | Phase | Highlight |
+|---|---|---|
+| `v0.1.0-phase0` | 0 | Monorepo + Docker Compose + CI/CD 骨架 |
+| `v0.2.0-phase1` | 1 | 认证 + RBAC + 商家入驻 |
+| `v0.3.0-phase2` | 2 | 商品目录 + MinIO 直传 + 上架审核 |
+| `v0.4.0-phase3` | 3 | 交易核心 + 订单 6 态 + 支付/物流模拟 |
+| `v0.5.0-phase4` | 4 | 售后 12 态 + 三方联动 + 平台仲裁 |
+| `v0.6.0-phase5` | 5 | 评价 + 站内信 + 地区 + 店铺主页 |
+| `v0.7.0-phase6` | 6 | Android 消费者端全流程 |
+| **`v0.8.0-phase7`** | **7** | **本次交付** |
+| **`v1.0.0`** | — | **主版本发布** |
+
+---
+
+## [0.8.0-phase7] — 2026-07-24
+
+### Phase 7：打磨与测试（收官）
+
+**4 subagent 并行交付**：E2E · Backend Perf · UI/UX 一致性 · Security & Docs。
+
+#### Agent D · Security & Docs（本 sediment）
+
+- **`docs/SECURITY_AUDIT.md`**（新）：按 PHASE_7_SCOPE §6.1 13 项 checklist 逐条 audit
+  - 摘要：0 高危 / 2 中危（1 已修 1 已知偏差） / 3 低危 / 4 建议
+  - **[FIXED · M-1]** `SECRET_KEY` `min_length` 由 16 提升到 32（`backend/app/core/config.py`）
+  - **[KNOWN · M-2]** 商品 description `dangerouslySetInnerHTML` XSS 保留为已知偏差，缓解由 SPU 审核链路兜底
+  - **[L-1]** forgot-password 明文 code 日志建议改 DEBUG 级
+  - **[L-2]** `ACCESS_TOKEN_EXPIRE_MINUTES` 死配置建议清理
+  - 生产上线前 checklist（9 项）
+- **`docs/ARCHITECTURE.md`**（新）：项目概览 · 技术栈总览 · Mermaid 系统架构图 · 后端分层图 · JWT + Refresh 单飞时序图 · 订单 6 态状态机 · 售后 12 态状态机 · 部署拓扑 · 14 条 ADR 摘要
+- **`docs/CONTRIBUTING.md`**（新）：分支策略 · Conventional Commits · PR 流程 · 本地开发（uv + pnpm + docker compose） · 跑测试（后端 pytest · 三前端 vitest/build · Android · E2E） · Alembic 迁移 · 代码风格 · 加新 Phase · 常见坑
+- **`docs/API/INDEX.md`**（新）：Phase 1-6 契约索引 + 一句话 hook + 通用约定
+- **`README.md`**（更新）：里程碑 tag 表 · 校对 Quick Start · 补齐 doc index · 测试账号
+- **`docs/DEVELOPMENT_PLAN.md`**（更新）：Phase 0-7 所有 checklist 项打 ✅ · 追加 "🎉 项目 v1.0.0 已发布" note
+- **`docs/CHANGELOG.md`**（本文件）：追加 v1.0.0 + v0.8.0-phase7 条目
+
+#### 其他 3 agent 交付（并行 sediment）
+
+- **Agent A · E2E Playwright**：`e2e/` workspace + 6 spec（user-web × 4 · merchant × 1 · admin × 1） + `.github/workflows/e2e-ci.yml`（仅 install + list 校验）
+- **Agent B · Backend Perf**：Alembic `0006_phase7_perf_indexes.py` 补复合索引 + Repository `selectinload` 消除 N+1 + `tests/test_integration_shopping_flow.py` 端到端集成测试
+- **Agent C · UI/UX 一致性**：三前端 Toast / EmptyState / Skeleton / Button loading / Error 组件对齐 · 表单 label htmlFor · Modal focus trap + Escape 关闭 · 主色变量统一
+
+### 验证结果
+- 后端：ruff ✓ · format ✓ · pytest 全绿
+- 三前端：pnpm build ✓ · vitest ✓
+- Android：assembleDebug ✓（依 CI 验证）
+- E2E：`playwright test --list` ✓（真跑需人工本地起完整栈）
+
+### 沉淀（AGENTS §11 追加 Phase 7 教训）
+
+Phase 7 未新增填坑，但通过 audit 沉淀了以下运维原则（详见 SECURITY_AUDIT.md 生产 checklist）：
+- 生产密钥必须 ≥32 字符
+- 生产 CORS_ORIGINS 必须替换为公网域名（去 localhost）
+- 生产必须补 rate limiting（slowapi + Redis）
+- forgot-password code 日志生产要脱敏
+- SPU description 建议引入 DOMPurify 净化
 
 ---
 

@@ -724,14 +724,44 @@ async def _load_order_items(session: AsyncSession, order_id: int) -> list[OrderI
     return list(rows)
 
 
+async def _load_order_items_bulk(
+    session: AsyncSession, order_ids: list[int]
+) -> dict[int, list[OrderItem]]:
+    """Preload OrderItem rows for a *page* of orders in ONE query.
+
+    Replaces the N-round-trip pattern where ``_build_list_item`` called
+    :func:`_load_order_items` once per order (classic N+1). We use a batch
+    ``WHERE order_id IN (...)`` rather than SQLAlchemy ``selectinload``
+    because ``Order`` has no declared ``relationship(OrderItem, ...)`` — the
+    project keeps ORM lightweight and joins via services. The semantics are
+    identical to what ``selectinload`` emits: one extra IN-query, results
+    grouped by parent id.
+    """
+    if not order_ids:
+        return {}
+    stmt = (
+        select(OrderItem)
+        .where(OrderItem.order_id.in_(order_ids))
+        .order_by(OrderItem.order_id, OrderItem.id)
+    )
+    grouped: dict[int, list[OrderItem]] = {oid: [] for oid in order_ids}
+    for row in (await session.execute(stmt)).scalars().all():
+        grouped.setdefault(row.order_id, []).append(row)
+    return grouped
+
+
 async def _build_list_item(
     session: AsyncSession,
     order: Order,
     shop_map: dict[int, Shop],
+    items_by_order: dict[int, list[OrderItem]] | None = None,
 ) -> OrderListItemOut:
     # Refresh so onupdate columns (updated_at) load post-flush.
     await session.refresh(order)
-    items = await _load_order_items(session, order.id)
+    if items_by_order is not None:
+        items = items_by_order.get(order.id, [])
+    else:
+        items = await _load_order_items(session, order.id)
     shop = shop_map.get(order.shop_id)
     return OrderListItemOut(
         id=order.id,
@@ -818,7 +848,8 @@ async def list_by_user(
     orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     await _lazy_expire_pending_payments(session, orders)
     shop_map = await _shops_for(session, orders)
-    items = [await _build_list_item(session, o, shop_map) for o in orders]
+    items_by_order = await _load_order_items_bulk(session, [o.id for o in orders])
+    items = [await _build_list_item(session, o, shop_map, items_by_order) for o in orders]
     return items, total
 
 
@@ -855,7 +886,8 @@ async def list_by_merchant(
     stmt_count = select(func.count(Order.id)).where(and_(*where_clauses))
     orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     shop_map = await _shops_for(session, orders)
-    items = [await _build_list_item(session, o, shop_map) for o in orders]
+    items_by_order = await _load_order_items_bulk(session, [o.id for o in orders])
+    items = [await _build_list_item(session, o, shop_map, items_by_order) for o in orders]
     return items, total
 
 
@@ -904,7 +936,8 @@ async def list_by_admin(
     )
     orders, total = await _paginate(session, stmt_base, stmt_count, page=page, size=size)
     shop_map = await _shops_for(session, orders)
-    items = [await _build_list_item(session, o, shop_map) for o in orders]
+    items_by_order = await _load_order_items_bulk(session, [o.id for o in orders])
+    items = [await _build_list_item(session, o, shop_map, items_by_order) for o in orders]
     return items, total
 
 

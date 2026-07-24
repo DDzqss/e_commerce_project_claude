@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -150,24 +152,19 @@ export default function ProductsListPage() {
             <Skeleton className="h-14 w-full" />
           </div>
         ) : isError ? (
-          <div className="p-8 text-center text-sm text-red-600">
-            商品列表加载失败。
-            <button
-              type="button"
-              className="ml-2 underline"
-              onClick={() => refetch()}
-            >
-              重试
-            </button>
-          </div>
+          <ErrorScreen
+            title="商品列表加载失败"
+            description="网络不稳定或服务暂时不可用，请稍后重试。"
+            onRetry={() => refetch()}
+            className="border-0 shadow-none"
+          />
         ) : !data || data.items.length === 0 ? (
-          <div className="p-12 text-center text-sm text-neutral-500">
-            <div className="text-3xl">🗂️</div>
-            <div className="mt-2">暂无商品</div>
-            <div className="mt-1 text-xs text-neutral-400">
-              点击右上角「新建商品」开始上架
-            </div>
-          </div>
+          <EmptyState
+            icon={<span>🗂️</span>}
+            title="暂无商品"
+            description="点击右上角「新建商品」开始上架"
+            className="border-0"
+          />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-neutral-50 text-left text-xs text-neutral-500">

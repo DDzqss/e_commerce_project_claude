@@ -19,6 +19,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -239,24 +241,19 @@ export default function AftersalesListPage() {
             <Skeleton className="h-14 w-full" />
           </div>
         ) : isError ? (
-          <div className="p-8 text-center text-sm text-red-600">
-            售后单列表加载失败。
-            <button
-              type="button"
-              className="ml-2 underline"
-              onClick={() => refetch()}
-            >
-              重试
-            </button>
-          </div>
+          <ErrorScreen
+            title="售后单列表加载失败"
+            description="网络不稳定或服务暂时不可用，请稍后重试。"
+            onRetry={() => refetch()}
+            className="border-0 shadow-none"
+          />
         ) : !data || data.items.length === 0 ? (
-          <div className="p-12 text-center text-sm text-neutral-500">
-            <div className="text-3xl">📮</div>
-            <div className="mt-2">暂无售后单</div>
-            <div className="mt-1 text-xs text-neutral-400">
-              当前筛选条件下没有匹配记录
-            </div>
-          </div>
+          <EmptyState
+            icon={<span>📮</span>}
+            title="暂无售后单"
+            description="当前筛选条件下没有匹配记录"
+            className="border-0"
+          />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-neutral-50 text-left text-xs text-neutral-500">

@@ -377,6 +377,12 @@ function AftersalesApplyContent() {
             className="mb-1.5 block text-sm font-medium text-neutral-800"
           >
             详细说明
+            <span
+              aria-hidden
+              className="ml-0.5 text-[color:var(--color-danger)]"
+            >
+              *
+            </span>
             <span className="ml-2 text-xs text-neutral-500">
               {reasonNote.length} / 500，至少 10 字
             </span>
@@ -386,13 +392,21 @@ function AftersalesApplyContent() {
             data-testid="reason-note"
             maxLength={500}
             rows={4}
+            aria-required="true"
+            aria-invalid={Boolean(errors.reason_note) || undefined}
+            aria-describedby={errors.reason_note ? "reason-note-err" : undefined}
             value={reasonNote}
             onChange={(e) => setReasonNote(e.target.value)}
             placeholder="请具体描述问题，便于商家/客服快速处理"
             className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-[color:var(--color-primary)] focus:outline-none"
           />
           {errors.reason_note && (
-            <p className="mt-1 text-xs text-[color:var(--color-primary)]">
+            <p
+              id="reason-note-err"
+              role="alert"
+              aria-live="polite"
+              className="mt-1 text-xs text-[color:var(--color-danger)]"
+            >
               {errors.reason_note}
             </p>
           )}

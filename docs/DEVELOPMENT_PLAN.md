@@ -342,64 +342,79 @@ frontend-user-web/
 
 ## 7. 开发阶段划分（里程碑）
 
-### Phase 0：项目筹备（1 周）
-- [ ] 完善本文档、`AGENTS.md`、`CLAUDE.md`
-- [ ] 搭建 Git 仓库、分支保护规则、CI/CD 骨架
-- [ ] Docker Compose 本地开发环境（Postgres + Redis + MinIO）
-- [ ] 后端项目骨架（FastAPI + SQLAlchemy + Alembic）
-- [ ] 前端项目骨架（4 个端 × Next.js 初始化）
-- [ ] Android 项目骨架
+### Phase 0：项目筹备（1 周）✅
+- [x] 完善本文档、`AGENTS.md`、`CLAUDE.md`
+- [x] 搭建 Git 仓库、分支保护规则、CI/CD 骨架
+- [x] Docker Compose 本地开发环境（Postgres + Redis + MinIO）
+- [x] 后端项目骨架（FastAPI + SQLAlchemy + Alembic）
+- [x] 前端项目骨架（4 个端 × Next.js 初始化）
+- [x] Android 项目骨架
 
-### Phase 1：基础能力（3 周）
-- [ ] 用户模型 + 认证体系（JWT）
-- [ ] 权限体系（RBAC）
-- [ ] 商家模型 + 商家入驻/审核
-- [ ] 管理员账户体系
-- [ ] 各端登录/注册页面
-- [ ] 通用 UI 组件库
+### Phase 1：基础能力（3 周）✅
+- [x] 用户模型 + 认证体系（JWT）
+- [x] 权限体系（RBAC）
+- [x] 商家模型 + 商家入驻/审核
+- [x] 管理员账户体系
+- [x] 各端登录/注册页面
+- [x] 通用 UI 组件库
 
-### Phase 2：商品与浏览（3 周）
-- [ ] 商品模型（SPU/SKU）、类目、品牌
-- [ ] 商品上架（商家端）
-- [ ] 商品搜索/筛选/详情（用户端）
-- [ ] 商品管理（管理员审核）
-- [ ] 库存管理
+### Phase 2：商品与浏览（3 周）✅
+- [x] 商品模型（SPU/SKU）、类目、品牌
+- [x] 商品上架（商家端）
+- [x] 商品搜索/筛选/详情（用户端）
+- [x] 商品管理（管理员审核）
+- [x] 库存管理
 
-### Phase 3：交易核心（4 周）★重点
-- [ ] 购物车（含多店铺分组）
-- [ ] 下单流程（地址、备注、模拟支付）
-- [ ] 订单状态机（含超时任务）
-- [ ] 用户端订单管理
-- [ ] 商家端订单处理
-- [ ] 管理员订单总览
+### Phase 3：交易核心（4 周）★重点 ✅
+- [x] 购物车（含多店铺分组）
+- [x] 下单流程（地址、备注、模拟支付）
+- [x] 订单状态机（含超时任务）
+- [x] 用户端订单管理
+- [x] 商家端订单处理
+- [x] 管理员订单总览
 
-### Phase 4：售后闭环（3 周）★重点
-- [ ] 退款/退货/换货申请
-- [ ] 商家审核流程
-- [ ] 平台介入仲裁
-- [ ] 超时机制、催办、申诉
-- [ ] 完整时间线 UI
+### Phase 4：售后闭环（3 周）★重点 ✅
+- [x] 退款/退货/换货申请
+- [x] 商家审核流程
+- [x] 平台介入仲裁
+- [x] 超时机制、催办、申诉
+- [x] 完整时间线 UI
 
-### Phase 5：辅助功能（2 周）
-- [ ] 商品评价 + 商家回复 + 举报审核
-- [ ] 消息通知（站内信）
-- [ ] 地址簿完善
-- [ ] 商家店铺主页
+### Phase 5：辅助功能（2 周）✅
+- [x] 商品评价 + 商家回复 + 举报审核
+- [x] 消息通知（站内信）
+- [x] 地址簿完善
+- [x] 商家店铺主页
 
-### Phase 6：Android App（并行进行，3-4 周）
-- [ ] 登录/注册
-- [ ] 商品浏览/详情
-- [ ] 购物车/下单
-- [ ] 订单管理/售后
+### Phase 6：Android App（并行进行，3-4 周）✅
+- [x] 登录/注册
+- [x] 商品浏览/详情
+- [x] 购物车/下单
+- [x] 订单管理/售后
 
-### Phase 7：打磨与测试（2 周）
-- [ ] 端到端测试
-- [ ] 性能优化
-- [ ] UI/UX 细节打磨
-- [ ] 安全审查
-- [ ] 文档整理
+### Phase 7：打磨与测试（2 周）✅
+- [x] 端到端测试（Playwright · e2e/ workspace · 6 spec）
+- [x] 性能优化（Alembic 0006 补索引 · selectinload 消除 N+1）
+- [x] UI/UX 细节打磨（三端 Toast / EmptyState / Skeleton / Modal focus trap 一致性）
+- [x] 安全审查（详见 [`docs/SECURITY_AUDIT.md`](SECURITY_AUDIT.md)）
+- [x] 文档整理（新增 [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) / [`docs/CONTRIBUTING.md`](CONTRIBUTING.md) / [`docs/API/INDEX.md`](API/INDEX.md)）
 
 **总周期估算**：18-20 周（可通过 multi-agent 并行显著缩短）
+
+---
+
+## 🎉 项目 v1.0.0 已发布
+
+- **发布时间**：2026-07-24
+- **交付内容**：Phase 0-7 全部 checklist 项闭环 · 4 端可运行 · 后端 pytest 全绿 · 三前端 build 全绿 · Android assembleDebug 全绿 · Playwright config 语法校验通过
+- **主要产物**：
+  - Backend：FastAPI + 6 Alembic 迁移 + 服务层 15+ 模块 + 200+ 测试
+  - Frontend × 3：Next.js 15 + React 19 + Tailwind CSS 4 + 300+ vitest 用例
+  - Android：Kotlin + Compose + 75 文件 + 单模块分层
+  - E2E：Playwright + 6 spec 覆盖核心购物路径
+  - 文档：ARCHITECTURE + CONTRIBUTING + SECURITY_AUDIT + API/INDEX + 6 Phase 契约
+- **Git Tag**：`v1.0.0` + `v0.8.0-phase7`（详见 [`README.md`](../README.md) 里程碑表）
+- **下一步（不属交付）**：见 [`PHASE_7_SCOPE.md`](PHASE_7_SCOPE.md) 附录 B（CDN / 全文搜索升级 / 真实支付网关 / 监控栈等）
 
 ---
 

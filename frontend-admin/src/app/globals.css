@@ -37,6 +37,9 @@
   --color-surface-muted: #f8fafc;
   --color-border: #e2e8f0;
 
+  /* Toast/Modal 淡入动画（Phase 7 §5.1 三端一致 300ms） */
+  --animate-fade-in: fade-in 300ms ease-out;
+
   --font-sans:
     "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
@@ -77,4 +80,18 @@ a {
 
 ::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+/*
+ * Phase 7 · 三端一致性：Toast / Modal 通用淡入动画。
+ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

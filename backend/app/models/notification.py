@@ -76,4 +76,12 @@ class Notification(IdMixin, TimestampMixin, Base):
             "is_read",
             "created_at",
         ),
+        # Phase 7 · inbox filtered by category (SYSTEM / ORDER / AFTERSALES / …).
+        Index(
+            "ix_notifications_recipient_category_created",
+            "recipient_type",
+            "recipient_id",
+            "category",
+            "created_at",
+        ),
     )

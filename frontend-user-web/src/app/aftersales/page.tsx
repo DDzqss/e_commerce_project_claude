@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Price } from "@/components/ui/Price";
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Pagination } from "@/components/catalog/Pagination";
 import { AftersalesStatusBadge } from "@/components/aftersales/AftersalesStatusBadge";
@@ -153,16 +154,11 @@ function AftersalesListContent() {
       )}
 
       {isError && (
-        <div className="rounded-md border border-[color:var(--color-primary-200)] bg-[color:var(--color-primary-50)] px-4 py-3 text-sm text-[color:var(--color-primary-700)]">
-          加载失败，
-          <button
-            type="button"
-            className="ml-1 underline"
-            onClick={() => refetch()}
-          >
-            重试
-          </button>
-        </div>
+        <ErrorScreen
+          title="售后单加载失败"
+          description="网络不稳定或服务暂时不可用，请稍后重试。"
+          onRetry={() => refetch()}
+        />
       )}
 
       {data && data.items.length === 0 && (

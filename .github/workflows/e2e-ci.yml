@@ -1,0 +1,60 @@
+name: E2E CI (Playwright)
+
+# 只做 config 语法 + 依赖安装校验，不实际跑测试（避免 CI 需完整后端栈）。
+# 真实 E2E 由人工在本地或预发跑，详见 e2e/README.md。
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "e2e/**"
+      - "frontend-user-web/**"
+      - "frontend-merchant/**"
+      - "frontend-admin/**"
+      - "backend/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/e2e-ci.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "e2e/**"
+      - "frontend-user-web/**"
+      - "frontend-merchant/**"
+      - "frontend-admin/**"
+      - "backend/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/e2e-ci.yml"
+
+jobs:
+  validate:
+    name: validate config + install browsers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers (chromium)
+        run: pnpm --filter e2e exec playwright install --with-deps chromium
+
+      - name: Type-check
+        run: pnpm --filter e2e exec tsc --noEmit
+
+      - name: Validate config via --list
+        # --list 只解析 config + 收集 test；不启动浏览器、不打 baseURL。
+        # 相当于对 config 语法与 test 收集正确性做 smoke。
+        run: pnpm --filter e2e exec playwright test --list

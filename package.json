@@ -14,7 +14,8 @@
     "dev:admin": "pnpm --filter frontend-admin dev",
     "build:all": "pnpm -r build",
     "lint:all": "pnpm -r lint",
-    "test:all": "pnpm -r test"
+    "test:all": "pnpm -r test",
+    "test:e2e": "pnpm --filter e2e test"
   },
   "devDependencies": {
     "prettier": "^3.3.3"

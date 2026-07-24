@@ -90,8 +90,11 @@ class Settings(BaseSettings):
     # ---- Auth / JWT -------------------------------------------------------
     SECRET_KEY: str = Field(
         default="CHANGE-ME-IN-PRODUCTION-please-generate-a-real-secret",
-        min_length=16,
-        description="Secret used to sign JWTs. MUST be overridden in prod.",
+        min_length=32,
+        description=(
+            "Secret used to sign JWTs. MUST be overridden in prod. "
+            "Minimum 32 chars per Phase 7 security baseline (§6.1)."
+        ),
     )
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 2  # 2 hours
