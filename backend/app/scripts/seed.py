@@ -124,6 +124,31 @@ ADMINS: tuple[AdminSeed, ...] = (
         display_name="技术管理员",
         role=AdminRole.TECH_ADMIN,
     ),
+    # README-friendly aliases used by the quick-start section.
+    AdminSeed(
+        username="admin_super",
+        password="Passw0rd!",  # noqa: S106
+        display_name="超级管理员",
+        role=AdminRole.SUPER_ADMIN,
+    ),
+    AdminSeed(
+        username="admin_business",
+        password="Passw0rd!",  # noqa: S106
+        display_name="业务管理员",
+        role=AdminRole.BUSINESS_ADMIN,
+    ),
+    AdminSeed(
+        username="admin_cs",
+        password="Passw0rd!",  # noqa: S106
+        display_name="客服管理员",
+        role=AdminRole.CUSTOMER_SERVICE_ADMIN,
+    ),
+    AdminSeed(
+        username="admin_tech",
+        password="Passw0rd!",  # noqa: S106
+        display_name="技术管理员",
+        role=AdminRole.TECH_ADMIN,
+    ),
 )
 
 USERS: tuple[UserSeed, ...] = (

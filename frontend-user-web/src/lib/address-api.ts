@@ -10,16 +10,19 @@
  *   POST   /user/addresses/{id}/set-default
  */
 
-import { apiDelete, apiGet, apiPatch, apiPost } from "./api";
-import type {
-  CreateAddressPayload,
-  UpdateAddressPayload,
-  UserAddress,
-} from "@/types/order";
+import { apiDelete, apiGet, apiPatch, apiPost } from './api';
+import type { CreateAddressPayload, UpdateAddressPayload, UserAddress } from '@/types/order';
+
+type ItemsEnvelope<T> = { items?: T[] };
+
+function unwrapItems<T>(data: T[] | ItemsEnvelope<T>): T[] {
+  return Array.isArray(data) ? data : (data.items ?? []);
+}
 
 /** GET /user/addresses — 默认在前，不分页；上限 20 条。 */
-export function listAddresses(): Promise<UserAddress[]> {
-  return apiGet<UserAddress[]>("user/addresses");
+export async function listAddresses(): Promise<UserAddress[]> {
+  const data = await apiGet<UserAddress[] | ItemsEnvelope<UserAddress>>('user/addresses');
+  return unwrapItems(data);
 }
 
 /** GET /user/addresses/{id} */
@@ -28,21 +31,13 @@ export function getAddress(id: number): Promise<UserAddress> {
 }
 
 /** POST /user/addresses */
-export function createAddress(
-  payload: CreateAddressPayload,
-): Promise<UserAddress> {
-  return apiPost<UserAddress, CreateAddressPayload>("user/addresses", payload);
+export function createAddress(payload: CreateAddressPayload): Promise<UserAddress> {
+  return apiPost<UserAddress, CreateAddressPayload>('user/addresses', payload);
 }
 
 /** PATCH /user/addresses/{id} */
-export function updateAddress(
-  id: number,
-  payload: UpdateAddressPayload,
-): Promise<UserAddress> {
-  return apiPatch<UserAddress, UpdateAddressPayload>(
-    `user/addresses/${id}`,
-    payload,
-  );
+export function updateAddress(id: number, payload: UpdateAddressPayload): Promise<UserAddress> {
+  return apiPatch<UserAddress, UpdateAddressPayload>(`user/addresses/${id}`, payload);
 }
 
 /** DELETE /user/addresses/{id} — 软删；若删的是默认，不自动指定新默认。 */

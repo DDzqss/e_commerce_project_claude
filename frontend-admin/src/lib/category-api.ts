@@ -11,14 +11,20 @@
  * 权限：admin:category:manage
  */
 
-import { apiGet, apiPost, apiPatch, api, unwrap } from "@/lib/api";
-import type { ApiResponse } from "@/types";
+import { apiGet, apiPost, apiPatch, api, unwrap } from '@/lib/api';
+import type { ApiResponse } from '@/types';
 import type {
   CategoryOut,
   CategoryTreeNode,
   CreateCategoryPayload,
   UpdateCategoryPayload,
-} from "@/types/api";
+} from '@/types/api';
+
+type ItemsEnvelope<T> = { items?: T[] };
+
+function unwrapItems<T>(data: T[] | ItemsEnvelope<T>): T[] {
+  return Array.isArray(data) ? data : (data.items ?? []);
+}
 
 /**
  * GET /admin/categories
@@ -27,8 +33,13 @@ import type {
  */
 export async function listAllCategories(): Promise<CategoryTreeNode[]> {
   // 后端返回可能是 tree 或 flat；两种都兼容。
-  const data = await apiGet<CategoryTreeNode[] | CategoryOut[]>(
-    "admin/categories",
+  const data = unwrapItems(
+    await apiGet<
+      | CategoryTreeNode[]
+      | CategoryOut[]
+      | ItemsEnvelope<CategoryTreeNode>
+      | ItemsEnvelope<CategoryOut>
+    >('admin/categories'),
   );
   if (data.length === 0) return [];
   // 判断是否已带 children：若首元素已有 children 字段则视为 tree
@@ -60,9 +71,7 @@ export function buildTree(flat: readonly CategoryOut[]): CategoryTreeNode[] {
     }
   }
   const sortRec = (nodes: CategoryTreeNode[]) => {
-    nodes.sort(
-      (a, b) => a.sort_order - b.sort_order || a.id - b.id,
-    );
+    nodes.sort((a, b) => a.sort_order - b.sort_order || a.id - b.id);
     nodes.forEach((n) => sortRec(n.children));
   };
   sortRec(roots);
@@ -81,13 +90,8 @@ export function getCategory(id: number | string): Promise<CategoryOut> {
  * 后端根据 parent_id 自动计算 level / path。
  * 错误：6003 层级超限 / 5001 校验
  */
-export function createCategory(
-  payload: CreateCategoryPayload,
-): Promise<CategoryOut> {
-  return apiPost<CategoryOut, CreateCategoryPayload>(
-    "admin/categories",
-    payload,
-  );
+export function createCategory(payload: CreateCategoryPayload): Promise<CategoryOut> {
+  return apiPost<CategoryOut, CreateCategoryPayload>('admin/categories', payload);
 }
 
 /**
@@ -99,10 +103,7 @@ export function updateCategory(
   id: number | string,
   payload: UpdateCategoryPayload,
 ): Promise<CategoryOut> {
-  return apiPatch<CategoryOut, UpdateCategoryPayload>(
-    `admin/categories/${id}`,
-    payload,
-  );
+  return apiPatch<CategoryOut, UpdateCategoryPayload>(`admin/categories/${id}`, payload);
 }
 
 /**
