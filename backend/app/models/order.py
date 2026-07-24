@@ -11,6 +11,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Enum,
     ForeignKey,
@@ -107,6 +108,15 @@ class Order(IdMixin, TimestampMixin, Base):
 
     # idempotency for POST /user/orders — UNIQUE(user_id, key)
     idempotency_key: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    # Phase 4 · aftersales side-links. Set from the aftersales service
+    # when a refund completes.
+    has_partial_refund: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    total_refunded_cents: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
 
     __table_args__ = (
         Index("ix_orders_user_created", "user_id", "created_at"),

@@ -22,6 +22,7 @@ import {
   OrderStatus,
   type OrderStatusHistoryEntry,
 } from "@/types/order";
+import { allowedAftersalesTypes } from "@/types/aftersales";
 
 export default function OrderDetailPage() {
   return (
@@ -140,6 +141,14 @@ function OrderDetailContent() {
                 )}
                 {data.status === OrderStatus.Completed && (
                   <span className="text-sm text-green-700">交易完成</span>
+                )}
+                {allowedAftersalesTypes(data.status).length > 0 && (
+                  <Link
+                    href={`/orders/${data.order_no}/aftersales/new`}
+                    data-testid="btn-apply-aftersales"
+                  >
+                    <Button variant="secondary">申请售后</Button>
+                  </Link>
                 )}
               </div>
             </div>

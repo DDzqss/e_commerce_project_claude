@@ -170,6 +170,14 @@ export function SiteHeader() {
                   </Link>
                   <Link
                     role="menuitem"
+                    href="/aftersales"
+                    className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    我的售后
+                  </Link>
+                  <Link
+                    role="menuitem"
                     href="/account/addresses"
                     className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
                     onClick={() => setOpen(false)}

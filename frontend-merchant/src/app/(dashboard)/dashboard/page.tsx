@@ -5,6 +5,7 @@ import Link from "next/link";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useMerchantOrderStats } from "@/hooks/useMerchantOrders";
+import { useAftersalesStats } from "@/hooks/useMerchantAftersales";
 import { formatCentsCny } from "@/lib/order-utils";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -16,6 +17,7 @@ const ROLE_LABEL: Record<string, string> = {
 export default function DashboardPage() {
   const { merchantAccount, shop } = useAuth();
   const statsQuery = useMerchantOrderStats();
+  const aftersalesStatsQuery = useAftersalesStats();
 
   const shopName = shop?.name ?? "—";
   const roleLabel = merchantAccount
@@ -23,6 +25,7 @@ export default function DashboardPage() {
     : "";
 
   const s = statsQuery.data;
+  const a = aftersalesStatsQuery.data;
 
   return (
     <div className="space-y-6">
@@ -36,7 +39,7 @@ export default function DashboardPage() {
         </p>
       </section>
 
-      {/* 4 张统计卡片 —— Phase 3 接入订单 stats/summary */}
+      {/* 4 张统计卡片 —— Phase 3 + Phase 4 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Link href="/orders" className="block hover:opacity-90">
           <StatCard
@@ -60,12 +63,21 @@ export default function DashboardPage() {
             tone="info"
           />
         </Link>
-        <StatCard
-          label="待处理售后"
-          value={0}
-          hint="Phase 4 开放"
-          tone="danger"
-        />
+        <Link href="/aftersales" className="block hover:opacity-90">
+          <StatCard
+            label="待审核售后"
+            value={
+              a?.pending_review_count ??
+              (aftersalesStatsQuery.isLoading ? "…" : "—")
+            }
+            hint={
+              a && a.overdue_soon_count > 0
+                ? `其中 ${a.overdue_soon_count} 条即将超时`
+                : "72 小时内需审核"
+            }
+            tone="danger"
+          />
+        </Link>
       </div>
 
       {/* Phase 提示卡片 */}
@@ -76,8 +88,8 @@ export default function DashboardPage() {
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-neutral-700">
           <li>Phase 1：账号登录、退出、修改密码、店铺信息维护</li>
           <li>Phase 2：商品上架、编辑与库存管理</li>
-          <li>Phase 3（当前）：订单接单、发货、缺货取消、备注</li>
-          <li>Phase 4：售后 / 退款 / 换货</li>
+          <li>Phase 3：订单接单、发货、缺货取消、备注</li>
+          <li>Phase 4（当前）：售后审核、收货、换货再发货、拒收升级</li>
         </ul>
       </section>
 

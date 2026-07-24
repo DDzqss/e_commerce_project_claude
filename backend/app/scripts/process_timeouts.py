@@ -1,14 +1,21 @@
-"""Timeout scanner — contract §12.
+"""Timeout scanner — contract §12 + Phase 4 §11.
 
-Two responsibilities:
+Sweeps through both order-side and aftersales-side deadlines and runs the
+appropriate transitions in batched slices of 100. Safe to run on a cron
+every 1-5 minutes.
 
-1. Expire ``pending_payment`` orders whose payment deadline has passed;
-   cancel them + release stock + write history rows.
-2. Auto-complete ``shipped`` orders whose ``auto_complete_at`` has
-   passed; mark the sale as final + update sold_count / sales_count.
+Order-side (Phase 3):
+1. Expire ``pending_payment`` orders whose payment deadline has passed
+2. Auto-complete ``shipped`` orders whose ``auto_complete_at`` has passed
 
-Both loops batch in slices of 100 to avoid long transactions on large
-backlogs. The whole thing is safe to run on a cron every 1-5 minutes.
+Aftersales-side (Phase 4):
+1. Merchant 72h no-review → admin_arbitrating (merchant_timeout)
+2. User 7d no-return → system_closed (user_ship_timeout)
+3. Merchant 15d no-receive → auto-confirm (refund / continue exchange)
+4. Exchange 15d no user-confirm → completed_exchanged (auto_confirmed)
+
+Both loops guard with ``WHERE status = X AND deadline < now`` so a re-run
+after the transition is a no-op.
 
 Usage::
 
@@ -28,48 +35,87 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import async_session_factory, dispose_engine
+from app.models.aftersales import Aftersales, AftersalesStatus
 from app.models.order import Order, OrderStatus
-from app.services import order_service
+from app.services import aftersales_service, order_service
 
 logger = logging.getLogger(__name__)
 
 
-async def _run(dry_run: bool) -> tuple[int, int]:
-    total_expired = 0
-    total_completed = 0
+async def _run(dry_run: bool) -> dict[str, int]:
+    counts: dict[str, int] = {
+        "expired_pending_payments": 0,
+        "auto_completed_orders": 0,
+        "aftersales_merchant_review_timeouts": 0,
+        "aftersales_user_return_timeouts": 0,
+        "aftersales_merchant_receive_timeouts": 0,
+        "aftersales_exchange_confirm_timeouts": 0,
+    }
 
     async with async_session_factory() as session:
         if dry_run:
             expired_ids = await _list_candidate_expired(session)
             completed_ids = await _list_candidate_completed(session)
-            logger.info(
-                "[dry-run] would expire %d orders: %s",
-                len(expired_ids),
-                expired_ids,
-            )
-            logger.info(
-                "[dry-run] would auto-complete %d orders: %s",
-                len(completed_ids),
-                completed_ids,
-            )
-            return len(expired_ids), len(completed_ids)
+            merchant_ids = await _list_candidate_merchant_review(session)
+            return_ids = await _list_candidate_user_return(session)
+            receive_ids = await _list_candidate_merchant_receive(session)
+            exchange_ids = await _list_candidate_exchange_confirm(session)
+            logger.info("[dry-run] expire=%d %s", len(expired_ids), expired_ids)
+            logger.info("[dry-run] complete=%d %s", len(completed_ids), completed_ids)
+            logger.info("[dry-run] as-merchant=%d %s", len(merchant_ids), merchant_ids)
+            logger.info("[dry-run] as-return=%d %s", len(return_ids), return_ids)
+            logger.info("[dry-run] as-receive=%d %s", len(receive_ids), receive_ids)
+            logger.info("[dry-run] as-exchange=%d %s", len(exchange_ids), exchange_ids)
+            counts["expired_pending_payments"] = len(expired_ids)
+            counts["auto_completed_orders"] = len(completed_ids)
+            counts["aftersales_merchant_review_timeouts"] = len(merchant_ids)
+            counts["aftersales_user_return_timeouts"] = len(return_ids)
+            counts["aftersales_merchant_receive_timeouts"] = len(receive_ids)
+            counts["aftersales_exchange_confirm_timeouts"] = len(exchange_ids)
+            return counts
 
-        # Loop until nothing left to process (batched at 100 by the service).
+        # Order-side sweeps (Phase 3).
         while True:
             n = await order_service.scan_and_expire_payments(session, batch=100)
             await session.commit()
-            total_expired += n
+            counts["expired_pending_payments"] += n
             if n < 100:
                 break
         while True:
             n = await order_service.scan_and_auto_complete(session, batch=100)
             await session.commit()
-            total_completed += n
+            counts["auto_completed_orders"] += n
             if n < 100:
                 break
 
-    logger.info("process_timeouts: expired=%d completed=%d", total_expired, total_completed)
-    return total_expired, total_completed
+        # Aftersales-side sweeps (Phase 4).
+        while True:
+            n = await aftersales_service.scan_merchant_review_timeouts(session, batch=100)
+            await session.commit()
+            counts["aftersales_merchant_review_timeouts"] += n
+            if n < 100:
+                break
+        while True:
+            n = await aftersales_service.scan_user_return_timeouts(session, batch=100)
+            await session.commit()
+            counts["aftersales_user_return_timeouts"] += n
+            if n < 100:
+                break
+        while True:
+            n = await aftersales_service.scan_merchant_receive_timeouts(session, batch=100)
+            await session.commit()
+            counts["aftersales_merchant_receive_timeouts"] += n
+            if n < 100:
+                break
+        while True:
+            n = await aftersales_service.scan_exchange_confirm_timeouts(session, batch=100)
+            await session.commit()
+            counts["aftersales_exchange_confirm_timeouts"] += n
+            if n < 100:
+                break
+
+    logger.info("process_timeouts: %s", counts)
+    return counts
 
 
 async def _list_candidate_expired(session: AsyncSession) -> list[int]:
@@ -90,8 +136,47 @@ async def _list_candidate_completed(session: AsyncSession) -> list[int]:
     return list((await session.execute(stmt)).scalars().all())
 
 
+async def _list_candidate_merchant_review(session: AsyncSession) -> list[int]:
+    now = datetime.now(UTC)
+    stmt = select(Aftersales.id).where(
+        Aftersales.status == AftersalesStatus.PENDING_MERCHANT_REVIEW,
+        Aftersales.merchant_review_deadline < now,
+    )
+    return list((await session.execute(stmt)).scalars().all())
+
+
+async def _list_candidate_user_return(session: AsyncSession) -> list[int]:
+    now = datetime.now(UTC)
+    stmt = select(Aftersales.id).where(
+        Aftersales.status == AftersalesStatus.MERCHANT_AGREED_WAITING_RETURN,
+        Aftersales.return_ship_deadline.is_not(None),
+        Aftersales.return_ship_deadline < now,
+    )
+    return list((await session.execute(stmt)).scalars().all())
+
+
+async def _list_candidate_merchant_receive(session: AsyncSession) -> list[int]:
+    now = datetime.now(UTC)
+    stmt = select(Aftersales.id).where(
+        Aftersales.status == AftersalesStatus.RETURN_SHIPPED_WAITING_RECEIVE,
+        Aftersales.merchant_receive_deadline.is_not(None),
+        Aftersales.merchant_receive_deadline < now,
+    )
+    return list((await session.execute(stmt)).scalars().all())
+
+
+async def _list_candidate_exchange_confirm(session: AsyncSession) -> list[int]:
+    now = datetime.now(UTC)
+    stmt = select(Aftersales.id).where(
+        Aftersales.status == AftersalesStatus.EXCHANGE_SHIPPED_WAITING_RECEIVE,
+        Aftersales.exchange_confirm_deadline.is_not(None),
+        Aftersales.exchange_confirm_deadline < now,
+    )
+    return list((await session.execute(stmt)).scalars().all())
+
+
 async def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Order timeout scanner")
+    parser = argparse.ArgumentParser(description="Order + aftersales timeout scanner")
     parser.add_argument(
         "--dry-run",
         action="store_true",

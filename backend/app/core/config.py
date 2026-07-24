@@ -128,6 +128,16 @@ class Settings(BaseSettings):
     MAX_CART_ITEMS_PER_USER: int = 500
     MAX_CART_ITEM_QUANTITY: int = 999
 
+    # ---- Phase 4 · aftersales --------------------------------------------
+    MERCHANT_REVIEW_TIMEOUT_HOURS: int = 72
+    USER_RETURN_TIMEOUT_DAYS: int = 7
+    MERCHANT_RECEIVE_TIMEOUT_DAYS: int = 15
+    EXCHANGE_CONFIRM_TIMEOUT_DAYS: int = 15
+    NUDGE_MAX_PER_DAY: int = 3
+    AFTERSALES_RISK_WINDOW_DAYS: int = 30
+    AFTERSALES_RISK_THRESHOLD: int = 3
+    MAX_EVIDENCE_IMAGES_PER_STAGE: int = 8
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from app.api.v1.admin import (
+    aftersales,
     auth,
     brands,
     categories,
@@ -29,5 +30,6 @@ router.include_router(brands.router, prefix="/brands", tags=["admin.brands"])
 router.include_router(spus.router, prefix="/spus", tags=["admin.spus"])
 router.include_router(orders.router, prefix="/orders", tags=["admin.orders"])
 router.include_router(tasks.router, prefix="/tasks", tags=["admin.tasks"])
+router.include_router(aftersales.router, prefix="/aftersales", tags=["admin.aftersales"])
 
 __all__ = ["router"]

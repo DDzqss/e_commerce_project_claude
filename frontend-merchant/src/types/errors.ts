@@ -55,6 +55,36 @@ export const ErrorCode = {
   ORDER_TRACKING_NO_INVALID: 13010,
   /** 已取消订单不可再操作 */
   ORDER_ALREADY_CANCELLED: 13011,
+
+  // ----- Phase 4 · 售后域（15xxx / 16xxx / 17xxx / 18xxx） -----
+  /** 售后单不存在 */
+  AFTERSALES_NOT_FOUND: 15001,
+  /** 无权访问此售后单 */
+  AFTERSALES_ACCESS_DENIED: 15002,
+  /** 售后状态不允许当前操作 */
+  AFTERSALES_STATUS_NOT_ALLOWED: 15003,
+  /** 订单不允许发起此类型售后 */
+  AFTERSALES_ORDER_TYPE_MISMATCH: 15004,
+  /** 订单已有 active 售后单 */
+  AFTERSALES_ORDER_HAS_ACTIVE: 15005,
+  /** 退款金额超过订单可退金额 */
+  AFTERSALES_REFUND_AMOUNT_EXCEED: 15006,
+  /** 售后类型与订单状态不匹配 */
+  AFTERSALES_TYPE_ORDER_STATUS_MISMATCH: 15007,
+  /** 未选择任何 order_item */
+  AFTERSALES_NO_ITEM_SELECTED: 15008,
+  /** 售后单已进入平台仲裁不可撤销 */
+  AFTERSALES_ARBITRATING_LOCKED: 15009,
+  /** 凭证数量超上限 */
+  AFTERSALES_EVIDENCE_LIMIT_EXCEED: 16001,
+  /** 凭证不属于此售后单 */
+  AFTERSALES_EVIDENCE_MISMATCH: 16002,
+  /** 快递单号无效 */
+  AFTERSALES_TRACKING_NO_INVALID: 17001,
+  /** 售后单尚未同意退货 */
+  AFTERSALES_NOT_AGREED_RETURN: 17002,
+  /** 售后单已回填过物流不可再回填 */
+  AFTERSALES_TRACKING_ALREADY_FILLED: 17003,
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -87,6 +117,26 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.ORDER_TRACKING_NO_INVALID]:
     "快递单号格式无效，需 6-30 位字母/数字",
   [ErrorCode.ORDER_ALREADY_CANCELLED]: "订单已取消，不可再操作",
+
+  // ----- Phase 4 · 售后域 -----
+  [ErrorCode.AFTERSALES_NOT_FOUND]: "售后单不存在",
+  [ErrorCode.AFTERSALES_ACCESS_DENIED]: "无权访问此售后单",
+  [ErrorCode.AFTERSALES_STATUS_NOT_ALLOWED]: "当前售后状态不允许此操作",
+  [ErrorCode.AFTERSALES_ORDER_TYPE_MISMATCH]: "订单不允许发起此类型售后",
+  [ErrorCode.AFTERSALES_ORDER_HAS_ACTIVE]: "订单已有进行中的售后单",
+  [ErrorCode.AFTERSALES_REFUND_AMOUNT_EXCEED]: "退款金额超过订单可退金额",
+  [ErrorCode.AFTERSALES_TYPE_ORDER_STATUS_MISMATCH]:
+    "售后类型与订单当前状态不匹配",
+  [ErrorCode.AFTERSALES_NO_ITEM_SELECTED]: "未选择任何商品明细",
+  [ErrorCode.AFTERSALES_ARBITRATING_LOCKED]:
+    "售后已进入平台仲裁，无法修改",
+  [ErrorCode.AFTERSALES_EVIDENCE_LIMIT_EXCEED]: "凭证图片数量超过 8 张上限",
+  [ErrorCode.AFTERSALES_EVIDENCE_MISMATCH]: "凭证不属于此售后单",
+  [ErrorCode.AFTERSALES_TRACKING_NO_INVALID]:
+    "快递单号格式无效，需 6-30 位字母/数字",
+  [ErrorCode.AFTERSALES_NOT_AGREED_RETURN]: "售后尚未同意退货，不能回填物流",
+  [ErrorCode.AFTERSALES_TRACKING_ALREADY_FILLED]:
+    "售后已回填过物流，不能再次回填",
 };
 
 /**

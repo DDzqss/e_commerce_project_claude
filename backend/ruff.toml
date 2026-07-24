@@ -38,7 +38,10 @@ ignore = [
     "PLR0913", # too-many-arguments (FastAPI deps make this noisy)
     "PLR2004", # magic value comparisons
     "PLR0911", # too-many-return-statements (state machine dispatchers legitimately have many)
+    "PLR0912", # too-many-branches (multi-status scanners legitimately branch)
+    "PLR0915", # too-many-statements (state machine dispatchers legitimately have many)
     "PLC0415", # allow local imports (used to avoid circular deps / lazy load in scripts)
+    "RUF001",  # allow ambiguous Chinese punctuation (fullwidth ，：) — intentional in i18n strings
     "S101",    # allow assert (used in tests)
     "B008",    # allow FastAPI Depends() in defaults
 ]

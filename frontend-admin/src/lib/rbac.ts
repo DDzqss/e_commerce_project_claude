@@ -57,6 +57,11 @@ export type Permission =
   | "admin:order:read_all"
   | "admin:order:intervene"
   | "admin:order:add_note"
+  // ---- Phase 4 契约 §6 新增：售后仲裁 ----
+  | "admin:aftersales:read_all"
+  | "admin:aftersales:arbitrate"
+  | "admin:aftersales:force_refund"
+  | "admin:aftersales:add_note"
   // ---- 后续 Phase 预留（暂无对应权限时返回 false，UI 侧 disabled）----
   | "admin:product:review"
   | "admin:order:read"
@@ -82,6 +87,12 @@ export interface AdminRoleMeta {
    * - BUSINESS_ADMIN      → 商家审核 + 类目/品牌/商品审核 + 强制下架
    * - CUSTOMER_SERVICE_ADMIN → 只读商品（read_all）+ 售后仲裁（Phase 4）
    * - TECH_ADMIN          → 系统 / RBAC / 日志
+   *
+   * Phase 4 契约 §6 追加：
+   * - admin:aftersales:read_all     → SUPER, BUSINESS, CUSTOMER_SERVICE
+   * - admin:aftersales:arbitrate    → SUPER, CUSTOMER_SERVICE
+   * - admin:aftersales:force_refund → SUPER, CUSTOMER_SERVICE
+   * - admin:aftersales:add_note     → SUPER, CUSTOMER_SERVICE
    */
   defaultPermissions: readonly Permission[];
 }
@@ -106,6 +117,10 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:order:read_all",
       "admin:order:intervene",
       "admin:order:add_note",
+      "admin:aftersales:read_all",
+      "admin:aftersales:arbitrate",
+      "admin:aftersales:force_refund",
+      "admin:aftersales:add_note",
       "admin:refund:arbitrate",
       "admin:user:manage",
       "admin:rbac:manage",
@@ -127,6 +142,7 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:spu:read_all",
       "admin:order:read",
       "admin:order:read_all",
+      "admin:aftersales:read_all",
     ],
   },
   [AdminRole.CUSTOMER_SERVICE_ADMIN]: {
@@ -142,6 +158,10 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:order:read_all",
       "admin:order:intervene",
       "admin:order:add_note",
+      "admin:aftersales:read_all",
+      "admin:aftersales:arbitrate",
+      "admin:aftersales:force_refund",
+      "admin:aftersales:add_note",
     ],
   },
   [AdminRole.TECH_ADMIN]: {

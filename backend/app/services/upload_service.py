@@ -18,6 +18,12 @@ _PREFIX_BY_PURPOSE: dict[UploadPurpose, str] = {
     UploadPurpose.SPU_GALLERY: "spu",
     UploadPurpose.BRAND_LOGO: "brand",
     UploadPurpose.CATEGORY_ICON: "category",
+    UploadPurpose.AFTERSALES_APPLY: "aftersales",
+    UploadPurpose.AFTERSALES_USER_RETURN: "aftersales",
+    UploadPurpose.AFTERSALES_MERCHANT_RECEIVE: "aftersales",
+    UploadPurpose.AFTERSALES_EXCHANGE_SHIP: "aftersales",
+    UploadPurpose.AFTERSALES_APPEAL: "aftersales",
+    UploadPurpose.AFTERSALES_ARBITRATION: "aftersales",
 }
 
 _EXT_BY_CONTENT_TYPE: dict[str, str] = {
