@@ -25,6 +25,10 @@ class AddressOut(BaseModel):
     detail: str
     postal_code: str | None = None
     is_default: bool
+    # Phase 5 — region-code linkage (nullable for legacy rows)
+    province_code: str | None = None
+    city_code: str | None = None
+    district_code: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -40,6 +44,10 @@ class AddressCreateIn(BaseModel):
     detail: str = Field(min_length=1, max_length=200)
     postal_code: str | None = Field(default=None, max_length=10)
     is_default: bool = False
+    # Phase 5 optional codes; validated at service layer if provided.
+    province_code: str | None = Field(default=None, max_length=12)
+    city_code: str | None = Field(default=None, max_length=12)
+    district_code: str | None = Field(default=None, max_length=12)
 
     @field_validator("receiver_phone")
     @classmethod
@@ -65,6 +73,10 @@ class AddressUpdateIn(BaseModel):
     detail: str | None = Field(default=None, min_length=1, max_length=200)
     postal_code: str | None = Field(default=None, max_length=10)
     is_default: bool | None = None
+    # Phase 5 optional codes
+    province_code: str | None = Field(default=None, max_length=12)
+    city_code: str | None = Field(default=None, max_length=12)
+    district_code: str | None = Field(default=None, max_length=12)
 
     @model_validator(mode="after")
     def _at_least_one(self) -> AddressUpdateIn:

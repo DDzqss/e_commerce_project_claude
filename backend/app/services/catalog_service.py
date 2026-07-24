@@ -12,11 +12,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import AppException, ErrorCode
 from app.models.brand import Brand
 from app.models.category import Category
+from app.models.merchant import Shop, ShopStatus
 from app.models.product import SPU, SPUStatus
 from app.schemas.catalog import (
     BrandOut,
     CategoryTreeOut,
 )
+from app.schemas.merchant import ShopPublicOut
 from app.schemas.product import SPUDetailOut, SPUListItemOut
 from app.services import brand_service, category_service, product_service
 
@@ -194,11 +196,73 @@ async def list_recommendations(session: AsyncSession, *, limit: int = 10) -> lis
     return await _hydrate_list_items(session, rows)
 
 
+# ---------------------------------------------------------------------------
+# Phase 5 · public shop page
+# ---------------------------------------------------------------------------
+def _mask_phone(phone: str | None) -> str:
+    if not phone:
+        return ""
+    if len(phone) <= 4:
+        return phone
+    return phone[:3] + "****" + phone[-2:]
+
+
+async def get_shop_public(session: AsyncSession, shop_id: int) -> ShopPublicOut:
+    """Public storefront view — anyone can read for an active shop."""
+    shop = await session.get(Shop, shop_id)
+    if shop is None or shop.deleted_at is not None or shop.status != ShopStatus.ACTIVE:
+        raise AppException(ErrorCode.RESOURCE_NOT_FOUND, "shop not found")
+    out = ShopPublicOut.model_validate(shop)
+    # Phone is masked before leaving the API.
+    out.contact_phone = _mask_phone(shop.contact_phone)
+    return out
+
+
+async def list_shop_spus(
+    session: AsyncSession,
+    shop_id: int,
+    *,
+    category_id: int | None,
+    sort: str | None,
+    page: int,
+    size: int,
+) -> tuple[list[SPUListItemOut], int]:
+    """List a single shop's approved SPUs — mirrors catalog listing filtered
+    by shop_id."""
+    shop = await session.get(Shop, shop_id)
+    if shop is None or shop.deleted_at is not None or shop.status != ShopStatus.ACTIVE:
+        raise AppException(ErrorCode.RESOURCE_NOT_FOUND, "shop not found")
+
+    size = min(size, _MAX_PAGE_SIZE)
+    conds: list[ColumnElement[bool]] = [
+        SPU.deleted_at.is_(None),
+        SPU.status == SPUStatus.APPROVED,
+        SPU.shop_id == shop_id,
+    ]
+    if category_id is not None:
+        ids = await category_service.descendant_ids(session, category_id)
+        conds.append(SPU.category_id.in_(ids))
+    total = int(
+        (await session.execute(select(func.count(SPU.id)).where(and_(*conds)))).scalar_one()
+    )
+    stmt = (
+        select(SPU)
+        .where(and_(*conds))
+        .order_by(_sort_expr(sort), SPU.id.desc())
+        .offset((page - 1) * size)
+        .limit(size)
+    )
+    rows = list((await session.execute(stmt)).scalars().all())
+    return await _hydrate_list_items(session, rows), total
+
+
 __all__ = [
+    "get_shop_public",
     "get_spu_detail",
     "list_brands",
     "list_categories",
     "list_recommendations",
     "list_related",
+    "list_shop_spus",
     "list_spus",
 ]

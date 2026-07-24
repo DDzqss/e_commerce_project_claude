@@ -102,6 +102,33 @@ export enum ErrorCode {
   AftersalesArbitrationDone = 18002,
   AftersalesForceRefundInvalid = 18003,
 
+  // 19xxx Phase 5 评价
+  ReviewNotFound = 19001,
+  ReviewForbidden = 19002,
+  OrderNotReviewable = 19003,
+  ReviewEditWindowClosed = 19004,
+  ReviewRatingInvalid = 19005,
+  ReviewContentTooLong = 19006,
+  ReviewImagesOverLimit = 19007,
+
+  // 20xxx Phase 5 评价回复
+  ReviewReplyNotFound = 20001,
+  ReviewReplyDuplicate = 20002,
+  ReviewReplyForbidden = 20003,
+
+  // 21xxx Phase 5 评价举报
+  ReviewReportNotFound = 21001,
+  ReviewReportDuplicate = 21002,
+  ReviewReportReasonInvalid = 21003,
+
+  // 22xxx Phase 5 通知
+  NotificationNotFound = 22001,
+  NotificationForbidden = 22002,
+
+  // 23xxx Phase 5 地区
+  RegionCodeInvalid = 23001,
+  RegionMismatch = 23002,
+
   // 9xxx 服务端
   InternalError = 9000,
 }
@@ -192,6 +219,33 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.AftersalesNotEscalated]: "尚未升级至平台，不能仲裁",
   [ErrorCode.AftersalesArbitrationDone]: "仲裁已完成",
   [ErrorCode.AftersalesForceRefundInvalid]: "强制退款金额非法",
+
+  // 19xxx 评价
+  [ErrorCode.ReviewNotFound]: "评价不存在",
+  [ErrorCode.ReviewForbidden]: "无权操作该评价",
+  [ErrorCode.OrderNotReviewable]: "该订单当前不可评价",
+  [ErrorCode.ReviewEditWindowClosed]: "评价编辑窗口已过或已编辑过",
+  [ErrorCode.ReviewRatingInvalid]: "评分需在 1-5 之间",
+  [ErrorCode.ReviewContentTooLong]: "评价内容超出长度限制",
+  [ErrorCode.ReviewImagesOverLimit]: "评价图片最多 6 张",
+
+  // 20xxx 回复
+  [ErrorCode.ReviewReplyNotFound]: "评价回复不存在",
+  [ErrorCode.ReviewReplyDuplicate]: "商家已回复过该评价",
+  [ErrorCode.ReviewReplyForbidden]: "无权回复该评价",
+
+  // 21xxx 举报
+  [ErrorCode.ReviewReportNotFound]: "举报记录不存在",
+  [ErrorCode.ReviewReportDuplicate]: "已举报过该评价",
+  [ErrorCode.ReviewReportReasonInvalid]: "举报理由非法",
+
+  // 22xxx 通知
+  [ErrorCode.NotificationNotFound]: "通知不存在",
+  [ErrorCode.NotificationForbidden]: "无权访问该通知",
+
+  // 23xxx 地区
+  [ErrorCode.RegionCodeInvalid]: "地区码无效",
+  [ErrorCode.RegionMismatch]: "所选省市区不匹配",
 
   [ErrorCode.InternalError]: "服务器开小差了，请稍后重试",
 };

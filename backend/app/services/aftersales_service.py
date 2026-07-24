@@ -73,6 +73,70 @@ from app.schemas.aftersales import (
 from app.services import refund_service, risk_service
 from app.services.audit_service import write_audit
 
+
+async def _notify_aftersales_event(
+    session: AsyncSession,
+    aftersales: Aftersales,
+    *,
+    event: str,
+) -> None:
+    """Best-effort notification hook (Phase 5)."""
+    try:
+        from app.models.admin_user import AdminRole
+        from app.models.notification import NotificationCategory
+        from app.services import notification_service
+
+        if event == "created":
+            await notification_service.notify_merchants_of_shop(
+                session,
+                aftersales.shop_id,
+                NotificationCategory.AFTERSALES,
+                title=f"新的售后申请 {aftersales.aftersales_no}",
+                body=aftersales.reason_note[:80] if aftersales.reason_note else "用户发起售后",
+                action_url=f"/merchant/aftersales/{aftersales.id}",
+                related_type="aftersales",
+                related_id=aftersales.id,
+            )
+        elif event == "merchant_approved":
+            await notification_service.notify_user(
+                session,
+                aftersales.user_id,
+                NotificationCategory.AFTERSALES,
+                title=f"售后 {aftersales.aftersales_no} 已通过审核",
+                body="商家已同意您的售后申请",
+                action_url=f"/user/aftersales/{aftersales.id}",
+                related_type="aftersales",
+                related_id=aftersales.id,
+            )
+        elif event == "merchant_rejected":
+            await notification_service.notify_user(
+                session,
+                aftersales.user_id,
+                NotificationCategory.AFTERSALES,
+                title=f"售后 {aftersales.aftersales_no} 已被驳回",
+                body=aftersales.merchant_review_note or "商家驳回",
+                action_url=f"/user/aftersales/{aftersales.id}",
+                related_type="aftersales",
+                related_id=aftersales.id,
+            )
+        elif event == "escalated":
+            await notification_service.notify_admins(
+                session,
+                NotificationCategory.AFTERSALES,
+                role_filter=AdminRole.CUSTOMER_SERVICE_ADMIN,
+                title=f"售后升级仲裁 {aftersales.aftersales_no}",
+                body=(
+                    aftersales.escalation_reason.value
+                    if aftersales.escalation_reason
+                    else "escalated"
+                ),
+                action_url=f"/admin/aftersales/{aftersales.id}",
+                related_type="aftersales",
+                related_id=aftersales.id,
+            )
+    except Exception:  # noqa: BLE001
+        pass
+
 # ---------------------------------------------------------------------------
 # Constants & tiny helpers
 # ---------------------------------------------------------------------------
@@ -598,6 +662,9 @@ async def user_create(
         user_agent=user_agent,
         extra={"order_id": order.id, "type": payload.type.value},
     )
+    await _notify_aftersales_event(session, row, event="created")
+    if risk_flagged:
+        await _notify_aftersales_event(session, row, event="escalated")
     return await _serialize_detail(session, row)
 
 
@@ -1102,6 +1169,7 @@ async def merchant_approve(
         user_agent=user_agent,
         extra={"actual_refund_cents": payload.actual_refund_cents},
     )
+    await _notify_aftersales_event(session, row, event="merchant_approved")
     return await _serialize_detail(session, row)
 
 
@@ -1138,6 +1206,7 @@ async def merchant_reject(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_aftersales_event(session, row, event="merchant_rejected")
     return await _serialize_detail(session, row)
 
 
@@ -1238,6 +1307,7 @@ async def merchant_refuse_receive(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_aftersales_event(session, row, event="escalated")
     return await _serialize_detail(session, row)
 
 

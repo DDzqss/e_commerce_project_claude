@@ -7,6 +7,8 @@ import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/useAuth";
 import { useAftersalesStats } from "@/hooks/useMerchantAftersales";
+import { useUnreadCount } from "@/hooks/useNotifications";
+import { useMerchantReviewStats } from "@/hooks/useMerchantReviews";
 import { toast } from "@/components/ui/Toast";
 
 type NavItem = {
@@ -32,11 +34,21 @@ const BASE_NAV_ITEMS: readonly Omit<NavItem, "badgeCount">[] = [
     label: "商品管理",
     icon: "▦",
   },
-  { href: "/shop", label: "店铺信息", icon: "◉" },
+  { href: "/shop", label: "店铺主页", icon: "◉" },
   {
     href: "/aftersales",
     label: "售后处理",
     icon: "⟲",
+  },
+  {
+    href: "/reviews",
+    label: "评价管理",
+    icon: "★",
+  },
+  {
+    href: "/notifications",
+    label: "通知中心",
+    icon: "✉",
   },
 ];
 
@@ -165,11 +177,18 @@ export function Sidebar() {
   const statsQuery = useAftersalesStats();
   const pendingCount = statsQuery.data?.pending_review_count ?? 0;
 
-  const items: NavItem[] = BASE_NAV_ITEMS.map((it) =>
-    it.href === "/aftersales"
-      ? { ...it, badgeCount: pendingCount }
-      : { ...it },
-  );
+  const unreadNotifQuery = useUnreadCount();
+  const unreadNotif = unreadNotifQuery.data?.unread_count ?? 0;
+
+  const reviewStatsQuery = useMerchantReviewStats();
+  const unrepliedReviews = reviewStatsQuery.data?.unreplied_count ?? 0;
+
+  const items: NavItem[] = BASE_NAV_ITEMS.map((it) => {
+    if (it.href === "/aftersales") return { ...it, badgeCount: pendingCount };
+    if (it.href === "/notifications") return { ...it, badgeCount: unreadNotif };
+    if (it.href === "/reviews") return { ...it, badgeCount: unrepliedReviews };
+    return { ...it };
+  });
 
   return (
     <nav
@@ -201,7 +220,7 @@ export function Sidebar() {
       <div className="border-t border-white/10 p-3">
         <AccountBottomMenu />
         <div className="mt-2 text-[11px] text-white/50">
-          v0.4.0 · Phase 4
+          v0.5.0 · Phase 5
         </div>
       </div>
     </nav>

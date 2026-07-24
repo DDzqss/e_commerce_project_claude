@@ -286,6 +286,24 @@ async def admin_approve(
         extra={"shop_id": shop.id, "account_id": account.id},
     )
 
+    # Phase 5 — best-effort notify the applicant of the outcome.
+    try:
+        from app.models.notification import NotificationCategory
+        from app.services import notification_service
+
+        await notification_service.notify_user(
+            session,
+            row.applicant_user_id,
+            NotificationCategory.SYSTEM,
+            title="商家入驻申请已通过",
+            body=f"店铺 {shop.name} 已开通，账号为 {account.login_name}",
+            action_url="/merchant/me",
+            related_type="merchant_application",
+            related_id=row.id,
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
     account_out = MerchantAccountWithPasswordOut.model_validate(
         {
             "id": account.id,
@@ -342,6 +360,22 @@ async def admin_reject(
         ip=ip,
         user_agent=user_agent,
     )
+    try:
+        from app.models.notification import NotificationCategory
+        from app.services import notification_service
+
+        await notification_service.notify_user(
+            session,
+            row.applicant_user_id,
+            NotificationCategory.SYSTEM,
+            title="商家入驻申请未通过",
+            body=review_note,
+            action_url="/user/merchant-applications",
+            related_type="merchant_application",
+            related_id=row.id,
+        )
+    except Exception:  # noqa: BLE001
+        pass
     return MerchantApplicationOut.model_validate(row)
 
 

@@ -11,8 +11,11 @@ from app.api.v1.user import (
     cart,
     me,
     merchant_applications,
+    notifications,
     orders,
     payments,
+    review_reports,
+    reviews,
     uploads,
 )
 
@@ -34,5 +37,9 @@ router.include_router(payments.router, prefix="", tags=["user.payments"])
 # Aftersales router owns both /orders/{id}/aftersales and /aftersales/*.
 router.include_router(aftersales.router, prefix="", tags=["user.aftersales"])
 router.include_router(uploads.router, prefix="/uploads", tags=["user.uploads"])
+# Phase 5 — reviews / notifications / review-reports.
+router.include_router(reviews.router, prefix="", tags=["user.reviews"])
+router.include_router(review_reports.router, prefix="", tags=["user.review-reports"])
+router.include_router(notifications.router, prefix="/notifications", tags=["user.notifications"])
 
 __all__ = ["router"]

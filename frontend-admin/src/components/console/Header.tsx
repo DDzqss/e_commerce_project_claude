@@ -14,6 +14,7 @@ import clsx from "clsx";
 import { ADMIN_ROLE_META, type AdminRole } from "@/lib/rbac";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/Toast";
+import { NotificationBell } from "@/components/console/NotificationBell";
 
 export function Header() {
   const { admin, logout } = useAuth();
@@ -47,6 +48,7 @@ export function Header() {
       <div className="text-sm text-neutral-500">平台管理后台</div>
 
       <div className="relative flex items-center gap-3" ref={menuRef}>
+        <NotificationBell />
         {admin && meta ? (
           <>
             <span

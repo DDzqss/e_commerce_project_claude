@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { AccountMenu } from "@/components/dashboard/AccountMenu";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { MerchantMeBoot } from "@/components/auth/MerchantMeBoot";
 
@@ -32,7 +33,10 @@ export default function DashboardLayout({
             <h1 className="text-sm font-medium text-neutral-700">
               商家后台管理系统
             </h1>
-            <AccountMenu />
+            <div className="flex items-center gap-3">
+              <NotificationDropdown />
+              <AccountMenu />
+            </div>
           </header>
 
           {/* 主内容 */}

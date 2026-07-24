@@ -61,9 +61,20 @@ async def update_shop(
     if payload.contact_phone is not None:
         shop.contact_phone = payload.contact_phone
         changed["contact_phone"] = payload.contact_phone
+    if payload.logo_url is not None:
+        shop.logo_url = payload.logo_url or None
+        changed["logo_url"] = True
+    if payload.banner_url is not None:
+        shop.banner_url = payload.banner_url or None
+        changed["banner_url"] = True
+    if payload.announcement is not None:
+        # Empty string is treated as "clear".
+        shop.announcement = payload.announcement or None
+        changed["announcement"] = True
 
     if changed:
         await session.flush()
+        await session.refresh(shop)
         await write_audit(
             session,
             actor_type=AuditActorType.MERCHANT,

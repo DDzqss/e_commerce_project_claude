@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { CategoryNav } from "@/components/catalog/CategoryNav";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useCart } from "@/hooks/useCart";
 import { useCartBadge } from "@/lib/cart-store";
 
@@ -79,6 +80,9 @@ export function SiteHeader() {
         </form>
 
         <nav className="flex items-center gap-4 text-sm">
+          {/* 通知铃铛（登录后显示） */}
+          {isLoggedIn && hasHydrated && <NotificationDropdown />}
+
           {/* 购物车入口：登录/未登录都显示，未登录点了会被 RequireAuth 拦到登录 */}
           <Link
             href="/cart"
@@ -175,6 +179,22 @@ export function SiteHeader() {
                     onClick={() => setOpen(false)}
                   >
                     我的售后
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    href="/reviews"
+                    className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    我的评价
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    href="/notifications"
+                    className="block px-3 py-2 text-neutral-700 hover:bg-neutral-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    消息通知
                   </Link>
                   <Link
                     role="menuitem"

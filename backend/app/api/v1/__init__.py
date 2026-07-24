@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
+from app.api.v1 import regions
 from app.api.v1.admin import router as admin_router
 from app.api.v1.catalog import router as catalog_router
 from app.api.v1.common import router as common_router
@@ -22,5 +23,7 @@ api_router.include_router(catalog_router, prefix="/catalog", tags=["catalog"])
 api_router.include_router(user_router, prefix="/user", tags=["user"])
 api_router.include_router(merchant_router, prefix="/merchant", tags=["merchant"])
 api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
+# Phase 5 — top-level region data (public, no auth).
+api_router.include_router(regions.router, prefix="/regions", tags=["regions"])
 
 __all__ = ["api_router"]

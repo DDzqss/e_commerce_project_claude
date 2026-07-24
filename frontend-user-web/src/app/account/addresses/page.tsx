@@ -16,6 +16,10 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { toast } from "@/components/ui/Toast";
+import {
+  RegionCascader,
+  type RegionValue,
+} from "@/components/ui/RegionCascader";
 import { useAddresses, useInvalidateAddresses } from "@/hooks/useAddresses";
 import {
   createAddress,
@@ -42,9 +46,12 @@ const addressSchema = z.object({
     .string()
     .min(1, "请填写手机号")
     .regex(phoneRegex, "请输入 11 位手机号"),
-  province: z.string().min(1, "请填写省份").max(40, "最多 40 字"),
-  city: z.string().min(1, "请填写城市").max(40, "最多 40 字"),
-  district: z.string().min(1, "请填写区/县").max(40, "最多 40 字"),
+  province: z.string().min(1, "请选择省份").max(40, "最多 40 字"),
+  city: z.string().min(1, "请选择城市").max(40, "最多 40 字"),
+  district: z.string().min(1, "请选择区县").max(40, "最多 40 字"),
+  province_code: z.string().nullable().optional(),
+  city_code: z.string().nullable().optional(),
+  district_code: z.string().nullable().optional(),
   detail: z.string().min(1, "请填写详细地址").max(200, "最多 200 字"),
   postal_code: z
     .string()
@@ -265,9 +272,24 @@ function AddressFormModal({
   onSaved: () => void;
 }) {
   const isEdit = Boolean(initial);
+  const [region, setRegion] = useState<RegionValue>({
+    province_code: initial?.province_code ?? null,
+    city_code: initial?.city_code ?? null,
+    district_code: initial?.district_code ?? null,
+    province_name: initial?.province ?? null,
+    city_name: initial?.city ?? null,
+    district_name: initial?.district ?? null,
+  });
+  const [regionError, setRegionError] = useState<string | null>(null);
+
+  const hasLegacyNames =
+    !initial?.province_code &&
+    Boolean(initial?.province || initial?.city || initial?.district);
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { isSubmitting },
   } = useForm<AddressForm>({
     resolver: zodResolver(addressSchema),
@@ -277,13 +299,39 @@ function AddressFormModal({
       province: initial?.province ?? "",
       city: initial?.city ?? "",
       district: initial?.district ?? "",
+      province_code: initial?.province_code ?? null,
+      city_code: initial?.city_code ?? null,
+      district_code: initial?.district_code ?? null,
       detail: initial?.detail ?? "",
       postal_code: initial?.postal_code ?? "",
       is_default: initial?.is_default ?? false,
     },
   });
 
+  // 级联变更同步到 react-hook-form
+  const applyRegion = (v: RegionValue) => {
+    setRegion(v);
+    setValue("province", v.province_name ?? "");
+    setValue("city", v.city_name ?? "");
+    setValue("district", v.district_name ?? "");
+    setValue("province_code", v.province_code);
+    setValue("city_code", v.city_code);
+    setValue("district_code", v.district_code);
+    if (regionError && v.province_name && v.city_name && v.district_name) {
+      setRegionError(null);
+    }
+  };
+
   const onSubmit = handleSubmit(async (values) => {
+    // 若用户从未选过级联（省市区任一为空），拦截
+    if (
+      !values.province.trim() ||
+      !values.city.trim() ||
+      !values.district.trim()
+    ) {
+      setRegionError("请选择省 / 市 / 区");
+      return;
+    }
     try {
       // 空 postal_code 转 null，跟契约 nullable 保持一致
       const normalized: CreateAddressPayload & UpdateAddressPayload = {
@@ -292,6 +340,9 @@ function AddressFormModal({
         province: values.province.trim(),
         city: values.city.trim(),
         district: values.district.trim(),
+        province_code: region.province_code,
+        city_code: region.city_code,
+        district_code: region.district_code,
         detail: values.detail.trim(),
         postal_code: values.postal_code?.trim() ? values.postal_code.trim() : null,
         is_default: Boolean(values.is_default),
@@ -347,52 +398,22 @@ function AddressFormModal({
             )}
           />
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          <FormField
-            control={control}
-            name="province"
-            render={({ value, onChange, name, error, onBlur }) => (
-              <Input
-                label="省份"
-                name={name}
-                value={(value as string) ?? ""}
-                onChange={(e) => onChange(e.target.value)}
-                onBlur={onBlur}
-                error={error}
-                maxLength={40}
-              />
-            )}
+        <div>
+          <label className="mb-1 block text-xs text-neutral-600">
+            所在地区
+          </label>
+          <RegionCascader
+            value={region}
+            onChange={applyRegion}
+            error={regionError}
           />
-          <FormField
-            control={control}
-            name="city"
-            render={({ value, onChange, name, error, onBlur }) => (
-              <Input
-                label="城市"
-                name={name}
-                value={(value as string) ?? ""}
-                onChange={(e) => onChange(e.target.value)}
-                onBlur={onBlur}
-                error={error}
-                maxLength={40}
-              />
-            )}
-          />
-          <FormField
-            control={control}
-            name="district"
-            render={({ value, onChange, name, error, onBlur }) => (
-              <Input
-                label="区/县"
-                name={name}
-                value={(value as string) ?? ""}
-                onChange={(e) => onChange(e.target.value)}
-                onBlur={onBlur}
-                error={error}
-                maxLength={40}
-              />
-            )}
-          />
+          {hasLegacyNames && !region.province_code && (
+            <p className="mt-1 text-xs text-neutral-400">
+              原地址：{initial?.province}
+              {initial?.city}
+              {initial?.district}（旧地址无地区码，重新选择将覆盖）
+            </p>
+          )}
         </div>
         <FormField
           control={control}

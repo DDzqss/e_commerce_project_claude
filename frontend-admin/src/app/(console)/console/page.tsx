@@ -27,6 +27,7 @@ import { listAllCategories } from "@/lib/category-api";
 import { countTreeNodes } from "@/components/ui/CategoryTreeEditor";
 import { useOrderOverview } from "@/hooks/useOrders";
 import { useAftersalesStats } from "@/hooks/useAftersales";
+import { usePendingReportsCount } from "@/hooks/useReports";
 import { usePermission } from "@/hooks/useAuth";
 
 export default function ConsoleHomePage() {
@@ -35,6 +36,7 @@ export default function ConsoleHomePage() {
   const canManageCategory = usePermission("admin:category:manage");
   const canReadOrders = usePermission("admin:order:read_all");
   const canReadAftersales = usePermission("admin:aftersales:read_all");
+  const canHandleReports = usePermission("admin:review_report:handle");
 
   const pendingApplications = useQuery({
     queryKey: ["dashboard", "pending-applications-count"],
@@ -68,6 +70,7 @@ export default function ConsoleHomePage() {
 
   const orderOverview = useOrderOverview({ enabled: canReadOrders });
   const aftersalesStats = useAftersalesStats({ enabled: canReadAftersales });
+  const pendingReports = usePendingReportsCount({ enabled: canHandleReports });
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,7 +82,7 @@ export default function ConsoleHomePage() {
           </p>
         </div>
         <span className="rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-500">
-          Phase 4
+          Phase 5
         </span>
       </header>
 
@@ -476,6 +479,47 @@ export default function ConsoleHomePage() {
               value="—"
               hint="您当前无查看权限"
               tone="success"
+            />
+          )}
+        </div>
+      </section>
+
+      {/* Phase 5 · 评价 / 通知 */}
+      <section aria-label="评价与通知">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+          评价与通知
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* 待处理举报（红色警示） */}
+          {canHandleReports ? (
+            <Link
+              href="/console/review-reports?status=pending"
+              className="rounded-md transition hover:shadow"
+              aria-label="查看待处理评价举报"
+            >
+              <StatCard
+                label="待处理举报"
+                value={
+                  pendingReports.isLoading
+                    ? "…"
+                    : pendingReports.isError
+                      ? "—"
+                      : String(pendingReports.data?.total ?? 0)
+                }
+                hint={
+                  pendingReports.isError
+                    ? "拉取失败，请稍后刷新"
+                    : "用户对评价的举报，pending 状态数（点击处理）"
+                }
+                tone="danger"
+              />
+            </Link>
+          ) : (
+            <StatCard
+              label="待处理举报"
+              value="—"
+              hint="您当前无查看权限"
+              tone="danger"
             />
           )}
         </div>

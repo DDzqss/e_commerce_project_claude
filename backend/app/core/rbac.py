@@ -43,6 +43,12 @@ class Permission(enum.StrEnum):
     USER_AFTERSALES_NUDGE = "user:aftersales:nudge"
     USER_AFTERSALES_APPEAL = "user:aftersales:appeal"
     USER_UPLOAD_PRESIGN = "user:upload:presign"
+    # user scope — Phase 5 · reviews / notifications
+    USER_REVIEW_CREATE = "user:review:create"
+    USER_REVIEW_EDIT_OWN = "user:review:edit_own"
+    USER_REVIEW_DELETE_OWN = "user:review:delete_own"
+    USER_REVIEW_REPORT = "user:review:report"
+    USER_NOTIFICATION_READ_OWN = "user:notification:read_own"
 
     # merchant scope
     MERCHANT_SELF_READ = "merchant:self:read"
@@ -62,6 +68,11 @@ class Permission(enum.StrEnum):
     MERCHANT_AFTERSALES_CONFIRM_RECEIVE = "merchant:aftersales:confirm_receive"
     MERCHANT_AFTERSALES_SHIP_EXCHANGE = "merchant:aftersales:ship_exchange"
     MERCHANT_AFTERSALES_ADD_NOTE = "merchant:aftersales:add_note"
+    # merchant scope — Phase 5
+    MERCHANT_REVIEW_READ_SHOP = "merchant:review:read_shop"
+    MERCHANT_REVIEW_REPLY = "merchant:review:reply"
+    MERCHANT_NOTIFICATION_READ_SHOP = "merchant:notification:read_shop"
+    MERCHANT_SHOP_UPDATE_PROFILE = "merchant:shop:update_profile"
 
     # admin scope
     ADMIN_SELF_READ = "admin:self:read"
@@ -83,6 +94,10 @@ class Permission(enum.StrEnum):
     ADMIN_AFTERSALES_ARBITRATE = "admin:aftersales:arbitrate"
     ADMIN_AFTERSALES_FORCE_REFUND = "admin:aftersales:force_refund"
     ADMIN_AFTERSALES_ADD_NOTE = "admin:aftersales:add_note"
+    # admin scope — Phase 5
+    ADMIN_REVIEW_MODERATE = "admin:review:moderate"
+    ADMIN_REVIEW_REPORT_HANDLE = "admin:review_report:handle"
+    ADMIN_NOTIFICATION_READ = "admin:notification:read"
 
 
 # ---------------------------------------------------------------------------
@@ -114,6 +129,12 @@ USER_BASE_PERMISSIONS: frozenset[Permission] = frozenset(
         Permission.USER_AFTERSALES_NUDGE,
         Permission.USER_AFTERSALES_APPEAL,
         Permission.USER_UPLOAD_PRESIGN,
+        # Phase 5
+        Permission.USER_REVIEW_CREATE,
+        Permission.USER_REVIEW_EDIT_OWN,
+        Permission.USER_REVIEW_DELETE_OWN,
+        Permission.USER_REVIEW_REPORT,
+        Permission.USER_NOTIFICATION_READ_OWN,
     }
 )
 
@@ -138,6 +159,11 @@ MERCHANT_ROLE_PERMISSIONS: dict[MerchantRole, frozenset[Permission]] = {
             Permission.MERCHANT_AFTERSALES_CONFIRM_RECEIVE,
             Permission.MERCHANT_AFTERSALES_SHIP_EXCHANGE,
             Permission.MERCHANT_AFTERSALES_ADD_NOTE,
+            # Phase 5
+            Permission.MERCHANT_REVIEW_READ_SHOP,
+            Permission.MERCHANT_REVIEW_REPLY,
+            Permission.MERCHANT_NOTIFICATION_READ_SHOP,
+            Permission.MERCHANT_SHOP_UPDATE_PROFILE,
         }
     ),
     MerchantRole.SHOP_OPERATOR: frozenset(
@@ -156,6 +182,10 @@ MERCHANT_ROLE_PERMISSIONS: dict[MerchantRole, frozenset[Permission]] = {
             Permission.MERCHANT_AFTERSALES_CONFIRM_RECEIVE,
             Permission.MERCHANT_AFTERSALES_SHIP_EXCHANGE,
             Permission.MERCHANT_AFTERSALES_ADD_NOTE,
+            # Phase 5
+            Permission.MERCHANT_REVIEW_READ_SHOP,
+            Permission.MERCHANT_REVIEW_REPLY,
+            Permission.MERCHANT_NOTIFICATION_READ_SHOP,
         }
     ),
     MerchantRole.SHOP_SUPPORT: frozenset(
@@ -166,6 +196,9 @@ MERCHANT_ROLE_PERMISSIONS: dict[MerchantRole, frozenset[Permission]] = {
             # Phase 4 — SHOP_SUPPORT can only read + note, not review / ship
             Permission.MERCHANT_AFTERSALES_READ_SHOP,
             Permission.MERCHANT_AFTERSALES_ADD_NOTE,
+            # Phase 5 — read reviews & notifications; no reply
+            Permission.MERCHANT_REVIEW_READ_SHOP,
+            Permission.MERCHANT_NOTIFICATION_READ_SHOP,
         }
     ),
 }
@@ -187,6 +220,9 @@ ROLE_PERMISSIONS: dict[AdminRole, frozenset[Permission]] = {
             Permission.ADMIN_ORDER_READ_ALL,
             # Phase 4 — BUSINESS_ADMIN can read but not arbitrate
             Permission.ADMIN_AFTERSALES_READ_ALL,
+            # Phase 5
+            Permission.ADMIN_REVIEW_MODERATE,
+            Permission.ADMIN_NOTIFICATION_READ,
         }
     ),
     AdminRole.CUSTOMER_SERVICE_ADMIN: frozenset(
@@ -201,6 +237,10 @@ ROLE_PERMISSIONS: dict[AdminRole, frozenset[Permission]] = {
             Permission.ADMIN_AFTERSALES_ARBITRATE,
             Permission.ADMIN_AFTERSALES_FORCE_REFUND,
             Permission.ADMIN_AFTERSALES_ADD_NOTE,
+            # Phase 5
+            Permission.ADMIN_REVIEW_MODERATE,
+            Permission.ADMIN_REVIEW_REPORT_HANDLE,
+            Permission.ADMIN_NOTIFICATION_READ,
         }
     ),
     AdminRole.TECH_ADMIN: frozenset(
@@ -208,6 +248,8 @@ ROLE_PERMISSIONS: dict[AdminRole, frozenset[Permission]] = {
             Permission.ADMIN_SELF_READ,
             Permission.ADMIN_AUDIT_LOG_READ,
             Permission.ADMIN_TASK_RUN,
+            # Phase 5 — admins should always see their inbox
+            Permission.ADMIN_NOTIFICATION_READ,
         }
     ),
 }

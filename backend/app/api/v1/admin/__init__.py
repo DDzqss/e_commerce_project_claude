@@ -11,7 +11,10 @@ from app.api.v1.admin import (
     categories,
     me,
     merchant_applications,
+    notifications,
     orders,
+    review_reports,
+    reviews,
     spus,
     tasks,
 )
@@ -31,5 +34,13 @@ router.include_router(spus.router, prefix="/spus", tags=["admin.spus"])
 router.include_router(orders.router, prefix="/orders", tags=["admin.orders"])
 router.include_router(tasks.router, prefix="/tasks", tags=["admin.tasks"])
 router.include_router(aftersales.router, prefix="/aftersales", tags=["admin.aftersales"])
+# Phase 5 — reviews, review reports, notifications.
+router.include_router(reviews.router, prefix="/reviews", tags=["admin.reviews"])
+router.include_router(
+    review_reports.router, prefix="/review-reports", tags=["admin.review-reports"]
+)
+router.include_router(
+    notifications.router, prefix="/notifications", tags=["admin.notifications"]
+)
 
 __all__ = ["router"]

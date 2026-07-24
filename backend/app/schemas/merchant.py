@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -52,6 +53,22 @@ class ShopOut(BaseModel):
     contact_name: str
     contact_phone: str
     status: ShopStatus
+    # Phase 5 additions
+    logo_url: str | None = None
+    banner_url: str | None = None
+    announcement: str | None = None
+    opened_at: datetime | None = None
+    rating_avg: float = 5.0
+    rating_count: int = 0
+    sales_count: int = 0
+
+    @field_validator("rating_avg", mode="before")
+    @classmethod
+    def _rating_to_float(cls, v: object) -> float:
+        # Numeric(3,2) comes back as Decimal — coerce to float for JSON.
+        if v is None:
+            return 5.0
+        return float(v)  # type: ignore[arg-type]
 
 
 class ShopUpdateIn(BaseModel):
@@ -60,6 +77,37 @@ class ShopUpdateIn(BaseModel):
     description: str | None = Field(default=None, max_length=2000)
     contact_name: str | None = Field(default=None, min_length=1, max_length=60)
     contact_phone: str | None = Field(default=None, min_length=1, max_length=20)
+    # Phase 5 profile fields
+    logo_url: str | None = Field(default=None, max_length=255)
+    banner_url: str | None = Field(default=None, max_length=255)
+    announcement: str | None = Field(default=None, max_length=2000)
+
+
+class ShopPublicOut(BaseModel):
+    """Public storefront projection (contract §9.1)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str | None = None
+    logo_url: str | None = None
+    banner_url: str | None = None
+    announcement: str | None = None
+    opened_at: datetime | None = None
+    rating_avg: float = 5.0
+    rating_count: int = 0
+    sales_count: int = 0
+    contact_name: str
+    contact_phone: str  # already masked by the service layer
+    status: ShopStatus
+
+    @field_validator("rating_avg", mode="before")
+    @classmethod
+    def _rating_to_float(cls, v: object) -> float:
+        if v is None:
+            return 5.0
+        return float(v)  # type: ignore[arg-type]
 
 
 class MerchantAccountOut(BaseModel):
@@ -99,5 +147,6 @@ __all__ = [
     "MerchantLoginIn",
     "MerchantMeOut",
     "ShopOut",
+    "ShopPublicOut",
     "ShopUpdateIn",
 ]

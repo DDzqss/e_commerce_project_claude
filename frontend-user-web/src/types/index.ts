@@ -53,3 +53,7 @@ export * from "./errors";
 export * from "./catalog";
 export * from "./order";
 export * from "./aftersales";
+export * from "./review";
+export * from "./notification";
+export * from "./region";
+export * from "./shop";
