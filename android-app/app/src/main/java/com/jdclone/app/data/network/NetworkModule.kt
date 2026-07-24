@@ -1,7 +1,7 @@
 package com.jdclone.app.data.network
 
-import com.jdclone.app.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.jdclone.app.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,10 +15,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 /**
- * Provides the shared networking stack (OkHttp + Retrofit + kotlinx.serialization).
- *
- * The base URL is read from [BuildConfig.BASE_URL], which is set in
- * `app/build.gradle.kts` to the emulator loopback alias by default.
+ * 网络层依赖图 —— Phase 0 版本增强：加入 [AuthInterceptor]。
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -34,7 +31,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(auth: AuthInterceptor): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -43,6 +40,7 @@ object NetworkModule {
             }
         }
         return OkHttpClient.Builder()
+            .addInterceptor(auth)
             .addInterceptor(logging)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)

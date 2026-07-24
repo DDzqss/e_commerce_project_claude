@@ -13,6 +13,51 @@
 
 ---
 
+## [0.7.0-phase6] — 2026-07-24
+
+### Phase 6：Android App（消费者端 · 全量对接 Phase 1-5 后端）
+
+#### 契约先行
+- `docs/API/phase-6-android-architecture.md`（423 行）：Kotlin/Compose 单模块分层、
+  AuthTokenManager (DataStore) + AuthInterceptor (Bearer + 401→refresh 单飞)、
+  NavRoutes 完整路由、UiState + ViewModel 模板、ApiEnvelope + 错误码中文映射、
+  Coil3 RemoteImage 封装
+
+#### Android App（75 Kotlin 文件 · 单 agent 全权交付 + SendMessage 续跑 1 次）
+- **Data 层**：AuthTokenManager (DataStore) / SessionState / AuthInterceptor (Mutex 单飞) /
+  ApiEnvelope + ApiException / ApiService（40+ 端点 覆盖 auth/catalog/cart/order/payment/aftersales/address/notification）+ 5 个 dto 文件 + 8 个 Repository
+- **UI Common**：UiState / ApiErrorMapper / LoadingScreen / ErrorScreen / EmptyState / Buttons /
+  PriceText / RemoteImage / StarRating / DateUtils / MaskUtils
+- **Navigation**：NavRoutes（22 常量路由 + 参数拼装 helper） + App.kt 双图（AuthGraph / MainGraph）
+- **Screens（约 25 个）**：
+  - Auth 4：Login / Register / ForgotPassword / ResetPassword
+  - Catalog 5：Home / Category / CategoryList / Search / ProductDetail（gallery + SKU 选择器）
+  - Cart 1：分店铺分组 + 全选/单选 + 失效商品处理
+  - Checkout 2：CheckoutScreen（地址选择 + 分组预览）+ MockPaymentScreen（3 渠道 + 成功/失败）
+  - Orders 2：OrderList（status tab）/ OrderDetail（Timeline + 物流 + 操作按钮）
+  - Aftersales 3：Apply（类型联动订单状态 + 部分退款 + 金额/原因/凭证）/ List / Detail（Timeline + 操作按钮 + 凭证 gallery 只看）
+  - Addresses 2：List / Edit（简化省市区为 3 TextField）
+  - Notifications 1：4 tab + 未读小圆点
+  - Profile 2：ProfileScreen（未登录引导 / 已登录信息 + 快捷入口）/ ChangePasswordScreen
+- **Tests**：MainDispatcherRule + TestApiService + CartViewModelTest（3 test）+ DomainLogicTest（9 test：formatYuan / maskPhone / allowedAftersalesTypes 等）
+- **build.gradle 调整**：`libs.androidx.lifecycle.runtime.compose` 依赖 + `buildFeatures.buildConfig=true` + `BASE_URL` + `IMAGE_CDN` buildConfigField
+
+#### 关键实现
+- **AuthInterceptor 单飞**：Mutex.withLock 内取 refresh + 换 token；并发线程复用最新 access
+- **SessionState ↔ Nav 协作**：App composable 顶层 `when (authState)` 决定 AuthGraph / MainGraph；登录成功后 repo `session.setLoggedIn()` 触发重组自动切图；无需手动 nav
+- **Idempotency**：Checkout + Aftersales ViewModel 各持一份 UUID；重试复用同 key
+- **图片渲染**：RemoteImage 拼 `BuildConfig.IMAGE_CDN + object_key`；null/blank fallback placeholder
+
+### 沉淀（AGENTS §11.4 追加 2 条）
+- CI ruff/formatter 版本每次都比本地新（Phase 3 PLC0415 → Phase 5 C420/S110/ASYNC240/新 formatter）：Agent 交付前 `uv sync --refresh`
+- Agent API 中断：SendMessage 缩小 scope 续跑（Phase 4 Admin agent 首创，Phase 6 Android agent 复用）
+
+### 验证结果
+- 本地：无 JDK 环境无法跑 gradle；由 CI 完整验证
+- CI（沿用 Phase 0 android-ci.yml）：JDK 21 + 自动生成 gradle wrapper + assembleDebug + testDebugUnitTest
+
+---
+
 ## [0.6.0-phase5] — 2026-07-24
 
 ### Phase 5：辅助功能（商品评价 + 站内信 + 地区数据 + 商家店铺主页）
