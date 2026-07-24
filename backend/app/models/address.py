@@ -35,6 +35,12 @@ class Address(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
     postal_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
+    # Phase 5 — optional region-code linkage (province/city/district).
+    # Old rows keep NULL; new writes populate the codes for FE cascade UI.
+    province_code: Mapped[str | None] = mapped_column(String(12), nullable=True)
+    city_code: Mapped[str | None] = mapped_column(String(12), nullable=True)
+    district_code: Mapped[str | None] = mapped_column(String(12), nullable=True)
+
     __table_args__ = (
         Index("ix_addresses_user_deleted", "user_id", "deleted_at"),
         # Note: partial UNIQUE(user_id) WHERE is_default AND deleted_at IS NULL

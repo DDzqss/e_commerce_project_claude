@@ -208,6 +208,14 @@ async def mock_succeed(
         user_agent=user_agent,
     )
     await session.refresh(order)
+    # Best-effort notification hook (Phase 5): tell the shop about new paid
+    # order. Any failure is swallowed by the notifier.
+    try:
+        from app.services import order_service as _order_service
+
+        await _order_service._notify_order_event(session, order, event="paid")
+    except Exception:
+        pass
     return PaymentAmountOnlyOut(
         session_id=ps.id,
         order_id=order.id,

@@ -26,6 +26,10 @@ export interface UserAddress {
   detail: string;
   postal_code: string | null;
   is_default: boolean;
+  /** Phase 5 追加：三级地区码，允许历史数据为 null。 */
+  province_code?: string | null;
+  city_code?: string | null;
+  district_code?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +43,10 @@ export interface CreateAddressPayload {
   detail: string;
   postal_code?: string | null;
   is_default?: boolean;
+  /** Phase 5 追加：三级 code，可选。 */
+  province_code?: string | null;
+  city_code?: string | null;
+  district_code?: string | null;
 }
 
 export interface UpdateAddressPayload {
@@ -50,6 +58,9 @@ export interface UpdateAddressPayload {
   detail?: string;
   postal_code?: string | null;
   is_default?: boolean;
+  province_code?: string | null;
+  city_code?: string | null;
+  district_code?: string | null;
 }
 
 /** ---------- Cart ---------- */

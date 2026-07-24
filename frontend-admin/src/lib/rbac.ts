@@ -62,6 +62,10 @@ export type Permission =
   | "admin:aftersales:arbitrate"
   | "admin:aftersales:force_refund"
   | "admin:aftersales:add_note"
+  // ---- Phase 5 契约 §10 新增：评价审核 / 举报处理 / 通知 ----
+  | "admin:review:moderate"
+  | "admin:review_report:handle"
+  | "admin:notification:read"
   // ---- 后续 Phase 预留（暂无对应权限时返回 false，UI 侧 disabled）----
   | "admin:product:review"
   | "admin:order:read"
@@ -93,6 +97,11 @@ export interface AdminRoleMeta {
    * - admin:aftersales:arbitrate    → SUPER, CUSTOMER_SERVICE
    * - admin:aftersales:force_refund → SUPER, CUSTOMER_SERVICE
    * - admin:aftersales:add_note     → SUPER, CUSTOMER_SERVICE
+   *
+   * Phase 5 契约 §10 追加：
+   * - admin:review:moderate         → SUPER, BUSINESS, CUSTOMER_SERVICE
+   * - admin:review_report:handle    → SUPER, CUSTOMER_SERVICE
+   * - admin:notification:read       → 任何 admin
    */
   defaultPermissions: readonly Permission[];
 }
@@ -121,6 +130,9 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:aftersales:arbitrate",
       "admin:aftersales:force_refund",
       "admin:aftersales:add_note",
+      "admin:review:moderate",
+      "admin:review_report:handle",
+      "admin:notification:read",
       "admin:refund:arbitrate",
       "admin:user:manage",
       "admin:rbac:manage",
@@ -143,6 +155,8 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:order:read",
       "admin:order:read_all",
       "admin:aftersales:read_all",
+      "admin:review:moderate",
+      "admin:notification:read",
     ],
   },
   [AdminRole.CUSTOMER_SERVICE_ADMIN]: {
@@ -162,6 +176,9 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:aftersales:arbitrate",
       "admin:aftersales:force_refund",
       "admin:aftersales:add_note",
+      "admin:review:moderate",
+      "admin:review_report:handle",
+      "admin:notification:read",
     ],
   },
   [AdminRole.TECH_ADMIN]: {
@@ -174,6 +191,7 @@ export const ADMIN_ROLE_META: Record<AdminRole, AdminRoleMeta> = {
       "admin:audit_log:read",
       "admin:user:manage",
       "admin:rbac:manage",
+      "admin:notification:read",
     ],
   },
 };

@@ -40,6 +40,21 @@ export interface ShopOut {
   status: ShopStatus;
   created_at: string;
   updated_at: string;
+  // ----- Phase 5 §3.7 新增 -----
+  /** 店铺 logo（MinIO object_key）。 */
+  logo_url?: string | null;
+  /** 店铺 banner（MinIO object_key）。 */
+  banner_url?: string | null;
+  /** 店铺公告（Phase 5 简化：纯文本 + \n）。 */
+  announcement?: string | null;
+  /** 首次开店时间。 */
+  opened_at?: string | null;
+  /** 店铺平均评分（visible reviews 聚合）。 */
+  rating_avg?: number;
+  /** 店铺评价总数。 */
+  rating_count?: number;
+  /** 累计销量（完成订单商品件数）。 */
+  sales_count?: number;
 }
 
 /** `GET /api/v1/merchant/me` 响应结构。 */
@@ -62,6 +77,10 @@ export interface UpdateShopIn {
   description?: string | null;
   contact_name?: string;
   contact_phone?: string;
+  // ----- Phase 5 §9.3 新增 -----
+  logo_url?: string | null;
+  banner_url?: string | null;
+  announcement?: string | null;
 }
 
 /** `POST /api/v1/merchant/auth/change-password` 请求体。 */
@@ -254,7 +273,10 @@ export type UploadPurpose =
   | "aftersales_merchant_receive"
   | "aftersales_exchange_ship"
   | "aftersales_appeal"
-  | "aftersales_arbitration";
+  | "aftersales_arbitration"
+  // ----- Phase 5 店铺主页（§9.3） -----
+  | "shop_logo"
+  | "shop_banner";
 
 export interface PresignUploadIn {
   purpose: UploadPurpose;

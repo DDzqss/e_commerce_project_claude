@@ -1,0 +1,4208 @@
+[
+  {
+    "code": "110000",
+    "parent_code": null,
+    "name": "北京市",
+    "level": 1,
+    "sort_order": 0,
+    "short_name": "京"
+  },
+  {
+    "code": "120000",
+    "parent_code": null,
+    "name": "天津市",
+    "level": 1,
+    "sort_order": 1,
+    "short_name": "津"
+  },
+  {
+    "code": "130000",
+    "parent_code": null,
+    "name": "河北省",
+    "level": 1,
+    "sort_order": 2,
+    "short_name": "冀"
+  },
+  {
+    "code": "140000",
+    "parent_code": null,
+    "name": "山西省",
+    "level": 1,
+    "sort_order": 3,
+    "short_name": "晋"
+  },
+  {
+    "code": "150000",
+    "parent_code": null,
+    "name": "内蒙古自治区",
+    "level": 1,
+    "sort_order": 4,
+    "short_name": "蒙"
+  },
+  {
+    "code": "210000",
+    "parent_code": null,
+    "name": "辽宁省",
+    "level": 1,
+    "sort_order": 5,
+    "short_name": "辽"
+  },
+  {
+    "code": "220000",
+    "parent_code": null,
+    "name": "吉林省",
+    "level": 1,
+    "sort_order": 6,
+    "short_name": "吉"
+  },
+  {
+    "code": "230000",
+    "parent_code": null,
+    "name": "黑龙江省",
+    "level": 1,
+    "sort_order": 7,
+    "short_name": "黑"
+  },
+  {
+    "code": "310000",
+    "parent_code": null,
+    "name": "上海市",
+    "level": 1,
+    "sort_order": 8,
+    "short_name": "沪"
+  },
+  {
+    "code": "320000",
+    "parent_code": null,
+    "name": "江苏省",
+    "level": 1,
+    "sort_order": 9,
+    "short_name": "苏"
+  },
+  {
+    "code": "330000",
+    "parent_code": null,
+    "name": "浙江省",
+    "level": 1,
+    "sort_order": 10,
+    "short_name": "浙"
+  },
+  {
+    "code": "340000",
+    "parent_code": null,
+    "name": "安徽省",
+    "level": 1,
+    "sort_order": 11,
+    "short_name": "皖"
+  },
+  {
+    "code": "350000",
+    "parent_code": null,
+    "name": "福建省",
+    "level": 1,
+    "sort_order": 12,
+    "short_name": "闽"
+  },
+  {
+    "code": "360000",
+    "parent_code": null,
+    "name": "江西省",
+    "level": 1,
+    "sort_order": 13,
+    "short_name": "赣"
+  },
+  {
+    "code": "370000",
+    "parent_code": null,
+    "name": "山东省",
+    "level": 1,
+    "sort_order": 14,
+    "short_name": "鲁"
+  },
+  {
+    "code": "410000",
+    "parent_code": null,
+    "name": "河南省",
+    "level": 1,
+    "sort_order": 15,
+    "short_name": "豫"
+  },
+  {
+    "code": "420000",
+    "parent_code": null,
+    "name": "湖北省",
+    "level": 1,
+    "sort_order": 16,
+    "short_name": "鄂"
+  },
+  {
+    "code": "430000",
+    "parent_code": null,
+    "name": "湖南省",
+    "level": 1,
+    "sort_order": 17,
+    "short_name": "湘"
+  },
+  {
+    "code": "440000",
+    "parent_code": null,
+    "name": "广东省",
+    "level": 1,
+    "sort_order": 18,
+    "short_name": "粤"
+  },
+  {
+    "code": "450000",
+    "parent_code": null,
+    "name": "广西壮族自治区",
+    "level": 1,
+    "sort_order": 19,
+    "short_name": "桂"
+  },
+  {
+    "code": "460000",
+    "parent_code": null,
+    "name": "海南省",
+    "level": 1,
+    "sort_order": 20,
+    "short_name": "琼"
+  },
+  {
+    "code": "500000",
+    "parent_code": null,
+    "name": "重庆市",
+    "level": 1,
+    "sort_order": 21,
+    "short_name": "渝"
+  },
+  {
+    "code": "510000",
+    "parent_code": null,
+    "name": "四川省",
+    "level": 1,
+    "sort_order": 22,
+    "short_name": "川"
+  },
+  {
+    "code": "520000",
+    "parent_code": null,
+    "name": "贵州省",
+    "level": 1,
+    "sort_order": 23,
+    "short_name": "黔"
+  },
+  {
+    "code": "530000",
+    "parent_code": null,
+    "name": "云南省",
+    "level": 1,
+    "sort_order": 24,
+    "short_name": "滇"
+  },
+  {
+    "code": "540000",
+    "parent_code": null,
+    "name": "西藏自治区",
+    "level": 1,
+    "sort_order": 25,
+    "short_name": "藏"
+  },
+  {
+    "code": "610000",
+    "parent_code": null,
+    "name": "陕西省",
+    "level": 1,
+    "sort_order": 26,
+    "short_name": "陕"
+  },
+  {
+    "code": "620000",
+    "parent_code": null,
+    "name": "甘肃省",
+    "level": 1,
+    "sort_order": 27,
+    "short_name": "甘"
+  },
+  {
+    "code": "630000",
+    "parent_code": null,
+    "name": "青海省",
+    "level": 1,
+    "sort_order": 28,
+    "short_name": "青"
+  },
+  {
+    "code": "640000",
+    "parent_code": null,
+    "name": "宁夏回族自治区",
+    "level": 1,
+    "sort_order": 29,
+    "short_name": "宁"
+  },
+  {
+    "code": "650000",
+    "parent_code": null,
+    "name": "新疆维吾尔自治区",
+    "level": 1,
+    "sort_order": 30,
+    "short_name": "新"
+  },
+  {
+    "code": "710000",
+    "parent_code": null,
+    "name": "台湾省",
+    "level": 1,
+    "sort_order": 31,
+    "short_name": "台"
+  },
+  {
+    "code": "810000",
+    "parent_code": null,
+    "name": "香港特别行政区",
+    "level": 1,
+    "sort_order": 32,
+    "short_name": "港"
+  },
+  {
+    "code": "820000",
+    "parent_code": null,
+    "name": "澳门特别行政区",
+    "level": 1,
+    "sort_order": 33,
+    "short_name": "澳"
+  },
+  {
+    "code": "110100",
+    "parent_code": "110000",
+    "name": "北京市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "110101",
+    "parent_code": "110100",
+    "name": "东城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "110102",
+    "parent_code": "110100",
+    "name": "西城区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "110105",
+    "parent_code": "110100",
+    "name": "朝阳区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "110106",
+    "parent_code": "110100",
+    "name": "丰台区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "110107",
+    "parent_code": "110100",
+    "name": "石景山区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "110108",
+    "parent_code": "110100",
+    "name": "海淀区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "110109",
+    "parent_code": "110100",
+    "name": "门头沟区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "110111",
+    "parent_code": "110100",
+    "name": "房山区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "110112",
+    "parent_code": "110100",
+    "name": "通州区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "110113",
+    "parent_code": "110100",
+    "name": "顺义区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "110114",
+    "parent_code": "110100",
+    "name": "昌平区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "110115",
+    "parent_code": "110100",
+    "name": "大兴区",
+    "level": 3,
+    "sort_order": 11
+  },
+  {
+    "code": "110116",
+    "parent_code": "110100",
+    "name": "怀柔区",
+    "level": 3,
+    "sort_order": 12
+  },
+  {
+    "code": "110117",
+    "parent_code": "110100",
+    "name": "平谷区",
+    "level": 3,
+    "sort_order": 13
+  },
+  {
+    "code": "110118",
+    "parent_code": "110100",
+    "name": "密云区",
+    "level": 3,
+    "sort_order": 14
+  },
+  {
+    "code": "110119",
+    "parent_code": "110100",
+    "name": "延庆区",
+    "level": 3,
+    "sort_order": 15
+  },
+  {
+    "code": "120100",
+    "parent_code": "120000",
+    "name": "天津市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "120101",
+    "parent_code": "120100",
+    "name": "和平区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "120102",
+    "parent_code": "120100",
+    "name": "河东区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "120103",
+    "parent_code": "120100",
+    "name": "河西区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "120104",
+    "parent_code": "120100",
+    "name": "南开区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "120105",
+    "parent_code": "120100",
+    "name": "河北区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "120106",
+    "parent_code": "120100",
+    "name": "红桥区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "120110",
+    "parent_code": "120100",
+    "name": "东丽区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "120111",
+    "parent_code": "120100",
+    "name": "西青区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "120112",
+    "parent_code": "120100",
+    "name": "津南区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "120113",
+    "parent_code": "120100",
+    "name": "北辰区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "120114",
+    "parent_code": "120100",
+    "name": "武清区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "120115",
+    "parent_code": "120100",
+    "name": "宝坻区",
+    "level": 3,
+    "sort_order": 11
+  },
+  {
+    "code": "120116",
+    "parent_code": "120100",
+    "name": "滨海新区",
+    "level": 3,
+    "sort_order": 12
+  },
+  {
+    "code": "120117",
+    "parent_code": "120100",
+    "name": "宁河区",
+    "level": 3,
+    "sort_order": 13
+  },
+  {
+    "code": "120118",
+    "parent_code": "120100",
+    "name": "静海区",
+    "level": 3,
+    "sort_order": 14
+  },
+  {
+    "code": "120119",
+    "parent_code": "120100",
+    "name": "蓟州区",
+    "level": 3,
+    "sort_order": 15
+  },
+  {
+    "code": "310100",
+    "parent_code": "310000",
+    "name": "上海市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "310101",
+    "parent_code": "310100",
+    "name": "黄浦区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "310104",
+    "parent_code": "310100",
+    "name": "徐汇区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "310105",
+    "parent_code": "310100",
+    "name": "长宁区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "310106",
+    "parent_code": "310100",
+    "name": "静安区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "310107",
+    "parent_code": "310100",
+    "name": "普陀区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "310109",
+    "parent_code": "310100",
+    "name": "虹口区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "310110",
+    "parent_code": "310100",
+    "name": "杨浦区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "310112",
+    "parent_code": "310100",
+    "name": "闵行区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "310113",
+    "parent_code": "310100",
+    "name": "宝山区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "310114",
+    "parent_code": "310100",
+    "name": "嘉定区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "310115",
+    "parent_code": "310100",
+    "name": "浦东新区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "310116",
+    "parent_code": "310100",
+    "name": "金山区",
+    "level": 3,
+    "sort_order": 11
+  },
+  {
+    "code": "310117",
+    "parent_code": "310100",
+    "name": "松江区",
+    "level": 3,
+    "sort_order": 12
+  },
+  {
+    "code": "310118",
+    "parent_code": "310100",
+    "name": "青浦区",
+    "level": 3,
+    "sort_order": 13
+  },
+  {
+    "code": "310120",
+    "parent_code": "310100",
+    "name": "奉贤区",
+    "level": 3,
+    "sort_order": 14
+  },
+  {
+    "code": "310151",
+    "parent_code": "310100",
+    "name": "崇明区",
+    "level": 3,
+    "sort_order": 15
+  },
+  {
+    "code": "500100",
+    "parent_code": "500000",
+    "name": "重庆市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "500101",
+    "parent_code": "500100",
+    "name": "万州区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "500102",
+    "parent_code": "500100",
+    "name": "涪陵区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "500103",
+    "parent_code": "500100",
+    "name": "渝中区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "500104",
+    "parent_code": "500100",
+    "name": "大渡口区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "500105",
+    "parent_code": "500100",
+    "name": "江北区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "500106",
+    "parent_code": "500100",
+    "name": "沙坪坝区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "500107",
+    "parent_code": "500100",
+    "name": "九龙坡区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "500108",
+    "parent_code": "500100",
+    "name": "南岸区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "500109",
+    "parent_code": "500100",
+    "name": "北碚区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "500110",
+    "parent_code": "500100",
+    "name": "綦江区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "500111",
+    "parent_code": "500100",
+    "name": "大足区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "500112",
+    "parent_code": "500100",
+    "name": "渝北区",
+    "level": 3,
+    "sort_order": 11
+  },
+  {
+    "code": "500113",
+    "parent_code": "500100",
+    "name": "巴南区",
+    "level": 3,
+    "sort_order": 12
+  },
+  {
+    "code": "500114",
+    "parent_code": "500100",
+    "name": "黔江区",
+    "level": 3,
+    "sort_order": 13
+  },
+  {
+    "code": "500115",
+    "parent_code": "500100",
+    "name": "长寿区",
+    "level": 3,
+    "sort_order": 14
+  },
+  {
+    "code": "500116",
+    "parent_code": "500100",
+    "name": "江津区",
+    "level": 3,
+    "sort_order": 15
+  },
+  {
+    "code": "500117",
+    "parent_code": "500100",
+    "name": "合川区",
+    "level": 3,
+    "sort_order": 16
+  },
+  {
+    "code": "500118",
+    "parent_code": "500100",
+    "name": "永川区",
+    "level": 3,
+    "sort_order": 17
+  },
+  {
+    "code": "500119",
+    "parent_code": "500100",
+    "name": "南川区",
+    "level": 3,
+    "sort_order": 18
+  },
+  {
+    "code": "500120",
+    "parent_code": "500100",
+    "name": "璧山区",
+    "level": 3,
+    "sort_order": 19
+  },
+  {
+    "code": "500151",
+    "parent_code": "500100",
+    "name": "铜梁区",
+    "level": 3,
+    "sort_order": 20
+  },
+  {
+    "code": "500152",
+    "parent_code": "500100",
+    "name": "潼南区",
+    "level": 3,
+    "sort_order": 21
+  },
+  {
+    "code": "500153",
+    "parent_code": "500100",
+    "name": "荣昌区",
+    "level": 3,
+    "sort_order": 22
+  },
+  {
+    "code": "500154",
+    "parent_code": "500100",
+    "name": "开州区",
+    "level": 3,
+    "sort_order": 23
+  },
+  {
+    "code": "130100",
+    "parent_code": "130000",
+    "name": "石家庄市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "130102",
+    "parent_code": "130100",
+    "name": "长安区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "130104",
+    "parent_code": "130100",
+    "name": "桥西区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "130105",
+    "parent_code": "130100",
+    "name": "新华区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "130107",
+    "parent_code": "130100",
+    "name": "井陉矿区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "130108",
+    "parent_code": "130100",
+    "name": "裕华区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "130109",
+    "parent_code": "130100",
+    "name": "藁城区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "130110",
+    "parent_code": "130100",
+    "name": "鹿泉区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "130111",
+    "parent_code": "130100",
+    "name": "栾城区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "130200",
+    "parent_code": "130000",
+    "name": "唐山市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "130202",
+    "parent_code": "130200",
+    "name": "路南区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "130203",
+    "parent_code": "130200",
+    "name": "路北区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "130204",
+    "parent_code": "130200",
+    "name": "古冶区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "130205",
+    "parent_code": "130200",
+    "name": "开平区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "130300",
+    "parent_code": "130000",
+    "name": "秦皇岛市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "130302",
+    "parent_code": "130300",
+    "name": "海港区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "130303",
+    "parent_code": "130300",
+    "name": "山海关区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "130304",
+    "parent_code": "130300",
+    "name": "北戴河区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "130400",
+    "parent_code": "130000",
+    "name": "邯郸市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "130402",
+    "parent_code": "130400",
+    "name": "邯山区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "130403",
+    "parent_code": "130400",
+    "name": "丛台区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "130404",
+    "parent_code": "130400",
+    "name": "复兴区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "130500",
+    "parent_code": "130000",
+    "name": "邢台市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "130600",
+    "parent_code": "130000",
+    "name": "保定市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "130700",
+    "parent_code": "130000",
+    "name": "张家口市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "130800",
+    "parent_code": "130000",
+    "name": "承德市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "130900",
+    "parent_code": "130000",
+    "name": "沧州市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "131000",
+    "parent_code": "130000",
+    "name": "廊坊市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "131100",
+    "parent_code": "130000",
+    "name": "衡水市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "140100",
+    "parent_code": "140000",
+    "name": "太原市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "140105",
+    "parent_code": "140100",
+    "name": "小店区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "140106",
+    "parent_code": "140100",
+    "name": "迎泽区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "140107",
+    "parent_code": "140100",
+    "name": "杏花岭区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "140200",
+    "parent_code": "140000",
+    "name": "大同市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "140300",
+    "parent_code": "140000",
+    "name": "阳泉市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "140400",
+    "parent_code": "140000",
+    "name": "长治市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "140500",
+    "parent_code": "140000",
+    "name": "晋城市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "140600",
+    "parent_code": "140000",
+    "name": "朔州市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "140700",
+    "parent_code": "140000",
+    "name": "晋中市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "140800",
+    "parent_code": "140000",
+    "name": "运城市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "140900",
+    "parent_code": "140000",
+    "name": "忻州市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "141000",
+    "parent_code": "140000",
+    "name": "临汾市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "141100",
+    "parent_code": "140000",
+    "name": "吕梁市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "150100",
+    "parent_code": "150000",
+    "name": "呼和浩特市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "150200",
+    "parent_code": "150000",
+    "name": "包头市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "150300",
+    "parent_code": "150000",
+    "name": "乌海市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "150400",
+    "parent_code": "150000",
+    "name": "赤峰市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "150500",
+    "parent_code": "150000",
+    "name": "通辽市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "150600",
+    "parent_code": "150000",
+    "name": "鄂尔多斯市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "150700",
+    "parent_code": "150000",
+    "name": "呼伦贝尔市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "150800",
+    "parent_code": "150000",
+    "name": "巴彦淖尔市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "150900",
+    "parent_code": "150000",
+    "name": "乌兰察布市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "210100",
+    "parent_code": "210000",
+    "name": "沈阳市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "210102",
+    "parent_code": "210100",
+    "name": "和平区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "210103",
+    "parent_code": "210100",
+    "name": "沈河区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "210104",
+    "parent_code": "210100",
+    "name": "大东区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "210200",
+    "parent_code": "210000",
+    "name": "大连市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "210202",
+    "parent_code": "210200",
+    "name": "中山区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "210203",
+    "parent_code": "210200",
+    "name": "西岗区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "210204",
+    "parent_code": "210200",
+    "name": "沙河口区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "210300",
+    "parent_code": "210000",
+    "name": "鞍山市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "210400",
+    "parent_code": "210000",
+    "name": "抚顺市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "210500",
+    "parent_code": "210000",
+    "name": "本溪市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "210600",
+    "parent_code": "210000",
+    "name": "丹东市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "210700",
+    "parent_code": "210000",
+    "name": "锦州市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "210800",
+    "parent_code": "210000",
+    "name": "营口市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "210900",
+    "parent_code": "210000",
+    "name": "阜新市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "211000",
+    "parent_code": "210000",
+    "name": "辽阳市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "211100",
+    "parent_code": "210000",
+    "name": "盘锦市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "211200",
+    "parent_code": "210000",
+    "name": "铁岭市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "211300",
+    "parent_code": "210000",
+    "name": "朝阳市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "211400",
+    "parent_code": "210000",
+    "name": "葫芦岛市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "220100",
+    "parent_code": "220000",
+    "name": "长春市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "220102",
+    "parent_code": "220100",
+    "name": "南关区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "220103",
+    "parent_code": "220100",
+    "name": "宽城区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "220104",
+    "parent_code": "220100",
+    "name": "朝阳区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "220200",
+    "parent_code": "220000",
+    "name": "吉林市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "220300",
+    "parent_code": "220000",
+    "name": "四平市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "220400",
+    "parent_code": "220000",
+    "name": "辽源市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "220500",
+    "parent_code": "220000",
+    "name": "通化市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "220600",
+    "parent_code": "220000",
+    "name": "白山市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "220700",
+    "parent_code": "220000",
+    "name": "松原市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "220800",
+    "parent_code": "220000",
+    "name": "白城市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "230100",
+    "parent_code": "230000",
+    "name": "哈尔滨市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "230102",
+    "parent_code": "230100",
+    "name": "道里区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "230103",
+    "parent_code": "230100",
+    "name": "南岗区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "230104",
+    "parent_code": "230100",
+    "name": "道外区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "230200",
+    "parent_code": "230000",
+    "name": "齐齐哈尔市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "230300",
+    "parent_code": "230000",
+    "name": "鸡西市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "230400",
+    "parent_code": "230000",
+    "name": "鹤岗市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "230500",
+    "parent_code": "230000",
+    "name": "双鸭山市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "230600",
+    "parent_code": "230000",
+    "name": "大庆市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "230700",
+    "parent_code": "230000",
+    "name": "伊春市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "230800",
+    "parent_code": "230000",
+    "name": "佳木斯市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "230900",
+    "parent_code": "230000",
+    "name": "七台河市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "231000",
+    "parent_code": "230000",
+    "name": "牡丹江市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "231100",
+    "parent_code": "230000",
+    "name": "黑河市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "231200",
+    "parent_code": "230000",
+    "name": "绥化市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "320100",
+    "parent_code": "320000",
+    "name": "南京市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "320102",
+    "parent_code": "320100",
+    "name": "玄武区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "320104",
+    "parent_code": "320100",
+    "name": "秦淮区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "320105",
+    "parent_code": "320100",
+    "name": "建邺区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "320106",
+    "parent_code": "320100",
+    "name": "鼓楼区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "320111",
+    "parent_code": "320100",
+    "name": "浦口区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "320113",
+    "parent_code": "320100",
+    "name": "栖霞区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "320114",
+    "parent_code": "320100",
+    "name": "雨花台区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "320115",
+    "parent_code": "320100",
+    "name": "江宁区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "320116",
+    "parent_code": "320100",
+    "name": "六合区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "320117",
+    "parent_code": "320100",
+    "name": "溧水区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "320118",
+    "parent_code": "320100",
+    "name": "高淳区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "320200",
+    "parent_code": "320000",
+    "name": "无锡市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "320205",
+    "parent_code": "320200",
+    "name": "锡山区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "320206",
+    "parent_code": "320200",
+    "name": "惠山区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "320211",
+    "parent_code": "320200",
+    "name": "滨湖区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "320213",
+    "parent_code": "320200",
+    "name": "梁溪区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "320300",
+    "parent_code": "320000",
+    "name": "徐州市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "320302",
+    "parent_code": "320300",
+    "name": "鼓楼区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "320303",
+    "parent_code": "320300",
+    "name": "云龙区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "320305",
+    "parent_code": "320300",
+    "name": "贾汪区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "320400",
+    "parent_code": "320000",
+    "name": "常州市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "320402",
+    "parent_code": "320400",
+    "name": "天宁区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "320404",
+    "parent_code": "320400",
+    "name": "钟楼区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "320411",
+    "parent_code": "320400",
+    "name": "新北区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "320412",
+    "parent_code": "320400",
+    "name": "武进区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "320500",
+    "parent_code": "320000",
+    "name": "苏州市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "320505",
+    "parent_code": "320500",
+    "name": "虎丘区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "320506",
+    "parent_code": "320500",
+    "name": "吴中区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "320507",
+    "parent_code": "320500",
+    "name": "相城区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "320508",
+    "parent_code": "320500",
+    "name": "姑苏区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "320509",
+    "parent_code": "320500",
+    "name": "吴江区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "320600",
+    "parent_code": "320000",
+    "name": "南通市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "320700",
+    "parent_code": "320000",
+    "name": "连云港市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "320800",
+    "parent_code": "320000",
+    "name": "淮安市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "320900",
+    "parent_code": "320000",
+    "name": "盐城市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "321000",
+    "parent_code": "320000",
+    "name": "扬州市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "321100",
+    "parent_code": "320000",
+    "name": "镇江市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "321200",
+    "parent_code": "320000",
+    "name": "泰州市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "321300",
+    "parent_code": "320000",
+    "name": "宿迁市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "330100",
+    "parent_code": "330000",
+    "name": "杭州市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "330102",
+    "parent_code": "330100",
+    "name": "上城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330105",
+    "parent_code": "330100",
+    "name": "拱墅区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330106",
+    "parent_code": "330100",
+    "name": "西湖区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "330108",
+    "parent_code": "330100",
+    "name": "滨江区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "330109",
+    "parent_code": "330100",
+    "name": "萧山区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "330110",
+    "parent_code": "330100",
+    "name": "余杭区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "330111",
+    "parent_code": "330100",
+    "name": "富阳区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "330112",
+    "parent_code": "330100",
+    "name": "临安区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "330113",
+    "parent_code": "330100",
+    "name": "临平区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "330114",
+    "parent_code": "330100",
+    "name": "钱塘区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "330200",
+    "parent_code": "330000",
+    "name": "宁波市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "330203",
+    "parent_code": "330200",
+    "name": "海曙区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330205",
+    "parent_code": "330200",
+    "name": "江北区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330206",
+    "parent_code": "330200",
+    "name": "北仑区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "330211",
+    "parent_code": "330200",
+    "name": "镇海区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "330212",
+    "parent_code": "330200",
+    "name": "鄞州区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "330213",
+    "parent_code": "330200",
+    "name": "奉化区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "330300",
+    "parent_code": "330000",
+    "name": "温州市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "330302",
+    "parent_code": "330300",
+    "name": "鹿城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330303",
+    "parent_code": "330300",
+    "name": "龙湾区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330304",
+    "parent_code": "330300",
+    "name": "瓯海区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "330305",
+    "parent_code": "330300",
+    "name": "洞头区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "330400",
+    "parent_code": "330000",
+    "name": "嘉兴市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "330402",
+    "parent_code": "330400",
+    "name": "南湖区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330411",
+    "parent_code": "330400",
+    "name": "秀洲区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330500",
+    "parent_code": "330000",
+    "name": "湖州市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "330502",
+    "parent_code": "330500",
+    "name": "吴兴区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330503",
+    "parent_code": "330500",
+    "name": "南浔区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330600",
+    "parent_code": "330000",
+    "name": "绍兴市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "330602",
+    "parent_code": "330600",
+    "name": "越城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330603",
+    "parent_code": "330600",
+    "name": "柯桥区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330604",
+    "parent_code": "330600",
+    "name": "上虞区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "330700",
+    "parent_code": "330000",
+    "name": "金华市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "330702",
+    "parent_code": "330700",
+    "name": "婺城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "330703",
+    "parent_code": "330700",
+    "name": "金东区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "330800",
+    "parent_code": "330000",
+    "name": "衢州市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "330900",
+    "parent_code": "330000",
+    "name": "舟山市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "331000",
+    "parent_code": "330000",
+    "name": "台州市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "331100",
+    "parent_code": "330000",
+    "name": "丽水市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "340100",
+    "parent_code": "340000",
+    "name": "合肥市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "340102",
+    "parent_code": "340100",
+    "name": "瑶海区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "340103",
+    "parent_code": "340100",
+    "name": "庐阳区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "340104",
+    "parent_code": "340100",
+    "name": "蜀山区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "340200",
+    "parent_code": "340000",
+    "name": "芜湖市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "340300",
+    "parent_code": "340000",
+    "name": "蚌埠市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "340400",
+    "parent_code": "340000",
+    "name": "淮南市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "340500",
+    "parent_code": "340000",
+    "name": "马鞍山市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "340600",
+    "parent_code": "340000",
+    "name": "淮北市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "340700",
+    "parent_code": "340000",
+    "name": "铜陵市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "340800",
+    "parent_code": "340000",
+    "name": "安庆市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "341000",
+    "parent_code": "340000",
+    "name": "黄山市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "341100",
+    "parent_code": "340000",
+    "name": "滁州市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "341200",
+    "parent_code": "340000",
+    "name": "阜阳市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "341300",
+    "parent_code": "340000",
+    "name": "宿州市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "341500",
+    "parent_code": "340000",
+    "name": "六安市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "341600",
+    "parent_code": "340000",
+    "name": "亳州市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "341700",
+    "parent_code": "340000",
+    "name": "池州市",
+    "level": 2,
+    "sort_order": 14
+  },
+  {
+    "code": "341800",
+    "parent_code": "340000",
+    "name": "宣城市",
+    "level": 2,
+    "sort_order": 15
+  },
+  {
+    "code": "350100",
+    "parent_code": "350000",
+    "name": "福州市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "350102",
+    "parent_code": "350100",
+    "name": "鼓楼区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "350103",
+    "parent_code": "350100",
+    "name": "台江区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "350104",
+    "parent_code": "350100",
+    "name": "仓山区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "350105",
+    "parent_code": "350100",
+    "name": "马尾区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "350111",
+    "parent_code": "350100",
+    "name": "晋安区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "350112",
+    "parent_code": "350100",
+    "name": "长乐区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "350200",
+    "parent_code": "350000",
+    "name": "厦门市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "350203",
+    "parent_code": "350200",
+    "name": "思明区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "350205",
+    "parent_code": "350200",
+    "name": "海沧区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "350206",
+    "parent_code": "350200",
+    "name": "湖里区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "350211",
+    "parent_code": "350200",
+    "name": "集美区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "350212",
+    "parent_code": "350200",
+    "name": "同安区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "350213",
+    "parent_code": "350200",
+    "name": "翔安区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "350300",
+    "parent_code": "350000",
+    "name": "莆田市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "350400",
+    "parent_code": "350000",
+    "name": "三明市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "350500",
+    "parent_code": "350000",
+    "name": "泉州市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "350502",
+    "parent_code": "350500",
+    "name": "鲤城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "350503",
+    "parent_code": "350500",
+    "name": "丰泽区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "350504",
+    "parent_code": "350500",
+    "name": "洛江区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "350600",
+    "parent_code": "350000",
+    "name": "漳州市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "350700",
+    "parent_code": "350000",
+    "name": "南平市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "350800",
+    "parent_code": "350000",
+    "name": "龙岩市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "350900",
+    "parent_code": "350000",
+    "name": "宁德市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "360100",
+    "parent_code": "360000",
+    "name": "南昌市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "360102",
+    "parent_code": "360100",
+    "name": "东湖区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "360103",
+    "parent_code": "360100",
+    "name": "西湖区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "360104",
+    "parent_code": "360100",
+    "name": "青云谱区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "360200",
+    "parent_code": "360000",
+    "name": "景德镇市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "360300",
+    "parent_code": "360000",
+    "name": "萍乡市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "360400",
+    "parent_code": "360000",
+    "name": "九江市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "360500",
+    "parent_code": "360000",
+    "name": "新余市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "360600",
+    "parent_code": "360000",
+    "name": "鹰潭市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "360700",
+    "parent_code": "360000",
+    "name": "赣州市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "360800",
+    "parent_code": "360000",
+    "name": "吉安市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "360900",
+    "parent_code": "360000",
+    "name": "宜春市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "361000",
+    "parent_code": "360000",
+    "name": "抚州市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "361100",
+    "parent_code": "360000",
+    "name": "上饶市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "370100",
+    "parent_code": "370000",
+    "name": "济南市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "370102",
+    "parent_code": "370100",
+    "name": "历下区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "370103",
+    "parent_code": "370100",
+    "name": "市中区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "370104",
+    "parent_code": "370100",
+    "name": "槐荫区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "370105",
+    "parent_code": "370100",
+    "name": "天桥区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "370112",
+    "parent_code": "370100",
+    "name": "历城区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "370113",
+    "parent_code": "370100",
+    "name": "长清区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "370200",
+    "parent_code": "370000",
+    "name": "青岛市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "370202",
+    "parent_code": "370200",
+    "name": "市南区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "370203",
+    "parent_code": "370200",
+    "name": "市北区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "370211",
+    "parent_code": "370200",
+    "name": "黄岛区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "370212",
+    "parent_code": "370200",
+    "name": "崂山区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "370213",
+    "parent_code": "370200",
+    "name": "李沧区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "370214",
+    "parent_code": "370200",
+    "name": "城阳区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "370300",
+    "parent_code": "370000",
+    "name": "淄博市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "370400",
+    "parent_code": "370000",
+    "name": "枣庄市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "370500",
+    "parent_code": "370000",
+    "name": "东营市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "370600",
+    "parent_code": "370000",
+    "name": "烟台市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "370700",
+    "parent_code": "370000",
+    "name": "潍坊市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "370800",
+    "parent_code": "370000",
+    "name": "济宁市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "370900",
+    "parent_code": "370000",
+    "name": "泰安市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "371000",
+    "parent_code": "370000",
+    "name": "威海市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "371100",
+    "parent_code": "370000",
+    "name": "日照市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "371300",
+    "parent_code": "370000",
+    "name": "临沂市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "371400",
+    "parent_code": "370000",
+    "name": "德州市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "371500",
+    "parent_code": "370000",
+    "name": "聊城市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "371600",
+    "parent_code": "370000",
+    "name": "滨州市",
+    "level": 2,
+    "sort_order": 14
+  },
+  {
+    "code": "371700",
+    "parent_code": "370000",
+    "name": "菏泽市",
+    "level": 2,
+    "sort_order": 15
+  },
+  {
+    "code": "410100",
+    "parent_code": "410000",
+    "name": "郑州市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "410102",
+    "parent_code": "410100",
+    "name": "中原区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "410103",
+    "parent_code": "410100",
+    "name": "二七区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "410104",
+    "parent_code": "410100",
+    "name": "管城回族区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "410105",
+    "parent_code": "410100",
+    "name": "金水区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "410200",
+    "parent_code": "410000",
+    "name": "开封市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "410300",
+    "parent_code": "410000",
+    "name": "洛阳市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "410400",
+    "parent_code": "410000",
+    "name": "平顶山市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "410500",
+    "parent_code": "410000",
+    "name": "安阳市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "410600",
+    "parent_code": "410000",
+    "name": "鹤壁市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "410700",
+    "parent_code": "410000",
+    "name": "新乡市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "410800",
+    "parent_code": "410000",
+    "name": "焦作市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "410900",
+    "parent_code": "410000",
+    "name": "濮阳市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "411000",
+    "parent_code": "410000",
+    "name": "许昌市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "411100",
+    "parent_code": "410000",
+    "name": "漯河市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "411200",
+    "parent_code": "410000",
+    "name": "三门峡市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "411300",
+    "parent_code": "410000",
+    "name": "南阳市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "411400",
+    "parent_code": "410000",
+    "name": "商丘市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "411500",
+    "parent_code": "410000",
+    "name": "信阳市",
+    "level": 2,
+    "sort_order": 14
+  },
+  {
+    "code": "411600",
+    "parent_code": "410000",
+    "name": "周口市",
+    "level": 2,
+    "sort_order": 15
+  },
+  {
+    "code": "411700",
+    "parent_code": "410000",
+    "name": "驻马店市",
+    "level": 2,
+    "sort_order": 16
+  },
+  {
+    "code": "420100",
+    "parent_code": "420000",
+    "name": "武汉市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "420102",
+    "parent_code": "420100",
+    "name": "江岸区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "420103",
+    "parent_code": "420100",
+    "name": "江汉区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "420104",
+    "parent_code": "420100",
+    "name": "硚口区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "420105",
+    "parent_code": "420100",
+    "name": "汉阳区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "420106",
+    "parent_code": "420100",
+    "name": "武昌区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "420107",
+    "parent_code": "420100",
+    "name": "青山区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "420111",
+    "parent_code": "420100",
+    "name": "洪山区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "420200",
+    "parent_code": "420000",
+    "name": "黄石市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "420300",
+    "parent_code": "420000",
+    "name": "十堰市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "420500",
+    "parent_code": "420000",
+    "name": "宜昌市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "420600",
+    "parent_code": "420000",
+    "name": "襄阳市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "420700",
+    "parent_code": "420000",
+    "name": "鄂州市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "420800",
+    "parent_code": "420000",
+    "name": "荆门市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "420900",
+    "parent_code": "420000",
+    "name": "孝感市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "421000",
+    "parent_code": "420000",
+    "name": "荆州市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "421100",
+    "parent_code": "420000",
+    "name": "黄冈市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "421200",
+    "parent_code": "420000",
+    "name": "咸宁市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "421300",
+    "parent_code": "420000",
+    "name": "随州市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "430100",
+    "parent_code": "430000",
+    "name": "长沙市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "430102",
+    "parent_code": "430100",
+    "name": "芙蓉区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "430103",
+    "parent_code": "430100",
+    "name": "天心区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "430104",
+    "parent_code": "430100",
+    "name": "岳麓区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "430105",
+    "parent_code": "430100",
+    "name": "开福区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "430111",
+    "parent_code": "430100",
+    "name": "雨花区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "430200",
+    "parent_code": "430000",
+    "name": "株洲市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "430300",
+    "parent_code": "430000",
+    "name": "湘潭市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "430400",
+    "parent_code": "430000",
+    "name": "衡阳市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "430500",
+    "parent_code": "430000",
+    "name": "邵阳市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "430600",
+    "parent_code": "430000",
+    "name": "岳阳市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "430700",
+    "parent_code": "430000",
+    "name": "常德市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "430800",
+    "parent_code": "430000",
+    "name": "张家界市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "430900",
+    "parent_code": "430000",
+    "name": "益阳市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "431000",
+    "parent_code": "430000",
+    "name": "郴州市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "431100",
+    "parent_code": "430000",
+    "name": "永州市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "431200",
+    "parent_code": "430000",
+    "name": "怀化市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "431300",
+    "parent_code": "430000",
+    "name": "娄底市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "440100",
+    "parent_code": "440000",
+    "name": "广州市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "440103",
+    "parent_code": "440100",
+    "name": "荔湾区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "440104",
+    "parent_code": "440100",
+    "name": "越秀区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "440105",
+    "parent_code": "440100",
+    "name": "海珠区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "440106",
+    "parent_code": "440100",
+    "name": "天河区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "440111",
+    "parent_code": "440100",
+    "name": "白云区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "440112",
+    "parent_code": "440100",
+    "name": "黄埔区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "440113",
+    "parent_code": "440100",
+    "name": "番禺区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "440114",
+    "parent_code": "440100",
+    "name": "花都区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "440115",
+    "parent_code": "440100",
+    "name": "南沙区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "440117",
+    "parent_code": "440100",
+    "name": "从化区",
+    "level": 3,
+    "sort_order": 9
+  },
+  {
+    "code": "440118",
+    "parent_code": "440100",
+    "name": "增城区",
+    "level": 3,
+    "sort_order": 10
+  },
+  {
+    "code": "440200",
+    "parent_code": "440000",
+    "name": "韶关市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "440300",
+    "parent_code": "440000",
+    "name": "深圳市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "440303",
+    "parent_code": "440300",
+    "name": "罗湖区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "440304",
+    "parent_code": "440300",
+    "name": "福田区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "440305",
+    "parent_code": "440300",
+    "name": "南山区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "440306",
+    "parent_code": "440300",
+    "name": "宝安区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "440307",
+    "parent_code": "440300",
+    "name": "龙岗区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "440308",
+    "parent_code": "440300",
+    "name": "盐田区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "440309",
+    "parent_code": "440300",
+    "name": "龙华区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "440310",
+    "parent_code": "440300",
+    "name": "坪山区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "440311",
+    "parent_code": "440300",
+    "name": "光明区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "440400",
+    "parent_code": "440000",
+    "name": "珠海市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "440402",
+    "parent_code": "440400",
+    "name": "香洲区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "440403",
+    "parent_code": "440400",
+    "name": "斗门区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "440404",
+    "parent_code": "440400",
+    "name": "金湾区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "440500",
+    "parent_code": "440000",
+    "name": "汕头市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "440600",
+    "parent_code": "440000",
+    "name": "佛山市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "440604",
+    "parent_code": "440600",
+    "name": "禅城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "440605",
+    "parent_code": "440600",
+    "name": "南海区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "440606",
+    "parent_code": "440600",
+    "name": "顺德区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "440700",
+    "parent_code": "440000",
+    "name": "江门市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "440800",
+    "parent_code": "440000",
+    "name": "湛江市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "440900",
+    "parent_code": "440000",
+    "name": "茂名市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "441200",
+    "parent_code": "440000",
+    "name": "肇庆市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "441300",
+    "parent_code": "440000",
+    "name": "惠州市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "441400",
+    "parent_code": "440000",
+    "name": "梅州市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "441500",
+    "parent_code": "440000",
+    "name": "汕尾市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "441600",
+    "parent_code": "440000",
+    "name": "河源市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "441700",
+    "parent_code": "440000",
+    "name": "阳江市",
+    "level": 2,
+    "sort_order": 14
+  },
+  {
+    "code": "441800",
+    "parent_code": "440000",
+    "name": "清远市",
+    "level": 2,
+    "sort_order": 15
+  },
+  {
+    "code": "441900",
+    "parent_code": "440000",
+    "name": "东莞市",
+    "level": 2,
+    "sort_order": 16
+  },
+  {
+    "code": "442000",
+    "parent_code": "440000",
+    "name": "中山市",
+    "level": 2,
+    "sort_order": 17
+  },
+  {
+    "code": "445100",
+    "parent_code": "440000",
+    "name": "潮州市",
+    "level": 2,
+    "sort_order": 18
+  },
+  {
+    "code": "445200",
+    "parent_code": "440000",
+    "name": "揭阳市",
+    "level": 2,
+    "sort_order": 19
+  },
+  {
+    "code": "445300",
+    "parent_code": "440000",
+    "name": "云浮市",
+    "level": 2,
+    "sort_order": 20
+  },
+  {
+    "code": "450100",
+    "parent_code": "450000",
+    "name": "南宁市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "450102",
+    "parent_code": "450100",
+    "name": "兴宁区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "450103",
+    "parent_code": "450100",
+    "name": "青秀区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "450200",
+    "parent_code": "450000",
+    "name": "柳州市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "450300",
+    "parent_code": "450000",
+    "name": "桂林市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "450400",
+    "parent_code": "450000",
+    "name": "梧州市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "450500",
+    "parent_code": "450000",
+    "name": "北海市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "450600",
+    "parent_code": "450000",
+    "name": "防城港市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "450700",
+    "parent_code": "450000",
+    "name": "钦州市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "450800",
+    "parent_code": "450000",
+    "name": "贵港市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "450900",
+    "parent_code": "450000",
+    "name": "玉林市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "451000",
+    "parent_code": "450000",
+    "name": "百色市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "451100",
+    "parent_code": "450000",
+    "name": "贺州市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "451200",
+    "parent_code": "450000",
+    "name": "河池市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "451300",
+    "parent_code": "450000",
+    "name": "来宾市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "451400",
+    "parent_code": "450000",
+    "name": "崇左市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "460100",
+    "parent_code": "460000",
+    "name": "海口市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "460200",
+    "parent_code": "460000",
+    "name": "三亚市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "460300",
+    "parent_code": "460000",
+    "name": "三沙市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "460400",
+    "parent_code": "460000",
+    "name": "儋州市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "510100",
+    "parent_code": "510000",
+    "name": "成都市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "510104",
+    "parent_code": "510100",
+    "name": "锦江区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "510105",
+    "parent_code": "510100",
+    "name": "青羊区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "510106",
+    "parent_code": "510100",
+    "name": "金牛区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "510107",
+    "parent_code": "510100",
+    "name": "武侯区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "510108",
+    "parent_code": "510100",
+    "name": "成华区",
+    "level": 3,
+    "sort_order": 4
+  },
+  {
+    "code": "510112",
+    "parent_code": "510100",
+    "name": "龙泉驿区",
+    "level": 3,
+    "sort_order": 5
+  },
+  {
+    "code": "510113",
+    "parent_code": "510100",
+    "name": "青白江区",
+    "level": 3,
+    "sort_order": 6
+  },
+  {
+    "code": "510114",
+    "parent_code": "510100",
+    "name": "新都区",
+    "level": 3,
+    "sort_order": 7
+  },
+  {
+    "code": "510115",
+    "parent_code": "510100",
+    "name": "温江区",
+    "level": 3,
+    "sort_order": 8
+  },
+  {
+    "code": "510300",
+    "parent_code": "510000",
+    "name": "自贡市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "510400",
+    "parent_code": "510000",
+    "name": "攀枝花市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "510500",
+    "parent_code": "510000",
+    "name": "泸州市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "510600",
+    "parent_code": "510000",
+    "name": "德阳市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "510700",
+    "parent_code": "510000",
+    "name": "绵阳市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "510800",
+    "parent_code": "510000",
+    "name": "广元市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "510900",
+    "parent_code": "510000",
+    "name": "遂宁市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "511000",
+    "parent_code": "510000",
+    "name": "内江市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "511100",
+    "parent_code": "510000",
+    "name": "乐山市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "511300",
+    "parent_code": "510000",
+    "name": "南充市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "511400",
+    "parent_code": "510000",
+    "name": "眉山市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "511500",
+    "parent_code": "510000",
+    "name": "宜宾市",
+    "level": 2,
+    "sort_order": 12
+  },
+  {
+    "code": "511600",
+    "parent_code": "510000",
+    "name": "广安市",
+    "level": 2,
+    "sort_order": 13
+  },
+  {
+    "code": "511700",
+    "parent_code": "510000",
+    "name": "达州市",
+    "level": 2,
+    "sort_order": 14
+  },
+  {
+    "code": "511800",
+    "parent_code": "510000",
+    "name": "雅安市",
+    "level": 2,
+    "sort_order": 15
+  },
+  {
+    "code": "511900",
+    "parent_code": "510000",
+    "name": "巴中市",
+    "level": 2,
+    "sort_order": 16
+  },
+  {
+    "code": "512000",
+    "parent_code": "510000",
+    "name": "资阳市",
+    "level": 2,
+    "sort_order": 17
+  },
+  {
+    "code": "520100",
+    "parent_code": "520000",
+    "name": "贵阳市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "520102",
+    "parent_code": "520100",
+    "name": "南明区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "520103",
+    "parent_code": "520100",
+    "name": "云岩区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "520200",
+    "parent_code": "520000",
+    "name": "六盘水市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "520300",
+    "parent_code": "520000",
+    "name": "遵义市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "520400",
+    "parent_code": "520000",
+    "name": "安顺市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "520500",
+    "parent_code": "520000",
+    "name": "毕节市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "520600",
+    "parent_code": "520000",
+    "name": "铜仁市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "530100",
+    "parent_code": "530000",
+    "name": "昆明市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "530102",
+    "parent_code": "530100",
+    "name": "五华区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "530103",
+    "parent_code": "530100",
+    "name": "盘龙区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "530111",
+    "parent_code": "530100",
+    "name": "官渡区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "530300",
+    "parent_code": "530000",
+    "name": "曲靖市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "530400",
+    "parent_code": "530000",
+    "name": "玉溪市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "530500",
+    "parent_code": "530000",
+    "name": "保山市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "530600",
+    "parent_code": "530000",
+    "name": "昭通市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "530700",
+    "parent_code": "530000",
+    "name": "丽江市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "530800",
+    "parent_code": "530000",
+    "name": "普洱市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "530900",
+    "parent_code": "530000",
+    "name": "临沧市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "540100",
+    "parent_code": "540000",
+    "name": "拉萨市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "540200",
+    "parent_code": "540000",
+    "name": "日喀则市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "540300",
+    "parent_code": "540000",
+    "name": "昌都市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "540400",
+    "parent_code": "540000",
+    "name": "林芝市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "540500",
+    "parent_code": "540000",
+    "name": "山南市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "540600",
+    "parent_code": "540000",
+    "name": "那曲市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "610100",
+    "parent_code": "610000",
+    "name": "西安市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "610102",
+    "parent_code": "610100",
+    "name": "新城区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "610103",
+    "parent_code": "610100",
+    "name": "碑林区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "610104",
+    "parent_code": "610100",
+    "name": "莲湖区",
+    "level": 3,
+    "sort_order": 2
+  },
+  {
+    "code": "610111",
+    "parent_code": "610100",
+    "name": "雁塔区",
+    "level": 3,
+    "sort_order": 3
+  },
+  {
+    "code": "610200",
+    "parent_code": "610000",
+    "name": "铜川市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "610300",
+    "parent_code": "610000",
+    "name": "宝鸡市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "610400",
+    "parent_code": "610000",
+    "name": "咸阳市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "610500",
+    "parent_code": "610000",
+    "name": "渭南市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "610600",
+    "parent_code": "610000",
+    "name": "延安市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "610700",
+    "parent_code": "610000",
+    "name": "汉中市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "610800",
+    "parent_code": "610000",
+    "name": "榆林市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "610900",
+    "parent_code": "610000",
+    "name": "安康市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "611000",
+    "parent_code": "610000",
+    "name": "商洛市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "620100",
+    "parent_code": "620000",
+    "name": "兰州市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "620102",
+    "parent_code": "620100",
+    "name": "城关区",
+    "level": 3,
+    "sort_order": 0
+  },
+  {
+    "code": "620103",
+    "parent_code": "620100",
+    "name": "七里河区",
+    "level": 3,
+    "sort_order": 1
+  },
+  {
+    "code": "620200",
+    "parent_code": "620000",
+    "name": "嘉峪关市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "620300",
+    "parent_code": "620000",
+    "name": "金昌市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "620400",
+    "parent_code": "620000",
+    "name": "白银市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "620500",
+    "parent_code": "620000",
+    "name": "天水市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "620600",
+    "parent_code": "620000",
+    "name": "武威市",
+    "level": 2,
+    "sort_order": 5
+  },
+  {
+    "code": "620700",
+    "parent_code": "620000",
+    "name": "张掖市",
+    "level": 2,
+    "sort_order": 6
+  },
+  {
+    "code": "620800",
+    "parent_code": "620000",
+    "name": "平凉市",
+    "level": 2,
+    "sort_order": 7
+  },
+  {
+    "code": "620900",
+    "parent_code": "620000",
+    "name": "酒泉市",
+    "level": 2,
+    "sort_order": 8
+  },
+  {
+    "code": "621000",
+    "parent_code": "620000",
+    "name": "庆阳市",
+    "level": 2,
+    "sort_order": 9
+  },
+  {
+    "code": "621100",
+    "parent_code": "620000",
+    "name": "定西市",
+    "level": 2,
+    "sort_order": 10
+  },
+  {
+    "code": "621200",
+    "parent_code": "620000",
+    "name": "陇南市",
+    "level": 2,
+    "sort_order": 11
+  },
+  {
+    "code": "630100",
+    "parent_code": "630000",
+    "name": "西宁市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "630200",
+    "parent_code": "630000",
+    "name": "海东市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "640100",
+    "parent_code": "640000",
+    "name": "银川市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "640200",
+    "parent_code": "640000",
+    "name": "石嘴山市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "640300",
+    "parent_code": "640000",
+    "name": "吴忠市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "640400",
+    "parent_code": "640000",
+    "name": "固原市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "640500",
+    "parent_code": "640000",
+    "name": "中卫市",
+    "level": 2,
+    "sort_order": 4
+  },
+  {
+    "code": "650100",
+    "parent_code": "650000",
+    "name": "乌鲁木齐市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "650200",
+    "parent_code": "650000",
+    "name": "克拉玛依市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "650400",
+    "parent_code": "650000",
+    "name": "吐鲁番市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "650500",
+    "parent_code": "650000",
+    "name": "哈密市",
+    "level": 2,
+    "sort_order": 3
+  },
+  {
+    "code": "710100",
+    "parent_code": "710000",
+    "name": "台北市",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "710200",
+    "parent_code": "710000",
+    "name": "高雄市",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "710300",
+    "parent_code": "710000",
+    "name": "台中市",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "810100",
+    "parent_code": "810000",
+    "name": "香港岛",
+    "level": 2,
+    "sort_order": 0
+  },
+  {
+    "code": "810200",
+    "parent_code": "810000",
+    "name": "九龙",
+    "level": 2,
+    "sort_order": 1
+  },
+  {
+    "code": "810300",
+    "parent_code": "810000",
+    "name": "新界",
+    "level": 2,
+    "sort_order": 2
+  },
+  {
+    "code": "820100",
+    "parent_code": "820000",
+    "name": "澳门半岛",
+    "level": 2,
+    "sort_order": 0
+  }
+]

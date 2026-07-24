@@ -138,6 +138,13 @@ class Settings(BaseSettings):
     AFTERSALES_RISK_THRESHOLD: int = 3
     MAX_EVIDENCE_IMAGES_PER_STAGE: int = 8
 
+    # ---- Phase 5 · reviews / notifications / shop-profile ----------------
+    REVIEW_EDIT_WINDOW_DAYS: int = 15
+    MAX_REVIEW_IMAGES: int = 6
+    MAX_REVIEW_LENGTH: int = 2000
+    MIN_REVIEW_LENGTH: int = 5
+    MAX_ANNOUNCEMENT_LENGTH: int = 2000
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

@@ -89,6 +89,17 @@ async def create(
     if make_default:
         await _clear_other_defaults(session, user.id, except_id=None)
 
+    # Phase 5 — validate region codes if provided.
+    if any([payload.province_code, payload.city_code, payload.district_code]):
+        from app.services import region_service
+
+        await region_service.validate_codes(
+            session,
+            province_code=payload.province_code,
+            city_code=payload.city_code,
+            district_code=payload.district_code,
+        )
+
     row = Address(
         user_id=user.id,
         receiver_name=payload.receiver_name,
@@ -99,6 +110,9 @@ async def create(
         detail=payload.detail,
         postal_code=payload.postal_code,
         is_default=make_default,
+        province_code=payload.province_code,
+        city_code=payload.city_code,
+        district_code=payload.district_code,
     )
     session.add(row)
     await session.flush()
@@ -130,6 +144,22 @@ async def update_(
 
     data = payload.model_dump(exclude_unset=True)
     became_default = data.pop("is_default", None) is True
+
+    # Phase 5 — validate codes across old & new merged state.
+    has_code_change = any(k in data for k in ("province_code", "city_code", "district_code"))
+    if has_code_change:
+        from app.services import region_service
+
+        merged_pc = data.get("province_code", row.province_code)
+        merged_cc = data.get("city_code", row.city_code)
+        merged_dc = data.get("district_code", row.district_code)
+        await region_service.validate_codes(
+            session,
+            province_code=merged_pc,
+            city_code=merged_cc,
+            district_code=merged_dc,
+        )
+
     for field, value in data.items():
         setattr(row, field, value)
 

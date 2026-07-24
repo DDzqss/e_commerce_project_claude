@@ -53,6 +53,93 @@ from app.services import cart_service
 from app.services.audit_service import write_audit
 from app.services.inventory_service import write_log_row
 
+
+def _fmt_yuan(cents: int) -> str:
+    return f"{cents / 100:.2f}"
+
+
+async def _notify_order_event(
+    session: AsyncSession,
+    order: Order,
+    *,
+    event: str,
+) -> None:
+    """Emit notifications for an order state transition (best-effort)."""
+    try:
+        # Local import to avoid circular deps at module load time.
+        from app.models.notification import NotificationCategory
+        from app.services import notification_service
+
+        if event == "paid":
+            await notification_service.notify_merchants_of_shop(
+                session,
+                order.shop_id,
+                NotificationCategory.ORDER,
+                title=f"新订单待发货 {order.order_no}",
+                body=f"订单金额 ¥{_fmt_yuan(order.total_cents)}",
+                action_url=f"/merchant/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+        elif event == "shipped":
+            await notification_service.notify_user(
+                session,
+                order.user_id,
+                NotificationCategory.ORDER,
+                title=f"订单 {order.order_no} 已发货",
+                body=f"运单号 {order.tracking_no or ''}",
+                action_url=f"/user/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+        elif event == "completed":
+            await notification_service.notify_merchants_of_shop(
+                session,
+                order.shop_id,
+                NotificationCategory.ORDER,
+                title=f"订单 {order.order_no} 已完成",
+                body=f"订单金额 ¥{_fmt_yuan(order.total_cents)}",
+                action_url=f"/merchant/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+        elif event == "cancelled_user":
+            await notification_service.notify_merchants_of_shop(
+                session,
+                order.shop_id,
+                NotificationCategory.ORDER,
+                title=f"订单 {order.order_no} 已被用户取消",
+                body=order.cancel_note or "用户主动取消",
+                action_url=f"/merchant/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+        elif event == "cancelled_merchant":
+            await notification_service.notify_user(
+                session,
+                order.user_id,
+                NotificationCategory.ORDER,
+                title=f"订单 {order.order_no} 已被商家取消",
+                body=order.cancel_note or "商家取消订单",
+                action_url=f"/user/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+        elif event == "cancelled_admin":
+            await notification_service.notify_user(
+                session,
+                order.user_id,
+                NotificationCategory.ORDER,
+                title=f"订单 {order.order_no} 已被平台干预取消",
+                body=order.cancel_note or "平台干预",
+                action_url=f"/user/orders/{order.id}",
+                related_type="order",
+                related_id=order.id,
+            )
+    except Exception:
+        pass
+
+
 # ---------------------------------------------------------------------------
 # Type helpers
 # ---------------------------------------------------------------------------
@@ -984,6 +1071,7 @@ async def cancel_by_user(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_order_event(session, order, event="cancelled_user")
     return await get_detail(session, order.id, "user", user.id)
 
 
@@ -1018,6 +1106,7 @@ async def cancel_by_merchant(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_order_event(session, order, event="cancelled_merchant")
     return await get_detail(session, order.id, "merchant", account.shop_id)
 
 
@@ -1052,6 +1141,7 @@ async def cancel_by_admin(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_order_event(session, order, event="cancelled_admin")
     return await get_detail(session, order.id, "admin", admin.id)
 
 
@@ -1106,6 +1196,7 @@ async def confirm_receipt(
         ip=ip,
         user_agent=user_agent,
     )
+    await _notify_order_event(session, order, event="completed")
     return await get_detail(session, order.id, "user", user.id)
 
 
@@ -1193,6 +1284,7 @@ async def ship_by_merchant(
         user_agent=user_agent,
         extra={"carrier": carrier, "tracking_no": tracking_no},
     )
+    await _notify_order_event(session, order, event="shipped")
     return await get_detail(session, order.id, "merchant", account.shop_id)
 
 

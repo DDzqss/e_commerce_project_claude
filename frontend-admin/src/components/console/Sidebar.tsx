@@ -17,6 +17,7 @@ import clsx from "clsx";
 import { useAuthStore } from "@/lib/auth-store";
 import { hasAnyPermission, hasPermission, type Permission } from "@/lib/rbac";
 import { useAftersalesStats } from "@/hooks/useAftersales";
+import { usePendingReportsCount } from "@/hooks/useReports";
 
 interface NavItem {
   href: string;
@@ -80,6 +81,20 @@ const NAV_ITEMS: readonly NavItem[] = [
     available: true,
   },
   {
+    href: "/console/reviews",
+    label: "评价审核",
+    requires: ["admin:review:moderate"],
+    group: "operation",
+    available: true,
+  },
+  {
+    href: "/console/review-reports",
+    label: "举报处理",
+    requires: ["admin:review_report:handle"],
+    group: "operation",
+    available: true,
+  },
+  {
     href: "/console/users",
     label: "用户管理",
     requires: ["admin:user:manage"],
@@ -123,6 +138,16 @@ export function Sidebar() {
   });
   const pendingArbitration =
     aftersalesStats.data?.escalated_pending_count ?? 0;
+
+  // 举报队列 pending 数量（红色徽章）
+  const canHandleReports = hasPermission(
+    permissions,
+    "admin:review_report:handle",
+  );
+  const pendingReportsQuery = usePendingReportsCount({
+    enabled: canHandleReports,
+  });
+  const pendingReportsCount = pendingReportsQuery.data?.total ?? 0;
 
   // 权限过滤：Phase 1 未开放的项目仍然显示（disabled），但没有权限的项目直接隐藏
   const visible = NAV_ITEMS.filter((item) =>
@@ -201,6 +226,17 @@ export function Sidebar() {
                             {pendingArbitration > 99 ? "99+" : pendingArbitration}
                           </span>
                         ) : null}
+                        {item.href === "/console/review-reports" &&
+                        pendingReportsCount > 0 ? (
+                          <span
+                            aria-label={`待处理举报 ${pendingReportsCount} 条`}
+                            className="ml-2 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[color:var(--color-danger)] px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                          >
+                            {pendingReportsCount > 99
+                              ? "99+"
+                              : pendingReportsCount}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   );
@@ -212,7 +248,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-[color:var(--color-border)] px-4 py-3 text-[11px] text-neutral-400">
-        Phase 4 · 售后闭环
+        Phase 5 · 评价 / 通知
       </div>
     </aside>
   );

@@ -44,12 +44,25 @@ from app.models.merchant import (
     ShopStatus,
 )
 from app.models.merchant_application import MerchantApplication, MerchantApplicationStatus
+from app.models.notification import (
+    Notification,
+    NotificationCategory,
+    NotificationRecipientType,
+)
 from app.models.order import CancelReason, Order, OrderStatus
 from app.models.order_item import OrderItem
 from app.models.order_status_history import ActorType, OrderStatusHistory
 from app.models.payment_session import PaymentChannel, PaymentSession, PaymentStatus
 from app.models.product import SPU, SPUStatus
 from app.models.refresh_token import RefreshToken, SubjectType
+from app.models.region import Region
+from app.models.review import Review
+from app.models.review_reply import ReviewReply
+from app.models.review_report import (
+    ReviewReport,
+    ReviewReportReasonCategory,
+    ReviewReportStatus,
+)
 from app.models.shipment_event import ShipmentEvent, ShipmentEventType
 from app.models.sku import SKU
 from app.models.user import User, UserStatus
@@ -94,6 +107,9 @@ __all__ = [
     "MerchantApplication",
     "MerchantApplicationStatus",
     "MerchantRole",
+    "Notification",
+    "NotificationCategory",
+    "NotificationRecipientType",
     "Order",
     "OrderItem",
     "OrderStatus",
@@ -102,6 +118,12 @@ __all__ = [
     "PaymentSession",
     "PaymentStatus",
     "RefreshToken",
+    "Region",
+    "Review",
+    "ReviewReply",
+    "ReviewReport",
+    "ReviewReportReasonCategory",
+    "ReviewReportStatus",
     "SPUStatus",
     "ShipmentEvent",
     "ShipmentEventType",

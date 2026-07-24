@@ -85,6 +85,42 @@ export const ErrorCode = {
   AFTERSALES_NOT_AGREED_RETURN: 17002,
   /** 售后单已回填过物流不可再回填 */
   AFTERSALES_TRACKING_ALREADY_FILLED: 17003,
+
+  // ----- Phase 5 · 评价域（19xxx / 20xxx / 21xxx） -----
+  /** 评价不存在 */
+  REVIEW_NOT_FOUND: 19001,
+  /** 无权访问该评价 */
+  REVIEW_ACCESS_DENIED: 19002,
+  /** 此订单不可评价（未收货或已评价） */
+  REVIEW_ORDER_NOT_REVIEWABLE: 19003,
+  /** 评价编辑窗口已过或已编辑过 */
+  REVIEW_EDIT_LOCKED: 19004,
+  /** 星级非法（应为 1-5） */
+  REVIEW_RATING_INVALID: 19005,
+  /** 评价内容长度非法 */
+  REVIEW_CONTENT_INVALID: 19006,
+  /** 评价图片数量超上限（6 张） */
+  REVIEW_IMAGES_LIMIT: 19007,
+
+  /** 评价回复不存在 */
+  REVIEW_REPLY_NOT_FOUND: 20001,
+  /** 已回复过（一条评价一条回复） */
+  REVIEW_REPLY_DUPLICATE: 20002,
+  /** 无权回复此评价 */
+  REVIEW_REPLY_ACCESS_DENIED: 20003,
+
+  /** 评价举报不存在 */
+  REVIEW_REPORT_NOT_FOUND: 21001,
+  /** 已举报过 */
+  REVIEW_REPORT_DUPLICATE: 21002,
+  /** 举报理由非法 */
+  REVIEW_REPORT_REASON_INVALID: 21003,
+
+  // ----- Phase 5 · 通知域（22xxx） -----
+  /** 通知不存在 */
+  NOTIFICATION_NOT_FOUND: 22001,
+  /** 无权访问该通知 */
+  NOTIFICATION_ACCESS_DENIED: 22002,
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -137,6 +173,25 @@ export const ERROR_MESSAGES: Record<number, string> = {
   [ErrorCode.AFTERSALES_NOT_AGREED_RETURN]: "售后尚未同意退货，不能回填物流",
   [ErrorCode.AFTERSALES_TRACKING_ALREADY_FILLED]:
     "售后已回填过物流，不能再次回填",
+
+  // ----- Phase 5 · 评价 / 回复 / 举报 -----
+  [ErrorCode.REVIEW_NOT_FOUND]: "评价不存在",
+  [ErrorCode.REVIEW_ACCESS_DENIED]: "无权访问该评价",
+  [ErrorCode.REVIEW_ORDER_NOT_REVIEWABLE]: "该订单当前不可评价",
+  [ErrorCode.REVIEW_EDIT_LOCKED]: "评价编辑窗口已过",
+  [ErrorCode.REVIEW_RATING_INVALID]: "评价星级必须为 1-5",
+  [ErrorCode.REVIEW_CONTENT_INVALID]: "评价内容长度不合法",
+  [ErrorCode.REVIEW_IMAGES_LIMIT]: "评价图片最多 6 张",
+  [ErrorCode.REVIEW_REPLY_NOT_FOUND]: "评价回复不存在",
+  [ErrorCode.REVIEW_REPLY_DUPLICATE]: "该评价已回复过，不能重复回复",
+  [ErrorCode.REVIEW_REPLY_ACCESS_DENIED]: "无权回复此评价",
+  [ErrorCode.REVIEW_REPORT_NOT_FOUND]: "评价举报不存在",
+  [ErrorCode.REVIEW_REPORT_DUPLICATE]: "已举报过该评价",
+  [ErrorCode.REVIEW_REPORT_REASON_INVALID]: "举报理由不合法",
+
+  // ----- Phase 5 · 通知 -----
+  [ErrorCode.NOTIFICATION_NOT_FOUND]: "通知不存在",
+  [ErrorCode.NOTIFICATION_ACCESS_DENIED]: "无权访问该通知",
 };
 
 /**

@@ -6,6 +6,8 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useMerchantOrderStats } from "@/hooks/useMerchantOrders";
 import { useAftersalesStats } from "@/hooks/useMerchantAftersales";
+import { useMerchantReviewStats } from "@/hooks/useMerchantReviews";
+import { useUnreadCount } from "@/hooks/useNotifications";
 import { formatCentsCny } from "@/lib/order-utils";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -18,6 +20,8 @@ export default function DashboardPage() {
   const { merchantAccount, shop } = useAuth();
   const statsQuery = useMerchantOrderStats();
   const aftersalesStatsQuery = useAftersalesStats();
+  const reviewStatsQuery = useMerchantReviewStats();
+  const unreadQuery = useUnreadCount();
 
   const shopName = shop?.name ?? "—";
   const roleLabel = merchantAccount
@@ -26,6 +30,8 @@ export default function DashboardPage() {
 
   const s = statsQuery.data;
   const a = aftersalesStatsQuery.data;
+  const r = reviewStatsQuery.data;
+  const unread = unreadQuery.data?.unread_count;
 
   return (
     <div className="space-y-6">
@@ -80,6 +86,46 @@ export default function DashboardPage() {
         </Link>
       </div>
 
+      {/* Phase 5 · 评价 + 通知 */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Link href="/reviews" className="block hover:opacity-90">
+          <StatCard
+            label="未回复评价"
+            value={
+              r?.unreplied_count ?? (reviewStatsQuery.isLoading ? "…" : "—")
+            }
+            hint="及时回复可提升店铺口碑"
+            tone={r && r.unreplied_count > 0 ? "warning" : "success"}
+          />
+        </Link>
+        <Link href="/reviews" className="block hover:opacity-90">
+          <StatCard
+            label="差评（≤ 3 星）"
+            value={
+              r?.low_rating_count ?? (reviewStatsQuery.isLoading ? "…" : "—")
+            }
+            hint="重点关注并回复"
+            tone="danger"
+          />
+        </Link>
+        <StatCard
+          label="平均评分"
+          value={
+            r ? r.avg_rating.toFixed(2) : reviewStatsQuery.isLoading ? "…" : "—"
+          }
+          hint="近 100 条评价均分"
+          tone="success"
+        />
+        <Link href="/notifications" className="block hover:opacity-90">
+          <StatCard
+            label="未读通知"
+            value={unread ?? (unreadQuery.isLoading ? "…" : "—")}
+            hint="每 60 秒自动刷新"
+            tone={unread && unread > 0 ? "warning" : "info"}
+          />
+        </Link>
+      </div>
+
       {/* Phase 提示卡片 */}
       <section className="rounded-lg border border-blue-100 bg-blue-50/60 p-5">
         <h3 className="text-sm font-semibold text-[var(--color-primary)]">
@@ -89,7 +135,8 @@ export default function DashboardPage() {
           <li>Phase 1：账号登录、退出、修改密码、店铺信息维护</li>
           <li>Phase 2：商品上架、编辑与库存管理</li>
           <li>Phase 3：订单接单、发货、缺货取消、备注</li>
-          <li>Phase 4（当前）：售后审核、收货、换货再发货、拒收升级</li>
+          <li>Phase 4：售后审核、收货、换货再发货、拒收升级</li>
+          <li>Phase 5（当前）：评价管理、店铺主页、站内信通知</li>
         </ul>
       </section>
 

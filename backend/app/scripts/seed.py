@@ -1,4 +1,4 @@
-"""Phase 1 + 2 seed script.
+"""Phase 1 + 2 + 3 + 4 + 5 seed script.
 
 Idempotent — safe to re-run; existing rows are left alone. Inserts:
 
@@ -8,6 +8,8 @@ Idempotent — safe to re-run; existing rows are left alone. Inserts:
 - 5 baseline brands (Phase 2)
 - 1 baseline shop + merchant account (so Phase 2 SPUs have an owner)
 - 3 approved SPUs with 2-3 SKUs each
+- Phase 5: regions (from ``regions_data.json``), demo reviews, demo
+  notifications, shop-profile placeholders
 
 Run:
     uv run python -m app.scripts.seed
@@ -23,6 +25,8 @@ import random
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,12 +62,20 @@ from app.models.merchant import (
     Shop,
     ShopStatus,
 )
+from app.models.notification import (
+    Notification,
+    NotificationCategory,
+    NotificationRecipientType,
+)
 from app.models.order import Order, OrderStatus
 from app.models.order_item import OrderItem
 from app.models.order_status_history import ActorType, OrderStatusHistory
 from app.models.product import SPU, SPUStatus
+from app.models.review import Review
+from app.models.review_reply import ReviewReply
 from app.models.sku import SKU
 from app.models.user import User, UserStatus
+from app.services import region_service
 
 logger = logging.getLogger(__name__)
 
@@ -783,6 +795,179 @@ async def _seed_aftersales_examples(session: AsyncSession, shop: Shop) -> None:
     logger.info("seeded aftersales example cases for shop %s", shop.name)
 
 
+# ---------------------------------------------------------------------------
+# Phase 5 seed steps
+# ---------------------------------------------------------------------------
+async def _seed_regions(session: AsyncSession) -> None:
+    path = Path(__file__).parent / "regions_data.json"
+    if not path.exists():
+        logger.warning("regions_data.json missing; skipping region seed")
+        return
+    added = await region_service.seed_from_json(session, path)
+    logger.info("seeded %d region rows (from %s)", added, path.name)
+
+
+async def _seed_shop_profile(session: AsyncSession, shop: Shop) -> None:
+    """Fill in Phase 5 storefront placeholders on the demo shop."""
+    changed = False
+    if not shop.logo_url:
+        shop.logo_url = "shop/seed/logo.jpg"
+        changed = True
+    if not shop.banner_url:
+        shop.banner_url = "shop/seed/banner.jpg"
+        changed = True
+    if not shop.announcement:
+        shop.announcement = "本店暑期不打烊，欢迎选购。"
+        changed = True
+    if shop.opened_at is None:
+        shop.opened_at = shop.created_at or datetime.now(UTC)
+        changed = True
+    if changed:
+        await session.flush()
+        logger.info("seeded shop profile placeholders for %s", shop.name)
+
+
+async def _seed_reviews(session: AsyncSession, shop: Shop) -> None:
+    """Insert 1-2 demo reviews on completed orders + one merchant reply."""
+    existing = int(
+        (
+            await session.execute(select(func.count(Review.id)).where(Review.shop_id == shop.id))
+        ).scalar_one()
+    )
+    if existing > 0:
+        return
+
+    user_row = (
+        await session.execute(select(User).where(User.phone == USERS[0].phone))
+    ).scalar_one_or_none()
+    if user_row is None:
+        return
+
+    # Completed order → review target.
+    completed_orders = list(
+        (
+            await session.execute(
+                select(Order).where(
+                    Order.user_id == user_row.id,
+                    Order.shop_id == shop.id,
+                    Order.status == OrderStatus.COMPLETED,
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    if not completed_orders:
+        return
+
+    now = datetime.now(UTC)
+    reviews_created: list[Review] = []
+    for order in completed_orders:
+        items = list(
+            (
+                await session.execute(
+                    select(OrderItem).where(OrderItem.order_id == order.id).limit(2)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        for idx, oi in enumerate(items):
+            r = Review(
+                order_id=order.id,
+                order_item_id=oi.id,
+                user_id=user_row.id,
+                spu_id=oi.spu_id,
+                sku_id=oi.sku_id,
+                shop_id=shop.id,
+                rating=5 if idx == 0 else 4,
+                content="商品质量非常好，物流也很快，五星好评！"
+                if idx == 0
+                else "还不错，值得购买。",
+                images=[],
+                is_anonymous=idx > 0,
+                visible=True,
+                edit_count=0,
+                edit_deadline_at=now + timedelta(days=15),
+            )
+            session.add(r)
+            reviews_created.append(r)
+    await session.flush()
+
+    # Aggregate shop rating.
+    shop.rating_avg = Decimal("4.50")
+    shop.rating_count = len(reviews_created)
+    await session.flush()
+
+    # Attach one merchant reply to the first review.
+    if reviews_created:
+        # Need a merchant account for this shop.
+        acct = (
+            await session.execute(
+                select(MerchantAccount).where(MerchantAccount.shop_id == shop.id).limit(1)
+            )
+        ).scalar_one_or_none()
+        if acct is not None:
+            session.add(
+                ReviewReply(
+                    review_id=reviews_created[0].id,
+                    merchant_account_id=acct.id,
+                    shop_id=shop.id,
+                    content="感谢您的支持，期待再次光临！",
+                )
+            )
+            await session.flush()
+    logger.info("seeded %d reviews for shop %s", len(reviews_created), shop.name)
+
+
+async def _seed_notifications(session: AsyncSession) -> None:
+    """Insert 5 example notifications for each seed user (mix of read/unread)."""
+    for spec in USERS:
+        user_row = (
+            await session.execute(select(User).where(User.phone == spec.phone))
+        ).scalar_one_or_none()
+        if user_row is None:
+            continue
+        existing = int(
+            (
+                await session.execute(
+                    select(func.count(Notification.id)).where(
+                        Notification.recipient_type == NotificationRecipientType.USER,
+                        Notification.recipient_id == user_row.id,
+                    )
+                )
+            ).scalar_one()
+        )
+        if existing > 0:
+            continue
+        now = datetime.now(UTC)
+        samples = [
+            (NotificationCategory.SYSTEM, "欢迎使用 JD-Clone", "感谢注册，赶紧去逛逛吧。", False),
+            (NotificationCategory.ORDER, "订单已发货", "您的订单已由顺丰速运揽收。", True),
+            (NotificationCategory.AFTERSALES, "售后进度更新", "商家已同意您的退款申请。", False),
+            (NotificationCategory.REVIEW, "评价被回复", "商家回复了您的评价。", True),
+            (NotificationCategory.PROMO, "限时优惠", "全场满减活动进行中。", False),
+        ]
+        for i, (cat, title, body, read_flag) in enumerate(samples):
+            session.add(
+                Notification(
+                    recipient_type=NotificationRecipientType.USER,
+                    recipient_id=user_row.id,
+                    category=cat,
+                    title=title,
+                    body=body,
+                    is_read=read_flag,
+                    read_at=now if read_flag else None,
+                    action_url="/",
+                    related_type=None,
+                    related_id=None,
+                )
+            )
+            _ = i
+        logger.info("seeded 5 notifications for user %s", spec.phone)
+    await session.flush()
+
+
 async def _seed() -> None:
     settings = get_settings()
     if settings.ENVIRONMENT == "production":
@@ -810,6 +995,16 @@ async def _seed() -> None:
 
         # Phase 4 seed data
         await _seed_aftersales_examples(session, shop)
+        await session.commit()
+
+        # Phase 5 seed data
+        await _seed_regions(session)
+        await session.commit()
+        await _seed_shop_profile(session, shop)
+        await session.commit()
+        await _seed_reviews(session, shop)
+        await session.commit()
+        await _seed_notifications(session)
         await session.commit()
 
     await dispose_engine()

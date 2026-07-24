@@ -140,7 +140,15 @@ function OrderDetailContent() {
                   </span>
                 )}
                 {data.status === OrderStatus.Completed && (
-                  <span className="text-sm text-green-700">交易完成</span>
+                  <>
+                    <span className="text-sm text-green-700">交易完成</span>
+                    <Link
+                      href={`/orders/${data.order_no}/reviews/new`}
+                      data-testid="btn-write-review"
+                    >
+                      <Button>评价商品</Button>
+                    </Link>
+                  </>
                 )}
                 {allowedAftersalesTypes(data.status).length > 0 && (
                   <Link

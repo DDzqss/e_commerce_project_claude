@@ -13,6 +13,55 @@
 
 ---
 
+## [0.6.0-phase5] — 2026-07-24
+
+### Phase 5：辅助功能（商品评价 + 站内信 + 地区数据 + 商家店铺主页）
+
+#### 契约先行
+- `docs/API/phase-5-contracts.md`：评价审核策略（先发后审）、编辑窗口（15 天/1 次）、
+  举报审核队列、站内信轮询 60s、地区 3 级树、商家店铺主页字段
+
+#### Backend
+- **6 张新表**：reviews / review_replies / review_reports / notifications / regions / shop_homepage
+- **Alembic 0005**：native enum + 复合 index + 3 级地区表
+- **Regions 数据**：34 省 + 304 市 + 258 区（seed via regions_data.json）
+- **事件驱动通知**：售后 approve / 评价新增 / 举报处理等业务事件自动写 notification
+- **评价审核策略**：默认 visible=true 先发后审；举报进入待审核队列 → admin hide 或驳回
+- **端点**：user 评价（create/edit/list）、reviews reply/report、notifications 三域各自 CRUD、
+  regions 查询、shop_homepage 公开读 + merchant patch
+- **136 测试全绿**（Phase 1-4: 115 + Phase 5: 21）
+- **Fix**：修复 `DELETE /notifications/read` 与 `DELETE /notifications/{id}` 路由注册顺序 bug（`/read` 被 `/{id}` int-parse 吞掉）
+
+#### Frontend · User-Web
+- **组件**：StarRating / RatingSummary / ReviewForm / ReviewCard / RegionCascader（省市区级联）/ NotificationDropdown / NotificationItem
+- **页面**：`/orders/[orderNo]/reviews/new`（发表评价）/ `/reviews`（我的评价）/ `/notifications` / `/shops/[id]`（商家主页）
+- **地址簿增强**：`/account/addresses` 集成 RegionCascader（省市区选择）
+- **打通订单详情**："发表评价" 按钮
+- **SiteHeader**：加通知铃铛 + 未读数徽章
+- **测试新增 3 组**：notification-dropdown / region-cascader / review-form
+
+#### Frontend · Merchant-Web
+- **组件**：StarRating / RatingSummary / ReviewCard / ReplyEditor / NotificationDropdown /
+  ShopHomepageEditor / ShopHomepagePreview
+- **页面**：`/reviews`（评价管理 + 回复）/ `/notifications` / `/shop`（更新为完整店铺主页编辑器）
+- **测试**：review-reply / shop-homepage-editor
+
+#### Frontend · Admin-Web
+- **组件**：StarRating / RatingSummary / AdminReviewCard / HideReviewModal / ReportItem /
+  HandleReportModal / NotificationBell
+- **页面**：`/console/reviews` + `/console/reviews/[id]` / `/console/review-reports`（举报处理台）/ `/console/notifications`
+- **RBAC 扩展**：admin:review:manage / admin:report:handle / admin:notification:read
+- **测试**：review-hide / report-handle
+
+### 沉淀（Phase 4 SendMessage-resume 教训）
+- 在 sediment commit 里已加：Agent 因 API 错误中断时用 SendMessage 缩小 scope 续跑，避免重启浪费 tokens
+
+### 验证结果
+- 后端：ruff ✓ · format ✓ · pytest 136/136 ✓
+- 三前端：pnpm build ✓
+
+---
+
 ## [0.5.0-phase4] — 2026-07-24
 
 ### Phase 4：售后闭环（退款 / 退货退款 / 换货 · 三方联动 · 平台仲裁 · 超时升级）

@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from decimal import Decimal
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, BigIntId, IdMixin, SoftDeleteMixin, TimestampMixin
@@ -53,6 +54,22 @@ class Shop(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
         nullable=False,
         default=ShopStatus.ACTIVE,
     )
+
+    # Phase 5 — storefront profile enhancements.
+    logo_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    banner_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    announcement: Mapped[str | None] = mapped_column(Text, nullable=True)
+    opened_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rating_avg: Mapped[Decimal] = mapped_column(
+        Numeric(3, 2),
+        nullable=False,
+        default=Decimal("5.00"),
+        server_default="5.00",
+    )
+    rating_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    sales_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
 
 
 class MerchantAccount(IdMixin, TimestampMixin, SoftDeleteMixin, Base):

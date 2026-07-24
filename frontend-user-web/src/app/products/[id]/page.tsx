@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SPUCard } from "@/components/catalog/SPUCard";
@@ -10,9 +11,14 @@ import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { Price } from "@/components/ui/Price";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
+import { RatingSummary } from "@/components/ui/RatingSummary";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Pagination } from "@/components/catalog/Pagination";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
 import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { useSPUDetail, useRelatedSPUs } from "@/hooks/useSPUDetail";
+import { useSpuReviews } from "@/hooks/useReviews";
 import { useAuth } from "@/hooks/useAuth";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { useCartBadge } from "@/lib/cart-store";
@@ -242,8 +248,21 @@ function DetailBody({ data }: { data: SPUDetail }) {
               </span>
             )}
             <span>
-              店铺 <b className="text-neutral-800">{data.shop.name}</b>
+              店铺{" "}
+              <Link
+                href={`/shops/${data.shop.id}`}
+                className="font-medium text-neutral-800 hover:text-[color:var(--color-primary)]"
+              >
+                {data.shop.name}
+              </Link>
             </span>
+            <Link
+              href={`/shops/${data.shop.id}`}
+              className="rounded border border-neutral-200 px-2 py-0.5 text-neutral-600 hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)]"
+              data-testid="enter-shop-btn"
+            >
+              进入店铺
+            </Link>
           </div>
 
           <div className="rounded-lg bg-[color:var(--color-primary-50)] p-4">
@@ -324,7 +343,103 @@ function DetailBody({ data }: { data: SPUDetail }) {
           />
         </section>
       )}
+
+      <ProductReviewsSection spuId={data.id} />
     </>
+  );
+}
+
+function ProductReviewsSection({ spuId }: { spuId: number }) {
+  const [ratingFilter, setRatingFilter] = useState<number | "" | "with_images">(
+    "",
+  );
+  const [page, setPage] = useState(1);
+  const size = 10;
+
+  const query = useMemo(() => {
+    const q: { rating?: number; with_images?: boolean; page: number; size: number } = {
+      page,
+      size,
+    };
+    if (ratingFilter === "with_images") {
+      q.with_images = true;
+    } else if (typeof ratingFilter === "number") {
+      q.rating = ratingFilter;
+    }
+    return q;
+  }, [ratingFilter, page]);
+
+  const { data, isLoading } = useSpuReviews(spuId, query);
+
+  const filters: { label: string; value: typeof ratingFilter }[] = [
+    { label: "全部", value: "" },
+    { label: "5 星", value: 5 },
+    { label: "4 星", value: 4 },
+    { label: "3 星", value: 3 },
+    { label: "2 星", value: 2 },
+    { label: "1 星", value: 1 },
+    { label: "有图", value: "with_images" },
+  ];
+
+  const setFilter = (v: typeof ratingFilter) => {
+    setRatingFilter(v);
+    setPage(1);
+  };
+
+  return (
+    <section className="mt-10" id="reviews" data-testid="product-reviews">
+      <h2 className="mb-3 text-lg font-semibold text-neutral-900">商品评价</h2>
+
+      {data?.summary && (
+        <RatingSummary summary={data.summary} className="mb-4" />
+      )}
+
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+        {filters.map((f) => {
+          const active = ratingFilter === f.value;
+          return (
+            <button
+              key={String(f.value) || "all"}
+              type="button"
+              onClick={() => setFilter(f.value)}
+              className={cn(
+                "rounded border px-2 py-1 transition",
+                active
+                  ? "border-[color:var(--color-primary)] bg-[color:var(--color-primary-50)] text-[color:var(--color-primary-700)]"
+                  : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400",
+              )}
+              data-testid={`review-filter-${String(f.value) || "all"}`}
+            >
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {isLoading && <Skeleton className="h-40 w-full" />}
+      {data && data.items.length === 0 && (
+        <EmptyState title="暂无评价" description="欢迎第一位买家分享使用体验" />
+      )}
+      {data && data.items.length > 0 && (
+        <ul className="flex flex-col gap-3">
+          {data.items.map((r) => (
+            <li key={r.id}>
+              <ReviewCard review={r} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {data && data.total > size && (
+        <div className="mt-6">
+          <Pagination
+            page={data.page}
+            size={data.size}
+            total={data.total}
+            onChange={setPage}
+          />
+        </div>
+      )}
+    </section>
   );
 }
 
