@@ -3,7 +3,7 @@ package com.jdclone.app.data.repository
 import com.jdclone.app.data.network.ApiService
 import com.jdclone.app.data.network.dto.BrandDto
 import com.jdclone.app.data.network.dto.CategoryDto
-import com.jdclone.app.data.network.dto.PageData
+import com.jdclone.app.data.network.PageData
 import com.jdclone.app.data.network.dto.ShopPublicDto
 import com.jdclone.app.data.network.dto.SpuDetailDto
 import com.jdclone.app.data.network.dto.SpuListItemDto

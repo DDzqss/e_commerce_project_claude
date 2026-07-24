@@ -8,7 +8,7 @@ import com.jdclone.app.data.network.dto.OrderDetailDto
 import com.jdclone.app.data.network.dto.OrderListItemDto
 import com.jdclone.app.data.network.dto.OrderPreviewDto
 import com.jdclone.app.data.network.dto.OrderPreviewRequest
-import com.jdclone.app.data.network.dto.PageData
+import com.jdclone.app.data.network.PageData
 import com.jdclone.app.data.network.dto.ShipmentInfoDto
 import com.jdclone.app.data.network.unwrap
 import java.util.UUID

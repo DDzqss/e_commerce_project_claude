@@ -33,7 +33,7 @@ import com.jdclone.app.data.network.dto.OrderDetailDto
 import com.jdclone.app.data.network.dto.OrderListItemDto
 import com.jdclone.app.data.network.dto.OrderPreviewDto
 import com.jdclone.app.data.network.dto.OrderPreviewRequest
-import com.jdclone.app.data.network.dto.PageData
+import com.jdclone.app.data.network.PageData
 import com.jdclone.app.data.network.dto.PayCreateRequest
 import com.jdclone.app.data.network.dto.PaymentAmountOnlyDto
 import com.jdclone.app.data.network.dto.PaymentSessionDto

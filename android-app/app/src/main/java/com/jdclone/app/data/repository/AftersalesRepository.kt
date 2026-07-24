@@ -10,7 +10,7 @@ import com.jdclone.app.data.network.dto.AftersalesItemRequest
 import com.jdclone.app.data.network.dto.AftersalesListItemDto
 import com.jdclone.app.data.network.dto.AftersalesNudgeResultDto
 import com.jdclone.app.data.network.dto.AftersalesSubmitTrackingRequest
-import com.jdclone.app.data.network.dto.PageData
+import com.jdclone.app.data.network.PageData
 import com.jdclone.app.data.network.unwrap
 import java.util.UUID
 import javax.inject.Inject

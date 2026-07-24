@@ -3,7 +3,7 @@ package com.jdclone.app.ui.screen.catalog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdclone.app.data.network.dto.CategoryDto
-import com.jdclone.app.data.network.dto.PageData
+import com.jdclone.app.data.network.PageData
 import com.jdclone.app.data.network.dto.SpuListItemDto
 import com.jdclone.app.data.repository.CatalogRepository
 import com.jdclone.app.ui.common.UiState
