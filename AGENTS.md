@@ -733,7 +733,17 @@ gh pr create --base develop
 2. 后端：跑 `uv run ruff check .` + `uv run pytest -v`；前端：跑 `pnpm --filter <ws> tsc --noEmit` + `pnpm --filter <ws> build`
 3. 显式列出你新增依赖的 npm/PyPI 包，Orchestrator 需据此更新 lockfile
 4. 命名一律 kebab-case（文件）、snake_case（Python）、camelCase（JS/TS 变量）、PascalCase（组件/类）
+5. 主动汇报**契约偏差点**：若你发现契约不明确、必须假定或调整某字段/端点，在返回时**单独列出**，Orchestrator 用于对齐其他 agent
 ```
+
+### 11.5.1 中断 agent 的恢复策略
+
+**Phase 4 教训**：Admin agent 因供应商 API `InternalServerException` 中断 2 次。
+
+- **首选：SendMessage 续跑**（`SendMessage(to=agentId, message=...)`）比重启新 agent 便宜得多，因为它保留 transcript
+- **续跑提示词要缩小 scope**：先 `git ls-files` 或 `Bash ls` 确认已产出文件，只让它做剩余部分
+- 续跑提示词末尾加"如果又遇到 API 错误，直接返回你写到哪里就 OK"避免陷入死循环
+- 若 SendMessage 续跑连续失败 2 次以上，才考虑 fresh 新 agent（此时提示词要明确"已完成 X / 只做 Y"）
 
 ### 11.6 沉淀更新流程
 
