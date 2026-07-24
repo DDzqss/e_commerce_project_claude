@@ -831,9 +831,7 @@ async def _seed_reviews(session: AsyncSession, shop: Shop) -> None:
     """Insert 1-2 demo reviews on completed orders + one merchant reply."""
     existing = int(
         (
-            await session.execute(
-                select(func.count(Review.id)).where(Review.shop_id == shop.id)
-            )
+            await session.execute(select(func.count(Review.id)).where(Review.shop_id == shop.id))
         ).scalar_one()
     )
     if existing > 0:
@@ -883,7 +881,9 @@ async def _seed_reviews(session: AsyncSession, shop: Shop) -> None:
                 sku_id=oi.sku_id,
                 shop_id=shop.id,
                 rating=5 if idx == 0 else 4,
-                content="商品质量非常好，物流也很快，五星好评！" if idx == 0 else "还不错，值得购买。",
+                content="商品质量非常好，物流也很快，五星好评！"
+                if idx == 0
+                else "还不错，值得购买。",
                 images=[],
                 is_anonymous=idx > 0,
                 visible=True,

@@ -10,9 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services import region_service
 
-_REGIONS_JSON = (
-    Path(__file__).resolve().parent.parent / "app" / "scripts" / "regions_data.json"
-)
+_REGIONS_JSON = Path(__file__).resolve().parent.parent / "app" / "scripts" / "regions_data.json"
 
 
 @pytest.fixture
@@ -39,9 +37,7 @@ async def test_list_provinces(client: AsyncClient, seeded_regions: int) -> None:
 
 
 @pytest.mark.asyncio
-async def test_list_cities_by_province(
-    client: AsyncClient, seeded_regions: int
-) -> None:
+async def test_list_cities_by_province(client: AsyncClient, seeded_regions: int) -> None:
     _ = seeded_regions
     # Beijing (110000) has exactly one child city (110100 市辖区).
     resp = await client.get("/api/v1/regions/children/110000")
@@ -54,9 +50,7 @@ async def test_list_cities_by_province(
 
 
 @pytest.mark.asyncio
-async def test_list_districts_by_city(
-    client: AsyncClient, seeded_regions: int
-) -> None:
+async def test_list_districts_by_city(client: AsyncClient, seeded_regions: int) -> None:
     _ = seeded_regions
     # 110100 (Beijing municipal district) has multiple 3rd-level districts.
     resp = await client.get("/api/v1/regions/children/110100")

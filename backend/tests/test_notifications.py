@@ -102,9 +102,7 @@ async def test_list_notifications_and_unread_count(
     assert u_list["data"]["total"] == 3
     assert u_list["data"]["unread_total"] == 2
 
-    u_cnt = (
-        await client.get("/api/v1/user/notifications/unread-count", headers=u_headers)
-    ).json()
+    u_cnt = (await client.get("/api/v1/user/notifications/unread-count", headers=u_headers)).json()
     assert u_cnt["data"]["count"] == 2
 
     m_cnt = (
@@ -112,9 +110,7 @@ async def test_list_notifications_and_unread_count(
     ).json()
     assert m_cnt["data"]["count"] == 3
 
-    a_cnt = (
-        await client.get("/api/v1/admin/notifications/unread-count", headers=a_headers)
-    ).json()
+    a_cnt = (await client.get("/api/v1/admin/notifications/unread-count", headers=a_headers)).json()
     assert a_cnt["data"]["count"] == 1
 
 
@@ -136,15 +132,13 @@ async def test_mark_read_and_mark_all_read(
     listing = (await client.get("/api/v1/user/notifications", headers=u_headers)).json()["data"]
     first_id = listing["items"][0]["id"]
 
-    one = await client.post(
-        f"/api/v1/user/notifications/{first_id}/read", headers=u_headers
-    )
+    one = await client.post(f"/api/v1/user/notifications/{first_id}/read", headers=u_headers)
     assert one.json()["code"] == 0
     assert one.json()["data"]["is_read"] is True
 
-    left = (
-        await client.get("/api/v1/user/notifications/unread-count", headers=u_headers)
-    ).json()["data"]["count"]
+    left = (await client.get("/api/v1/user/notifications/unread-count", headers=u_headers)).json()[
+        "data"
+    ]["count"]
     assert left == 2
 
     all_read = await client.post("/api/v1/user/notifications/read-all", headers=u_headers)
@@ -178,9 +172,9 @@ async def test_event_driven_creation(
         price_cents=8000,
     )
     order_id = ctx["order"]["id"]
-    detail = (
-        await client.get(f"/api/v1/user/orders/{order_id}", headers=ctx["u_headers"])
-    ).json()["data"]
+    detail = (await client.get(f"/api/v1/user/orders/{order_id}", headers=ctx["u_headers"])).json()[
+        "data"
+    ]
     oi = detail["items"][0]
 
     case = (
@@ -205,9 +199,9 @@ async def test_event_driven_creation(
     )
     assert approve.json()["code"] == 0
 
-    listing = (
-        await client.get("/api/v1/user/notifications", headers=ctx["u_headers"])
-    ).json()["data"]
+    listing = (await client.get("/api/v1/user/notifications", headers=ctx["u_headers"])).json()[
+        "data"
+    ]
     aftersales_related = [
         n
         for n in listing["items"]

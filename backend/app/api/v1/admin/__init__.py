@@ -39,8 +39,6 @@ router.include_router(reviews.router, prefix="/reviews", tags=["admin.reviews"])
 router.include_router(
     review_reports.router, prefix="/review-reports", tags=["admin.review-reports"]
 )
-router.include_router(
-    notifications.router, prefix="/notifications", tags=["admin.notifications"]
-)
+router.include_router(notifications.router, prefix="/notifications", tags=["admin.notifications"])
 
 __all__ = ["router"]

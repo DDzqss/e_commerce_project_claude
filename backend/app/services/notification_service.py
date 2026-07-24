@@ -168,8 +168,9 @@ async def list_(
         where.append(Notification.category == cat)
 
     total = int(
-        (await session.execute(select(func.count(Notification.id)).where(and_(*where))))
-        .scalar_one()
+        (
+            await session.execute(select(func.count(Notification.id)).where(and_(*where)))
+        ).scalar_one()
     )
     unread_total = int(
         (

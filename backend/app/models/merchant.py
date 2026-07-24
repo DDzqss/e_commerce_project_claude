@@ -69,9 +69,7 @@ class Shop(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
     rating_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
-    sales_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0, server_default="0"
-    )
+    sales_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
 
 
 class MerchantAccount(IdMixin, TimestampMixin, SoftDeleteMixin, Base):

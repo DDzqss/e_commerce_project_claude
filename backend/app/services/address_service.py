@@ -146,9 +146,7 @@ async def update_(
     became_default = data.pop("is_default", None) is True
 
     # Phase 5 — validate codes across old & new merged state.
-    has_code_change = any(
-        k in data for k in ("province_code", "city_code", "district_code")
-    )
+    has_code_change = any(k in data for k in ("province_code", "city_code", "district_code"))
     if has_code_change:
         from app.services import region_service
 

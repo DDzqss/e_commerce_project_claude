@@ -120,9 +120,7 @@ async def _summarize(session: AsyncSession, where: list[Any]) -> ReviewRatingSum
 
     dist: dict[int, int] = dict.fromkeys(range(1, 6), 0)
     dist_stmt = (
-        select(Review.rating, func.count(Review.id))
-        .where(and_(*conds))
-        .group_by(Review.rating)
+        select(Review.rating, func.count(Review.id)).where(and_(*conds)).group_by(Review.rating)
     )
     for rating, n in (await session.execute(dist_stmt)).all():
         dist[int(rating)] = int(n)
@@ -200,9 +198,7 @@ async def user_create_batch(
 
     # Preload order items belonging to this order.
     oi_rows = list(
-        (
-            await session.execute(select(OrderItem).where(OrderItem.order_id == order.id))
-        )
+        (await session.execute(select(OrderItem).where(OrderItem.order_id == order.id)))
         .scalars()
         .all()
     )

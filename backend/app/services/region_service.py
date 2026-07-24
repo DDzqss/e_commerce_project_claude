@@ -76,11 +76,7 @@ async def validate_codes(
     if not codes:
         return
     rows = list(
-        (
-            await session.execute(select(Region).where(Region.code.in_(codes)))
-        )
-        .scalars()
-        .all()
+        (await session.execute(select(Region).where(Region.code.in_(codes)))).scalars().all()
     )
     by_code = {r.code: r for r in rows}
     for c in codes:
@@ -117,9 +113,7 @@ async def seed_from_json(session: AsyncSession, path: Path) -> int:
     if not path.exists():
         return 0
     data: list[dict[str, Any]] = json.loads(path.read_text(encoding="utf-8"))
-    existing = set(
-        (await session.execute(select(Region.code))).scalars().all()
-    )
+    existing = set((await session.execute(select(Region.code))).scalars().all())
     added = 0
     # Insert level 1 first, then 2, then 3 to satisfy the self-FK.
     data_sorted = sorted(data, key=lambda d: (int(d.get("level", 1)), str(d.get("code", ""))))
