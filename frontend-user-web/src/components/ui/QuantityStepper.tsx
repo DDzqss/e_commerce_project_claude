@@ -72,6 +72,20 @@ export function QuantityStepper({
         inputMode="numeric"
         value={value}
         disabled={disabled}
+        role="spinbutton"
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setTo(value + 1);
+          } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setTo(value - 1);
+          }
+        }}
         onChange={(e) => {
           const digits = e.target.value.replace(/[^\d]/g, "");
           if (digits === "") {
