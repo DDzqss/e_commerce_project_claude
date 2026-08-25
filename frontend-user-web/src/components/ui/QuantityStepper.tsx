@@ -81,9 +81,13 @@ export function QuantityStepper({
           setTo(Number(digits));
         }}
         onBlur={(e) => {
-          // blur 时兜底一次，防止用户没输入数字
-          const n = Number(e.target.value.replace(/[^\d]/g, ""));
-          if (!Number.isFinite(n) || n < min) setTo(min);
+          // blur 时兜底一次：非数字回落到 min、越界回落到边界值；
+          // 并强制输入框显示与状态一致（受控组件在同值场景不会自动回写 DOM，
+          // 例如已在 max 时继续输入会残留越界数字）。
+          const n = Number(e.currentTarget.value.replace(/[^\d]/g, ""));
+          const clamped = clamp(n);
+          setTo(clamped);
+          e.currentTarget.value = String(clamped);
         }}
         className={cn(
           inputCls,
