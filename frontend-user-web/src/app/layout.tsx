@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { ReactQueryProvider } from "@/lib/query-client";
 import { ToastViewport } from "@/components/ui/Toast";
+import { BackToTop } from "@/components/ui/BackToTop";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-neutral-50 text-neutral-900 antialiased">
         <ReactQueryProvider>
           {children}
+          <BackToTop />
           <ToastViewport />
         </ReactQueryProvider>
       </body>
