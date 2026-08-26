@@ -13,27 +13,28 @@ from app.core.errors import envelope
 from app.core.rbac import Permission
 from app.models.user import User
 from app.schemas.review import ReviewCreateBatchIn, ReviewUpdateIn
-from app.services import review_service
+from app.services import order_service, review_service
 
 router = APIRouter()
 
 
 @router.post(
-    "/orders/{order_id}/reviews",
+    "/orders/{order_no}/reviews",
     status_code=status.HTTP_201_CREATED,
     summary="Batch-create reviews for a completed order",
 )
 async def create_reviews(
-    order_id: int,
+    order_no: str,
     payload: ReviewCreateBatchIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_REVIEW_CREATE)),
 ) -> dict[str, Any]:
+    order = await order_service.resolve_order_ref(session, order_no)
     items = await review_service.user_create_batch(
         session,
         user,
-        order_id,
+        order.id,
         payload,
         ip=get_client_ip(request),
         user_agent=get_user_agent(request),

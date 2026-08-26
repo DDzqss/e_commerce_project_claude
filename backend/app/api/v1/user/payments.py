@@ -14,27 +14,28 @@ from app.core.idempotency import require_idempotency_key
 from app.core.rbac import Permission
 from app.models.user import User
 from app.schemas.payment import PayCreateIn
-from app.services import payment_service
+from app.services import order_service, payment_service
 
 router = APIRouter()
 
 
 @router.post(
-    "/orders/{order_id}/pay",
+    "/orders/{order_no}/pay",
     summary="Create a payment session for an order",
 )
 async def create_pay_session(
-    order_id: int,
+    order_no: str,
     payload: PayCreateIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_CREATE)),
     idempotency_key: str = Depends(require_idempotency_key),
 ) -> dict[str, Any]:
+    order = await order_service.resolve_order_ref(session, order_no)
     result = await payment_service.create_session(
         session,
         user,
-        order_id,
+        order.id,
         payload.channel,
         idempotency_key,
         ip=get_client_ip(request),

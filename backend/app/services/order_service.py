@@ -181,6 +181,24 @@ async def _load_order_for_shop(
     return order
 
 
+async def resolve_order_ref(session: AsyncSession, ref: str) -> Order:
+    """按数字主键 id 或 order_no 字符串解析订单。
+
+    用户端 URL 与接口走 order_no（契约 §8），但历史调用与测试可能传数字 id；
+    这里两种都兼容：先按数字 id 查主键，再回退按 order_no 查。
+    """
+    if ref.isdigit():
+        row = await session.get(Order, int(ref))
+        if row is not None:
+            return row
+    row = (
+        await session.execute(select(Order).where(Order.order_no == ref))
+    ).scalar_one_or_none()
+    if row is None:
+        raise AppException(ErrorCode.ORDER_NOT_FOUND, "order not found")
+    return row
+
+
 async def _load_owned_address(session: AsyncSession, user: User, address_id: int) -> Address:
     row = await session.get(Address, address_id)
     if row is None or row.deleted_at is not None or row.user_id != user.id:

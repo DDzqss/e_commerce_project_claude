@@ -20,28 +20,29 @@ from app.schemas.aftersales import (
     AftersalesEvidenceIn,
     AftersalesSubmitTrackingIn,
 )
-from app.services import aftersales_service
+from app.services import aftersales_service, order_service
 
 router = APIRouter()
 
 
 @router.post(
-    "/orders/{order_id}/aftersales",
+    "/orders/{order_no}/aftersales",
     status_code=status.HTTP_201_CREATED,
     summary="Create an aftersales case for an order",
 )
 async def create_aftersales(
-    order_id: int,
+    order_no: str,
     payload: AftersalesCreateIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_AFTERSALES_CREATE)),
     _: str = Depends(require_idempotency_key),
 ) -> dict[str, Any]:
+    order = await order_service.resolve_order_ref(session, order_no)
     detail = await aftersales_service.user_create(
         session,
         user,
-        order_id,
+        order.id,
         payload,
         ip=get_client_ip(request),
         user_agent=get_user_agent(request),

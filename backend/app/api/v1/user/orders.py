@@ -83,28 +83,30 @@ async def list_orders(
     )
 
 
-@router.get("/{order_id}", summary="Order detail")
+@router.get("/{order_no}", summary="Order detail")
 async def get_order(
-    order_id: int,
+    order_no: str,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_READ_OWN)),
 ) -> dict[str, Any]:
-    detail = await order_service.get_detail(session, order_id, "user", user.id)
+    order = await order_service.resolve_order_ref(session, order_no)
+    detail = await order_service.get_detail(session, order.id, "user", user.id)
     return envelope(data=detail.model_dump(mode="json"))
 
 
-@router.post("/{order_id}/cancel", summary="Cancel a pending_payment order")
+@router.post("/{order_no}/cancel", summary="Cancel a pending_payment order")
 async def cancel_order(
-    order_id: int,
+    order_no: str,
     payload: OrderCancelIn,
     request: Request,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_CANCEL_OWN)),
 ) -> dict[str, Any]:
+    order = await order_service.resolve_order_ref(session, order_no)
     detail = await order_service.cancel_by_user(
         session,
         user,
-        order_id,
+        order.id,
         payload.cancel_note,
         ip=get_client_ip(request),
         user_agent=get_user_agent(request),
@@ -112,28 +114,30 @@ async def cancel_order(
     return envelope(data=detail.model_dump(mode="json"))
 
 
-@router.post("/{order_id}/confirm-receipt", summary="Confirm delivery (shipped → completed)")
+@router.post("/{order_no}/confirm-receipt", summary="Confirm delivery (shipped → completed)")
 async def confirm_receipt(
-    order_id: int,
+    order_no: str,
     request: Request,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_CONFIRM_RECEIPT)),
 ) -> dict[str, Any]:
+    order = await order_service.resolve_order_ref(session, order_no)
     detail = await order_service.confirm_receipt(
         session,
         user,
-        order_id,
+        order.id,
         ip=get_client_ip(request),
         user_agent=get_user_agent(request),
     )
     return envelope(data=detail.model_dump(mode="json"))
 
 
-@router.get("/{order_id}/shipment", summary="Get shipment tracking")
+@router.get("/{order_no}/shipment", summary="Get shipment tracking")
 async def get_shipment(
-    order_id: int,
+    order_no: str,
     session: AsyncSession = Depends(get_db),
     user: User = Depends(require_user_permission(Permission.USER_ORDER_READ_OWN)),
 ) -> dict[str, Any]:
-    result = await order_service.get_shipment_for_user(session, user, order_id)
+    order = await order_service.resolve_order_ref(session, order_no)
+    result = await order_service.get_shipment_for_user(session, user, order.id)
     return envelope(data=result)
